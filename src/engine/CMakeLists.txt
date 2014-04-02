@@ -1,6 +1,6 @@
 set(BULLET_ROOT ${LIB_DIR}/bullet)
-
-find_package(bullet REQUIRED)
+message(${BULLET_ROOT})
+find_package(Bullet REQUIRED)
 
 include_directories(${BULLET_INCLUDE_DIRS})
 

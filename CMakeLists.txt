@@ -10,6 +10,6 @@ else()
     message(FATAL_ERROR "Platform not supported")
 endif()
 
-set(${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 add_subdirectory("src")
