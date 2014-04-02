@@ -2,9 +2,9 @@
 
 using namespace std;
 
-extern int add(int, int);
+extern void bullet_test();
 
 int main() {
-    cout << add(1, 2) << endl;
+    bullet_test();
     return 0;
 }
