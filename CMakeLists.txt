@@ -6,7 +6,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-if(NOT APPLE AND NOT LINUX)
+if(NOT UNIX)
     message(FATAL_ERROR "Platform not supported")
 endif()
 

@@ -1,10 +1,14 @@
 #include <btBulletDynamicsCommon.h>
 #include <stdio.h>
+#include <Ogre.h>
+
+using namespace Ogre;
 
 /// This is a Hello World program for running a basic Bullet physics simulation
 
 void bullet_test()
-{    
+{
+	Root *root = new Root();    
 	///-----includes_end-----
 
 	int i;
