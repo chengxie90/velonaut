@@ -6,13 +6,11 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-if(APPLE)
-    set(LIB_DIR ${PROJECT_SOURCE_DIR}/lib/osx)
-elseif(UNIX)
-    set(LIB_DIR ${PROJECT_SOURCE_DIR}/lib/linux)
-else()
+if(NOT APPLE AND NOT LINUX)
     message(FATAL_ERROR "Platform not supported")
 endif()
+
+set(LIB_DIR ${PROJECT_SOURCE_DIR}/lib/${CMAKE_SYSTEM_NAME})
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
