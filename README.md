@@ -12,8 +12,9 @@
 1. Open QtCreator
 2. Open File or Project
 3. Open ./CMakeLists.txt
-4. Hit "Run CMake" and "Done"
-5. Build and debug as usual
+4. Choose a build folder, doesn't matter where as long as not the project's root directory.
+5. Hit "Run CMake" and "Done"
+6. Build and debug as usual
 
 CMake must be run again after adding/deleting/renaming a file, or the changes won't be reflected in QtCreator.
 
