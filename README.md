@@ -25,7 +25,6 @@ mkdir build
 cd build
 cmake ..
 make
-../game/velonaut
 ```
 
 CMake must be run again after adding/deleting/renaming a file.
@@ -33,17 +32,17 @@ CMake must be run again after adding/deleting/renaming a file.
 ## Directory Structure
 ```
 ./game
-	Game assets and binary
+	Game assets, and binaries for each platforms and build configurations
 ./lib
-	Precompiled 3rd party libs
+	Precompiled 3rd party libs and headers
 ./cmake
 	CMake files for finding libraries
 ./src/engine
 	Engine source code, now compiled to a static library
 ./src/game
 	Game source code, now compiled to a binary at ./game. 
-	In the future this directory can be removed if the engine is fully data-driven
+	In the future this directory can be removed if the engine becomes fully data-driven
 ./asset
-	Can be used to store raw game assets in the future.
+	Can be used to store raw game assets, like Maya files, in the future.
 
 ```
