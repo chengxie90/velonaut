@@ -1,6 +1,7 @@
 #include <btBulletDynamicsCommon.h>
 #include <stdio.h>
 #include <Ogre.h>
+#include <lua.hpp>
 
 using namespace Ogre;
 
@@ -10,6 +11,8 @@ void bullet_test()
 {
 	Root *root = new Root();    
 	///-----includes_end-----
+    
+    lua_State* s = luaL_newstate();
 
 	int i;
 	///-----initialization_start-----
