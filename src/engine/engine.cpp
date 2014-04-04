@@ -1,7 +1,8 @@
-#include <btBulletDynamicsCommon.h>
+#include <bullet/btBulletDynamicsCommon.h>
 #include <stdio.h>
-#include <Ogre.h>
-#include <lua.hpp>
+#include <OGRE/Ogre.h>
+#include <lua/lua.hpp>
+#include <RakNet/RakPeerInterface.h>
 
 using namespace Ogre;
 
@@ -13,6 +14,8 @@ void bullet_test()
 	///-----includes_end-----
     
     lua_State* s = luaL_newstate();
+    
+    RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
 
 	int i;
 	///-----initialization_start-----
