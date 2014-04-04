@@ -10,7 +10,7 @@ FIND_LIBRARY (RakNet_LIBRARY_RELEASE NAMES ${RakNet_LIBRARY_Name}
     /usr/local/lib64
     /usr/local/lib
     /opt/local/lib
-	$ENV{RAKNET_ROOT}/lib
+    $ENV{RAKNET_ROOT}/lib
     $ENV{RAKNET_ROOT}/lib/Release
     )
 	
@@ -26,15 +26,13 @@ FIND_LIBRARY (RakNet_LIBRARY_DEBUG NAMES  ${RakNet_LIBRARY_Name_Debug}
 	$ENV{RAKNET_ROOT}/lib
     $ENV{RAKNET_ROOT}/lib/Debug
     )	
-	
-	
 
-FIND_PATH (RakNet_INCLUDES RakPeer.h
+FIND_PATH (RakNet_INCLUDES RakNet/RakPeer.h
     ENV CPATH
     /usr/include
     /usr/local/include
     /opt/local/include
-	$ENV{RAKNET_ROOT}/include
+    $ENV{RAKNET_ROOT}/include
     )
 
 IF(RakNet_INCLUDES AND RakNet_LIBRARY_RELEASE)
@@ -53,7 +51,7 @@ IF(RakNet_FOUND)
         SET(RakNet_LIBRARIES ${RakNet_LIBRARY_RELEASE} )
       ENDIF()
   IF(NOT RakNet_FIND_QUIETLY)
-    MESSAGE(STATUS "Found RakNet: ${RakNet_LIBRARY}")
+    MESSAGE(STATUS "Found RakNet: ${RakNet_LIBRARIES}")
   ENDIF(NOT RakNet_FIND_QUIETLY)
 ELSE(RakNet_FOUND)
   IF(RakNet_FIND_REQUIRED)
