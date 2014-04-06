@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderSubRenderState.h"
+#include "OgreShaderParameter.h"
 
 #define SGX_FUNC_TRIPLANAR_TEXTURING "SGX_TriplanarTexturing"
 

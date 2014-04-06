@@ -29,12 +29,16 @@ THE SOFTWARE.
 #ifndef __StringConverter_H__
 #define __StringConverter_H__
 
-#include "OgreCommon.h"
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
 #include "OgreColourValue.h"
+#include "OgreMath.h"
+#include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
+#include "OgreQuaternion.h"
 #include "OgreVector2.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
 
 namespace Ogre {
 
@@ -214,8 +218,7 @@ namespace Ogre {
         /** Converts a String to a boolean. 
         @remarks
             Returns true if case-insensitive match of the start of the string
-            matches "true", "yes", "1", or "on", false if "false", "no", "0" 
-            or "off".
+            matches "true", "yes" or "1", false otherwise.
         */
         static bool parseBool(const String& val, bool defaultValue = 0);
         /** Parses a Vector2 out of a String.
@@ -270,32 +273,8 @@ namespace Ogre {
         /** Checks the String is a valid number value. */
         static bool isNumber(const String& val);
 
-		/** Converts a ColourBufferType to a String.
-		@remarks
-			String output format is "Back", "Back Left", "Back Right", etc.
-		*/
-		static String toString(ColourBufferType val);
-
-		/** Converts a String to a ColourBufferType.
-		@remarks
-			String input format should be "Back", "Back Left", "Back Right", etc.
-		*/
-		static ColourBufferType parseColourBuffer(const String& val, ColourBufferType defaultValue = CBT_BACK);
-
-		/** Converts a StereoModeType to a String
-		@remarks
-			String output format is "None", "Frame Sequential", etc.
-		*/
-		static String toString(StereoModeType val);
-
-		/** Converts a String to a StereoModeType
-		@remarks
-			String input format should be "None", "Frame Sequential", etc.
-		*/
-		static StereoModeType parseStereoMode(const String& val, StereoModeType defaultValue = SMT_NONE);
-		
         //-----------------------------------------------------------------------
-        static void setDefaultStringLocale(const String &loc)
+        static void setDefaultStringLocale(String loc)
         {
             msDefaultStringLocale = loc;
             msLocale = std::locale(msDefaultStringLocale.c_str());
@@ -311,7 +290,7 @@ namespace Ogre {
     protected:
         static String msDefaultStringLocale;
         static std::locale msLocale;
-        static bool msUseLocale;		
+        static bool msUseLocale;
     };
 
     /** @} */

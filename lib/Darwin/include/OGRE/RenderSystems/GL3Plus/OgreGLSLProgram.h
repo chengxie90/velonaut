@@ -1,211 +1,224 @@
 /*
-  -----------------------------------------------------------------------------
-  This source file is part of OGRE
-  (Object-oriented Graphics Rendering Engine)
-  For the latest info, see http://www.ogre3d.org/
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  THE SOFTWARE.
-  -----------------------------------------------------------------------------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
 */
 #ifndef __GLSLProgram_H__
 #define __GLSLProgram_H__
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "OgreGpuProgram.h"
-#include "OgreHardwareVertexBuffer.h"
-#include "OgreGL3PlusHardwareUniformBuffer.h"
-#include "OgreGL3PlusHardwareShaderStorageBuffer.h"
-#include "OgreGL3PlusHardwareCounterBuffer.h"
-#include "OgreGL3PlusVertexArrayObject.h"
+#include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre {
+    /** Specialisation of HighLevelGpuProgram to provide support for OpenGL 
+        Shader Language (GLSL).
+    @remarks
+		GLSL has no target assembler or entry point specification like DirectX 9 HLSL.
+		Vertex and Fragment shaders only have one entry point called "main".  
+		When a shader is compiled, microcode is generated but can not be accessed by
+		the application.
+		GLSL also does not provide assembler low level output after compiling.  The GL Render
+		system assumes that the Gpu program is a GL Gpu program so GLSLProgram will create a 
+		GLSLGpuProgram that is subclassed from GLGpuProgram for the low level implementation.
+		The GLSLProgram class will create a shader object and compile the source but will
+		not create a program object.  It's up to GLSLGpuProgram class to request a program object
+		to link the shader object to.
 
-    class GLSLShader;
-
-    /// Structure used to keep track of named uniforms in the linked program object
-    struct GLUniformReference
-    {
-        /// GL location handle
-        GLint mLocation;
-        /// Which type of program params will this value come from?
-        GpuProgramType mSourceProgType;
-        /// The constant definition it relates to
-        const GpuConstantDefinition* mConstantDef;
-    };
-
-    /** Structure used to keep track of named atomic counter uniforms
-        in the linked program object.  Same as GLUniformReference, but
-        contains an additional offset parameter which currently only
-        atomic counters feature.
+	@note
+		GLSL supports multiple modular shader objects that can be attached to one program
+		object to form a single shader.  This is supported through the "attach" material script
+		command.  All the modules to be attached are listed on the same line as the attach command
+		separated by white space.
+        
     */
-    struct GLAtomicCounterReference
-    {
-        /// GL binding handle (similar to location)
-        GLint mBinding;
-        /// GL offset (only used for atomic counters)
-        GLint mOffset;
-        /// Which type of program params will this value come from?
-        GpuProgramType mSourceProgType;
-        /// The constant definition it relates to
-        const GpuConstantDefinition* mConstantDef;
-    };
-
-    typedef vector<GLUniformReference>::type GLUniformReferenceList;
-    typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
-    typedef vector<GLAtomicCounterReference>::type GLAtomicCounterReferenceList;
-    typedef GLAtomicCounterReferenceList::iterator GLAtomicCounterReferenceIterator;
-    typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
-    typedef GLUniformBufferList::iterator GLUniformBufferIterator;
-    typedef map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr>::type SharedParamsBufferMap;
-    typedef vector<HardwareCounterBufferSharedPtr>::type GLCounterBufferList;
-    typedef GLCounterBufferList::iterator GLCounterBufferIterator;
-
-    /** C++ encapsulation of GLSL program object.
-     */
-    class _OgreGL3PlusExport GLSLProgram
+    class _OgreGL3PlusExport GLSLProgram : public HighLevelGpuProgram
     {
     public:
-        /// Constructor should only be used by GLSLMonolithicProgramManager and GLSLSeparableProgramManager
-        GLSLProgram(GLSLShader* vertexProgram,
-                    GLSLShader* hullProgram,
-                    GLSLShader* domainProgram,
-                    GLSLShader* geometryProgram,
-                    GLSLShader* fragmentProgram,
-                    GLSLShader* computeProgram);
-        virtual ~GLSLProgram(void);
+        /// Command object for attaching another GLSL Program 
+        class CmdAttach : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& shaderNames);
+        };
 
-        /** Makes a program object active by making sure it is linked and then putting it in use.
-         */
-        virtual void activate(void) = 0;
+        /// Command object for setting macro defines
+        class CmdPreprocessorDefines : public ParamCommand
+        {
+        public:
+                String doGet(const void* target) const;
+                void doSet(void* target, const String& val);
+        };
+        /// Command object for setting the input operation type (geometry shader only)
+        class _OgreGL3PlusExport CmdInputOperationType : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        /// Command object for setting the output operation type (geometry shader only)
+        class _OgreGL3PlusExport CmdOutputOperationType : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        /// Command object for setting the maximum output vertices (geometry shader only)
+        class _OgreGL3PlusExport CmdMaxOutputVertices : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        /// Command object for setting matrix packing in column-major order
+        class CmdColumnMajorMatrices : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+		/** Returns the operation type that this geometry program expects to
+			receive as input
+		*/
+		virtual RenderOperation::OperationType getInputOperationType(void) const 
+		{ return mInputOperationType; }
+		/** Returns the operation type that this geometry program will emit
+		*/
+		virtual RenderOperation::OperationType getOutputOperationType(void) const 
+		{ return mOutputOperationType; }
+		/** Returns the maximum number of vertices that this geometry program can
+			output in a single run
+		*/
+		virtual int getMaxOutputVertices(void) const { return mMaxOutputVertices; }
 
-        /** Updates program object uniforms using data from GpuProgramParameters.
-            Normally called by GLSLShader::bindParameters() just before rendering occurs.
+		/** Sets the operation type that this geometry program expects to receive
+		*/
+		virtual void setInputOperationType(RenderOperation::OperationType operationType) 
+		{ mInputOperationType = operationType; }
+		/** Set the operation type that this geometry program will emit
+		*/
+		virtual void setOutputOperationType(RenderOperation::OperationType operationType) 
+		{ mOutputOperationType = operationType; }
+		/** Set the maximum number of vertices that a single run of this geometry program
+			can emit.
+		*/
+		virtual void setMaxOutputVertices(int maxOutputVertices) 
+		{ mMaxOutputVertices = maxOutputVertices; }
+
+        GLSLProgram(ResourceManager* creator, 
+            const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader);
+		~GLSLProgram();
+
+		GLuint getGLShaderHandle() const { return mGLShaderHandle; }
+		GLuint getGLProgramHandle() const { return mGLProgramHandle; }
+		void attachToProgramObject( const GLuint programObject );
+		void detachFromProgramObject( const GLuint programObject );
+		String getAttachedShaderNames() const { return mAttachedShaderNames; }
+
+		/// Overridden
+		bool getPassTransformStates(void) const;
+		bool getPassSurfaceAndLightStates(void) const;
+		bool getPassFogStates(void) const;
+
+        /** Attach another GLSL Shader to this one. */
+        void attachChildShader(const String& name);
+
+		/// Sets the preprocessor defines use to compile the program.
+		void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
+		/// Sets the preprocessor defines use to compile the program.
+		const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
+
+        /// Overridden from GpuProgram
+        const String& getLanguage(void) const;
+        /** Sets whether matrix packing in column-major order. */
+        void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
+        /** Gets whether matrix packed in column-major order. */
+        bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
+
+		/// Overridden from GpuProgram
+		GpuProgramParametersSharedPtr createParameters(void);
+
+		/// Compile source into shader object
+		bool compile( const bool checkErrors = false);
+
+	protected:
+		static CmdPreprocessorDefines msCmdPreprocessorDefines;
+        static CmdAttach msCmdAttach;
+        static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
+		static CmdInputOperationType msInputOperationTypeCmd;
+		static CmdOutputOperationType msOutputOperationTypeCmd;
+		static CmdMaxOutputVertices msMaxOutputVerticesCmd;
+
+        /** Internal load implementation, must be implemented by subclasses.
         */
-        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
-        /** Updates program object uniform blocks using data from GpuProgramParameters.
-            Normally called by GLSLShader::bindParameters() just before rendering occurs.
-        */
-        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
-        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-            Normally called by GLSLShader::bindMultiPassParameters() just before multi pass rendering occurs.
-        */
-        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
-        /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
-        virtual void extractLayoutQualifiers(void);
-        /// Get the GL Handle for the program object
-        GLuint getGLProgramHandle(void) const { return mGLProgramHandle; }
-        /** Sets whether the linked program includes the required instructions
-            to perform skeletal animation.
-            @remarks
-            If this is set to true, OGRE will not blend the geometry according to
-            skeletal animation, it will expect the vertex program to do it.
-        */
-        void setSkeletalAnimationIncluded(bool included) { mSkeletalAnimation = included; }
+        void loadFromSource(void);
+        /** Internal method for creating a dummy low-level program for this
+        high-level program.	GLSL does not give access to the low level implementation of the
+		shader so this method creates an object sub-classed from GL3PlusGpuProgram just to be
+		compatible with	GL3PlusRenderSystem.
+		*/
+		void createLowLevelImpl(void);
+        /// Internal unload implementation, must be implemented by subclasses
+        void unloadHighLevelImpl(void);
+		/// Overridden from HighLevelGpuProgram
+		void unloadImpl(void);
 
-        /** Returns whether the linked program includes the required instructions
-            to perform skeletal animation.
-            @remarks
-             If this returns true, OGRE will not blend the geometry according to
-             skeletal animation, it will expect the vertex program to do it.
-                                                                             */
-        bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
-
-        /// Get the index of a non-standard attribute bound in the linked code
-        virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
-        /// Is a non-standard attribute bound in the linked code?
-        bool isAttributeValid(VertexElementSemantic semantic, uint index);
-
-        GLSLShader* getVertexShader() const { return mVertexShader; }
-        GLSLShader* getHullShader() const { return mHullShader; }
-        GLSLShader* getDomainShader() const { return mDomainShader; }
-        GLSLShader* getGeometryShader() const { return mGeometryShader; }
-        GLSLShader* getFragmentShader() const { return mFragmentShader; }
-        GLSLShader* getComputeShader() const { return mComputeShader; }
-        GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
-
-    protected:
-        /// Container of uniform references that are active in the program object
-        GLUniformReferenceList mGLUniformReferences;
-        /// Container of atomic counter uniform references that are active in the program object
-        GLAtomicCounterReferenceList mGLAtomicCounterReferences;
-        /// Container of uniform buffer references that are active in the program object
-        GLUniformBufferList mGLUniformBufferReferences;
-        /// Map of shared parameter blocks to uniform buffer references
-        SharedParamsBufferMap mSharedParamsBufferMap;
-        /// Container of counter buffer references that are active in the program object
-        GLCounterBufferList mGLCounterBufferReferences;
-
-        /// Linked vertex shader.
-        GLSLShader* mVertexShader;
-        /// Linked hull (control) shader.
-        GLSLShader* mHullShader;
-        /// Linked domain (evaluation) shader.
-        GLSLShader* mDomainShader;
-        /// Linked geometry shader.
-        GLSLShader* mGeometryShader;
-        /// Linked fragment shader.
-        GLSLShader* mFragmentShader;
-        /// Linked compute shader.
-        GLSLShader* mComputeShader;
-        /// GL handle for the vertex array object
-        GL3PlusVertexArrayObject* mVertexArrayObject;
-
-        /// Flag to indicate that uniform references have already been built
-        bool mUniformRefsBuilt;
-        /// GL handle for the program object
+        /// Populate the passed parameters with name->index map
+        void populateParameterNames(GpuProgramParametersSharedPtr params);
+        /// Populate the passed parameters with name->index map, must be overridden
+        void buildConstantDefinitions() const;
+		/** Check the compile result for an error with default precision - and recompile if needed.
+			some glsl compilers return an error default precision is set to types other then
+			int or float, this function test a failed compile result for the error,
+			delete the needed lines from the source if needed then try to re-compile.
+		*/
+		void checkAndFixInvalidDefaultPrecisionError( String &message );
+	private:
+		/// GL handle for shader object
+		GLuint mGLShaderHandle;
         GLuint mGLProgramHandle;
-        /// Flag indicating that the program or pipeline object has been successfully linked
-        GLint mLinked;
-        /// Flag indicating that the program or pipeline object has tried to link and failed
-        bool mTriedToLinkAndFailed;
-        /// Flag indicating skeletal animation is being performed
-        bool mSkeletalAnimation;
-
-        /// Build uniform references from active named uniforms
-        void buildGLUniformReferences(void);
-        typedef set<GLuint>::type AttributeSet;
-
-        /// An array to hold the attributes indexes
-        GLint mCustomAttributesIndexes[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
-        /// A value to define the case we didn't look for the attributes since the contractor
-#define NULL_CUSTOM_ATTRIBUTES_INDEX -2
-        /// A value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
-#define NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX -1
-
-        Ogre::String getCombinedName(void);
-        /// Get the the binary data of a program from the microcode cache
-        void getMicrocodeFromCache(void);
-        /// Compiles and links the vertex and fragment programs
-        virtual void compileAndLink(void) = 0;
-        // /// Put a program in use
-        // virtual void _useProgram(void) = 0;
-
-        typedef map<String, VertexElementSemantic>::type SemanticToStringMap;
-        SemanticToStringMap mSemanticTypeMap;
-
-        VertexElementSemantic getAttributeSemanticEnum(String type);
-        const char * getAttributeSemanticString(VertexElementSemantic semantic);
+		/// Flag indicating if shader object successfully compiled
+		GLint mCompiled;
+		/// The input operation type for this (geometry) program
+		RenderOperation::OperationType mInputOperationType;
+		/// The output operation type for this (geometry) program
+		RenderOperation::OperationType mOutputOperationType;
+		/// The maximum amount of vertices that this (geometry) program can output
+		int mMaxOutputVertices;
+		/// Attached Shader names
+		String mAttachedShaderNames;
+		/// Preprocessor options
+		String mPreprocessorDefines;
+		/// Container of attached programs
+		typedef vector< GLSLProgram* >::type GLSLProgramContainer;
+		typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
+		GLSLProgramContainer mAttachedGLSLPrograms;
+        /// Matrix in column major pack format?
+        bool mColumnMajorMatrices;
     };
-
-
 }
 
 #endif // __GLSLProgram_H__
