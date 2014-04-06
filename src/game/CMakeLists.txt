@@ -1,11 +1,9 @@
 file(GLOB_RECURSE GAME_SRCS *.cpp)
 
-add_executable(${PROJECT_NAME} ${GAME_SRCS})
+add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${GAME_SRCS})
+
+#set_property(TARGET ${PROJECT_NAME} PROPERTY MACOSX_BUNDLE TRUE)
 
 target_link_libraries(${PROJECT_NAME} engine)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/game/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE})
-
-if(APPLE)
-    set(EXECUTABLE_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH}/bin) # Temp hack for OS X
-endif()
