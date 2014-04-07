@@ -215,6 +215,7 @@ void BaseApplication::loadResources(void)
 //-------------------------------------------------------------------------------------
 void BaseApplication::go(void)
 {
+    /*
 #ifdef _DEBUG
 	#ifndef OGRE_STATIC_LIB	
 		mResourcesCfg = m_ResourcePath + "resources_d.cfg";
@@ -232,7 +233,8 @@ void BaseApplication::go(void)
 		mPluginsCfg = "plugins.cfg";
 	#endif
 #endif
- 
+ */
+    mRoot->loadPlugin("./RenderSystem_GL_d.so");
 	if (!setup())
 		return;
  
@@ -244,8 +246,8 @@ void BaseApplication::go(void)
 //-------------------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-	mRoot = new Ogre::Root(mPluginsCfg);
- 
+    //mRoot = new Ogre::Root(mPluginsCfg);
+    mRoot = new Ogre::Root("","","");
     //setupResources();
  
 	bool carryOn = configure();
@@ -259,9 +261,9 @@ bool BaseApplication::setup(void)
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
  
 	// Create any resource listeners (for loading screens)
-	createResourceListener();
+    //createResourceListener();
 	// Load resources
-	loadResources();
+    //loadResources();
  
 	// Create the scene
 	createScene();
@@ -269,7 +271,7 @@ bool BaseApplication::setup(void)
 	createFrameListener();
  
 	return true;
-};
+}
 //-------------------------------------------------------------------------------------
 bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {

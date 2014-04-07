@@ -5,6 +5,10 @@ OgreTest::OgreTest():mRoot(0),
     mSceneMgr(0),
     mWindow(0)
 {
+
+}
+
+void OgreTest::init() {
     mRoot = new Ogre::Root("", "", "");
     mRoot->loadPlugin("./RenderSystem_GL_d.so");
 
@@ -23,6 +27,14 @@ OgreTest::OgreTest():mRoot(0),
 
     // Get the SceneManager, in this case a generic one
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
+    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1));
+    mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+
+    Ogre::Light* pointLight = mSceneMgr->createLight("pointLight");
+        pointLight->setType(Ogre::Light::LT_POINT);
+        pointLight->setPosition(Ogre::Vector3(-75, 150, 250));
+        pointLight->setDiffuseColour(1.0, 0.0, 0.0);
+        pointLight->setSpecularColour(1.0, 0.0, 0.0);
 
     // Create the camera
     mCamera = mSceneMgr->createCamera("PlayerCam");
@@ -65,12 +77,65 @@ OgreTest::OgreTest():mRoot(0),
     Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
     mRoot->addFrameListener(this);
+
+    Ogre::String lNameOfResourceGroup = "Mission 1 : Deliver Tom";
+    {
+        Ogre::ResourceGroupManager& lRgMgr = Ogre::ResourceGroupManager::getSingleton();
+        lRgMgr.createResourceGroup(lNameOfResourceGroup);
+
+        Ogre::String lDirectoryToLoad = "../../data/meshes";
+        bool lIsRecursive = false;
+        lRgMgr.addResourceLocation(lDirectoryToLoad, "FileSystem", lNameOfResourceGroup, lIsRecursive);
+
+        // The function 'initialiseResourceGroup' parses scripts if any in the locations.
+        lRgMgr.initialiseResourceGroup(lNameOfResourceGroup);
+
+        // Files that can be loaded are loaded.
+        lRgMgr.loadResourceGroup(lNameOfResourceGroup);
+
+        // Now the loaded Mesh is available from its ResourceGroup,
+        // as well as from the Ogre::MeshManager. A shared pointer to
+        // it can be accessed by : Ogre::MeshManager::getSingleton().getByName(name_of_the_mesh);
+
+        MeshPtr v = Ogre::MeshManager::getSingleton().getByName("ninja.mesh");
+
+
+        // Now I can create Entities using that mesh.
+        Ogre::String lNameOfTheMesh = "ninja.mesh";
+        int lNumberOfEntities = 2;
+        for(int iter = 0; iter < lNumberOfEntities; ++iter)
+        {
+            Ogre::Entity* lEntity = mSceneMgr->createEntity(lNameOfTheMesh);
+            // Now I attach it to a scenenode, so that it becomes present in the scene.
+            Ogre::SceneNode* lNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+            lNode->attachObject(lEntity);
+            // I move the SceneNode so that it is visible to the camera.
+            float lPositionOffset = float(1+ iter * 2) - (float(lNumberOfEntities));
+            lNode->scale(0.2,0.2,0.2);
+            lPositionOffset = lPositionOffset * 20;
+            lNode->translate(lPositionOffset, lPositionOffset, -200.0f);
+            // The loaded mesh will be white. This is normal.
+        }
+    }
+
+
+
     mRoot->startRendering();
+}
+
+bool OgreTest::frameStarted(const Ogre::FrameEvent& evt)
+{
+    mMouse->capture();
+    mKeyboard->capture();
+
+    if (mKeyboard->isKeyDown(OIS::KC_ESCAPE))
+         return false;
+
+    return true;
 }
 
 bool OgreTest::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-    std::cout << "frame rendering" << std::endl;
     return true;
 }
 

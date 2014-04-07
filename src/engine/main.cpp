@@ -11,11 +11,12 @@ class Listener : public FrameListener {
     }
 };
 
-/*
+
 int main() {
 
 
     OgreTest t;
+    t.init();
 
     /*
     Root *root = new Root();
@@ -46,7 +47,7 @@ int main() {
     root->startRendering();
 
     delete root;    
-
+*/
     return 0;
 }
-*/
+

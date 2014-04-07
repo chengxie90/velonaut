@@ -17,6 +17,7 @@ class OgreTest : public Ogre::FrameListener, public Ogre::WindowEventListener, p
 {
 public:
     OgreTest();
+    void init();
 
 private:
     Ogre::Root *mRoot;
@@ -30,6 +31,7 @@ private:
     OIS::Keyboard* mKeyboard;
 
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    virtual bool frameStarted( const Ogre::FrameEvent& evt);
 
     virtual bool keyPressed( const OIS::KeyEvent &arg );
     virtual bool keyReleased( const OIS::KeyEvent &arg );
