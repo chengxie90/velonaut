@@ -30,6 +30,10 @@ private:
     OIS::Mouse*    mMouse;
     OIS::Keyboard* mKeyboard;
 
+    virtual void windowResized (RenderWindow *rw);
+    virtual bool windowClosing (RenderWindow *rw);
+    virtual void windowClosed(RenderWindow *rw);
+
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
     virtual bool frameStarted( const Ogre::FrameEvent& evt);
 
