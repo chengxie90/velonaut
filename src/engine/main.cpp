@@ -1,4 +1,5 @@
 #include <OGRE/Ogre.h>
+#include "ogretest.h"
 
 using namespace Ogre;
 
@@ -10,7 +11,13 @@ class Listener : public FrameListener {
     }
 };
 
+/*
 int main() {
+
+
+    OgreTest t;
+
+    /*
     Root *root = new Root();
     root->loadPlugin("RenderSystem_GL");
 
@@ -38,6 +45,8 @@ int main() {
 
     root->startRendering();
 
-    delete root;
+    delete root;    
+
     return 0;
 }
+*/

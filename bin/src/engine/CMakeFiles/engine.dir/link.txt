@@ -1,0 +1,2 @@
+/usr/bin/ar cr libengine.a  CMakeFiles/engine.dir/engine.cpp.o CMakeFiles/engine.dir/gfx.cpp.o CMakeFiles/engine.dir/ogretest.cpp.o
+/usr/bin/ranlib libengine.a
