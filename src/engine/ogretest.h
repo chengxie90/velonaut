@@ -7,8 +7,8 @@
 #include <OGRE/Ogre.h>
 #include <OIS.h>
 
-//#include <lua/lua.hpp>
-//#include <RakNet/RakPeerInterface.h>
+#include <lua/lua.hpp>
+#include <RakNet/RakPeerInterface.h>
 
 
 using namespace Ogre;
