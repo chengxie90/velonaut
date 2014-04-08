@@ -18,11 +18,14 @@ include_directories(${BULLET_INCLUDE_DIRS}
 
 file(GLOB_RECURSE ENGINE_SRCS *.cpp)
 
+if(APPLE)
+    set_source_files_properties(main.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+    set_target_properties(${PROJECT_NAME}
+    PROPERTIES LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework CoreVideo -framework ApplicationServices")
+endif()
+
 add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${ENGINE_SRCS})
 
-# set_target_properties(${PROJECT_NAME}
-#     PROPERTIES LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework CoreVideo -framework ApplicationServices")
-# set(${CMAKE_CXX_FLAGS} "-framework IOKit -framework Cocoa -framework Carbon -framework CoreVideo -framework ApplicationServices")
 
 target_link_libraries(${PROJECT_NAME}   ${BULLET_LIBRARIES} 
                                         ${OGRE_LIBRARIES}

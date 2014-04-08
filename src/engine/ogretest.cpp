@@ -10,7 +10,8 @@ OgreTest::OgreTest():mRoot(0),
 
 void OgreTest::init() {
     mRoot = new Ogre::Root("", "", "");
-    mRoot->loadPlugin("./RenderSystem_GL_d.so");
+
+    mRoot->loadPlugin("./Linux/Debug/RenderSystem_GL_d.so");
     mRoot->setRenderSystem(mRoot->getAvailableRenderers()[0]);
     mWindow = mRoot->initialise(true, "TutorialApplication Render Window");
 
@@ -72,7 +73,7 @@ void OgreTest::init() {
         Ogre::ResourceGroupManager& lRgMgr = Ogre::ResourceGroupManager::getSingleton();
         lRgMgr.createResourceGroup(lNameOfResourceGroup);
 
-        Ogre::String lDirectoryToLoad = "../../data/meshes";
+        Ogre::String lDirectoryToLoad = "data/meshes";
         bool lIsRecursive = false;
         lRgMgr.addResourceLocation(lDirectoryToLoad, "FileSystem", lNameOfResourceGroup, lIsRecursive);
 
@@ -103,10 +104,16 @@ void OgreTest::init() {
             // The loaded mesh will be white. This is normal.
         }
     }
+}
 
-
-
+void OgreTest::run()
+{
     mRoot->startRendering();
+}
+
+void OgreTest::render()
+{
+    mRoot->renderOneFrame();
 }
 
 bool OgreTest::frameStarted(const Ogre::FrameEvent& evt)
@@ -127,19 +134,16 @@ bool OgreTest::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 bool OgreTest::keyPressed( const OIS::KeyEvent &arg )
 {
-    std::cout << "mouse pressed!" << std::endl;
     return true;
 }
 
 bool OgreTest::keyReleased( const OIS::KeyEvent &arg )
 {
-    std::cout << "mouse released!" << std::endl;
     return true;
 }
 
 bool OgreTest::mouseMoved( const OIS::MouseEvent &arg )
 {
-    std::cout << "mouse moved!" << std::endl;
     return true;
 }
 
