@@ -97,9 +97,6 @@ void OgreTest::init() {
         // as well as from the Ogre::MeshManager. A shared pointer to
         // it can be accessed by : Ogre::MeshManager::getSingleton().getByName(name_of_the_mesh);
 
-        MeshPtr v = Ogre::MeshManager::getSingleton().getByName("ninja.mesh");
-
-
         // Now I can create Entities using that mesh.
         Ogre::String lNameOfTheMesh = "ninja.mesh";
         int lNumberOfEntities = 2;
@@ -170,6 +167,32 @@ bool OgreTest::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 
 bool OgreTest::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
+    return true;
+}
+
+void OgreTest::windowResized( RenderWindow* rw ) {
+    std::cout << "window resize" << std::endl;
+}
+
+void OgreTest::windowClosed( RenderWindow* rw ) {
+    std::cout << "CLOSED" << std::endl;
+    if(rw == mWindow)
+       {
+           if(mInputManager)
+           {
+               mInputManager->destroyInputObject( mMouse );
+               mInputManager->destroyInputObject( mKeyboard );
+
+               OIS::InputManager::destroyInputSystem(mInputManager);
+               mInputManager = 0;
+           }
+       }
+}
+
+
+bool OgreTest::windowClosing( RenderWindow* rw ) {
+    std::cout << "CLOOOOOSE" << std::endl;
+    mRoot->removeFrameListener(this);
     return true;
 }
 
