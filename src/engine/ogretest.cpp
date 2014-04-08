@@ -10,7 +10,7 @@ OgreTest::OgreTest():mRoot(0),
 
 void OgreTest::init() {
     mRoot = new Ogre::Root("", "", "");
-    mRoot->loadPlugin("./RenderSystem_GL_d.so");
+    mRoot->loadPlugin("RenderSystem_GL");
 
     if(mRoot->showConfigDialog())
     {
@@ -83,7 +83,7 @@ void OgreTest::init() {
         Ogre::ResourceGroupManager& lRgMgr = Ogre::ResourceGroupManager::getSingleton();
         lRgMgr.createResourceGroup(lNameOfResourceGroup);
 
-        Ogre::String lDirectoryToLoad = "../../data/meshes";
+        Ogre::String lDirectoryToLoad = "data/meshes";
         bool lIsRecursive = false;
         lRgMgr.addResourceLocation(lDirectoryToLoad, "FileSystem", lNameOfResourceGroup, lIsRecursive);
 
@@ -117,10 +117,16 @@ void OgreTest::init() {
             // The loaded mesh will be white. This is normal.
         }
     }
+}
 
-
-
+void OgreTest::run()
+{
     mRoot->startRendering();
+}
+
+void OgreTest::render()
+{
+    mRoot->renderOneFrame();
 }
 
 bool OgreTest::frameStarted(const Ogre::FrameEvent& evt)

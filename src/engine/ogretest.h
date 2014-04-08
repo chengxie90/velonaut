@@ -1,15 +1,9 @@
 #ifndef OGRETEST_H
 #define OGRETEST_H
 
-
-//#include <bullet/btBulletDynamicsCommon.h>
 #include <stdio.h>
 #include <OGRE/Ogre.h>
 #include <OIS.h>
-
-//#include <lua/lua.hpp>
-//#include <RakNet/RakPeerInterface.h>
-
 
 using namespace Ogre;
 
@@ -18,6 +12,8 @@ class OgreTest : public Ogre::FrameListener, public Ogre::WindowEventListener, p
 public:
     OgreTest();
     void init();
+    void run();
+    void render();
 
 private:
     Ogre::Root *mRoot;
@@ -38,7 +34,6 @@ private:
     virtual bool mouseMoved( const OIS::MouseEvent &arg );
     virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
     virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
-
 };
 
 #endif // OGRETEST_H

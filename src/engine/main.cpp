@@ -1,53 +1,21 @@
-#include <OGRE/Ogre.h>
-#include "ogretest.h"
+// #include "ogretest.h"
+#ifdef __APPLE__
+#include "macosx.h"
+#endif
 
-using namespace Ogre;
+#include "app.h"
 
-class Listener : public FrameListener {
-    virtual bool frameStarted(const FrameEvent& evt)
-    {
-        printf("!23\n");
-        return true;
-    }
-};
-
-
-int main() {
-
-
-    OgreTest t;
-    t.init();
-
-    /*
-    Root *root = new Root();
-    root->loadPlugin("RenderSystem_GL");
-
-    RenderWindow* window = NULL;
-    if (root->showConfigDialog()) {
-        window = root->initialise(true, "title");
-    }
-    else {
-        assert(false);
-    }
-
-    SceneManager* scene = root->createSceneManager(Ogre::ST_GENERIC);
-
-    Camera* cam = scene->createCamera("cam");
-    cam->setNearClipDistance(1);
-    cam->setFarClipDistance(1000);
-    cam->setAspectRatio(1);
-
-    Viewport* vp = window->addViewport(cam);
-    vp->setBackgroundColour(ColourValue(1,0,0));
-
-    Listener listener;
-
-    root->addFrameListener(&listener);
-
-    root->startRendering();
-
-    delete root;    
-*/
+int main(int argc, char *argv[]) {
+    App app;
+    app.init();
+#ifdef __APPLE__
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    AppDelegate *appDelegate = [[AppDelegate alloc] init];
+    appDelegate.app = &app;
+    [[NSApplication sharedApplication] setDelegate:appDelegate];
+	NSApplicationMain(argc, (const char **)argv);
+    [pool release];
+#endif
     return 0;
 }
 
