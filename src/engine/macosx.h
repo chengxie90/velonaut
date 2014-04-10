@@ -36,7 +36,9 @@
 
 - (void)renderOneFrame:(id)sender
 {
-    self.app->render();
+    if (self.app) {
+        self.app->render();
+    }
 }
 
 @end

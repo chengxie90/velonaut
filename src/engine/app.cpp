@@ -6,8 +6,7 @@ bool App::init()
 {
     test_ = new OgreTest();
     test_->init();
-    LuaManager luaManager;
-
+    //LuaManager luaManager;
 }
 
 void App::run()
