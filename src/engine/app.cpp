@@ -1,11 +1,14 @@
 #include "app.h"
 #include "ogretest.h"
+#include "bullettest.h"
 #include "luamanager.h"
 
 bool App::init()
 {
     test_ = new OgreTest();
     test_->init();
+    BulletTest* bulletTest = new BulletTest();
+    bulletTest->test();
     LuaManager luaManager;
 
 }
