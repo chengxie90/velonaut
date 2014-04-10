@@ -10,20 +10,10 @@ OgreTest::OgreTest():mRoot(0),
 
 void OgreTest::init() {
     mRoot = new Ogre::Root("", "", "");
-    mRoot->loadPlugin("RenderSystem_GL");
 
-    if(mRoot->showConfigDialog())
-    {
-        // If returned true, user clicked OK so initialise
-        // Here we choose to let the system create a default rendering window by passing 'true'
-        mWindow = mRoot->initialise(true, "TutorialApplication Render Window");
-
-        //return true;
-    }
-    else
-    {
-       // return false;
-    }
+    mRoot->loadPlugin("./Linux/Debug/RenderSystem_GL_d.so");
+    mRoot->setRenderSystem(mRoot->getAvailableRenderers()[0]);
+    mWindow = mRoot->initialise(true, "TutorialApplication Render Window");
 
     // Get the SceneManager, in this case a generic one
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
@@ -144,19 +134,16 @@ bool OgreTest::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 bool OgreTest::keyPressed( const OIS::KeyEvent &arg )
 {
-    std::cout << "mouse pressed!" << std::endl;
     return true;
 }
 
 bool OgreTest::keyReleased( const OIS::KeyEvent &arg )
 {
-    std::cout << "mouse released!" << std::endl;
     return true;
 }
 
 bool OgreTest::mouseMoved( const OIS::MouseEvent &arg )
 {
-    std::cout << "mouse moved!" << std::endl;
     return true;
 }
 
@@ -171,13 +158,19 @@ bool OgreTest::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id 
 }
 
 void OgreTest::windowResized( RenderWindow* rw ) {
-    std::cout << "window resize" << std::endl;
+
+    unsigned int width, height, depth;
+    int left, top;
+    rw->getMetrics(width, height, depth, left, top);
+
+    const OIS::MouseState &ms = mMouse->getMouseState();
+    ms.width = width;
+    ms.height = height;
 }
 
 void OgreTest::windowClosed( RenderWindow* rw ) {
     std::cout << "CLOSED" << std::endl;
-    if(rw == mWindow)
-       {
+    if(rw == mWindow) {
            if(mInputManager)
            {
                mInputManager->destroyInputObject( mMouse );
@@ -186,7 +179,10 @@ void OgreTest::windowClosed( RenderWindow* rw ) {
                OIS::InputManager::destroyInputSystem(mInputManager);
                mInputManager = 0;
            }
-       }
+     }
+
+   mRoot->shutdown();
+   exit(0);
 }
 
 
@@ -196,18 +192,3 @@ bool OgreTest::windowClosing( RenderWindow* rw ) {
     return true;
 }
 
-/*
-void OgreTest::windowResized(Ogre::RenderWindow* rw)
-{
-    unsigned int width, height, depth;
-    int left, top;
-    rw->getMetrics(width, height, depth, left, top);
-
-    /*
-    const OIS::MouseState &ms = mMouse->getMouseState();
-    ms.width = width;
-    ms.height = height;
-
-}
-
-*/

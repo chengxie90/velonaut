@@ -1,10 +1,13 @@
 #include "app.h"
 #include "ogretest.h"
+#include "luamanager.h"
 
 bool App::init()
 {
     test_ = new OgreTest();
     test_->init();
+    LuaManager luaManager;
+
 }
 
 void App::run()

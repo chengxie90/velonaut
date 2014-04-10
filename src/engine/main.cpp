@@ -8,6 +8,7 @@
 int main(int argc, char *argv[]) {
     App app;
     app.init();
+    app.run();
 #ifdef __APPLE__
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     AppDelegate *appDelegate = [[AppDelegate alloc] init];
