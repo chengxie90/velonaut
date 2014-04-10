@@ -1,4 +1,0 @@
-#ifndef LUA_FUNCTIONS_H
-#define LUA_FUNCTIONS_H
-
-#endif // LUA_FUNCTIONS_H
