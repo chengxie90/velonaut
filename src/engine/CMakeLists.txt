@@ -8,7 +8,6 @@ find_package(OGRE REQUIRED)
 find_package(OIS REQUIRED)
 find_package(Lua REQUIRED)
 find_package(RakNet REQUIRED)
-find_package(SDL2 REQUIRED)
 
 include_directories(${BULLET_INCLUDE_DIRS} 
                     ${OGRE_INCLUDE_DIRS}
