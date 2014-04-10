@@ -1,16 +1,15 @@
 dofile("data/scripts/utility.lua")
-dofile("data/scripts/scene.lua")
 
-normalscene = Scene:new()
-ascene = AScene:new()
+local Matrix = require "data/scripts/matrix"
+local Scene = require "data/scripts/scene"
 
-normalscene:find("bla")
-ascene:find("blu")
+local test_scene = Scene:new()
+test_scene:find("bla")
+test_scene:a()
 
-normalscene:a()
-ascene:a()
-ascene:b()
-
+local mtx = Matrix {{1,2},{3,4}}
+mtx = mtx * 2
+print(mtx)
 
 App = {}
 

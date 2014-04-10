@@ -1,4 +1,4 @@
-Scene = createClass()
+local Scene = createClass()
 
 Scene._gameObjects = {}
 
@@ -10,14 +10,7 @@ function Scene:a()
 	print("a")
 end
 
+return Scene;
 
-AScene = createClass(Scene)
 
-function AScene:find(name)
-	print("AScene find" .. name)
-end
-
-function AScene:b()
-	print("b")
-end
 
