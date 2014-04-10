@@ -13,41 +13,56 @@
 using namespace std; 
 using namespace Ogre;
 
-Ogre::String OSX_cocoa_view( SDL_Window * window ) {
-    SDL_SysWMinfo info;
-    SDL_GetVersion(&info.version);
-    assert(SDL_GetWindowWMInfo(window, &info));
-    NSWindow* nswindow = info.info.cocoa.window;
-    assert(nswindow);
-    NSView *view = [nswindow contentView];
-    assert(view);
-    return Ogre::StringConverter::toString( (unsigned long)view );
-}
-
 int main(int argc, char *argv[]) {
     assert(!SDL_Init(SDL_INIT_EVERYTHING));
     
     SDL_Window* win = SDL_CreateWindow("Velonaut", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                        800, 600,
-                                       SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+                                       SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     assert(win);
+    
+#ifndef __APPLE__
+    SDL_GLContext glcontext = NULL;
+    glcontext = SDL_GL_CreateContext(win);
+    assert(glcontext);
+#endif
         
     Ogre::Root * root = new Ogre::Root();
-    root->loadPlugin( "RenderSystem_GL" );
+    
+#ifdef __APPLE__
+    root->loadPlugin("RenderSystem_GL");
+#elif __LINUX__
+    root->loadPlugin("./Linux/Debug/RenderSystem_GL.so");   
+#endif
     
     root->setRenderSystem( root->getAvailableRenderers()[0] );
     root->initialise( false );
     
     Ogre::NameValuePairList params;
     
+#ifdef __APPLE__
     params["externalGLControl"] = "1";
-    params["externalWindowHandle"] = OSX_cocoa_view(win);
+    params["externalWindowHandle"] = osx_cocoa_view(win);
     params["macAPI"] = "cocoa";
     params["macAPICocoaUseNSView"] = "true";
+#elif __LINUX__
+    params["externalGLControl"] = "1";
+    params["currentGLContext"] = "1";
+    SDL_SysWMinfo info;
+    SDL_GetVersion(&info.version);
+    assert(SDL_GetWindowWMInfo(win, &info));
+    params["parentWindowHandle"] = Ogre::StringConverter::toString(info.info.x11.window);
+#endif
+    
+#ifndef __APPLE__
+    SDL_GL_MakeCurrent(win, glcontext);
+    SDL_GL_SetSwapInterval(1);
+#endif
     
     Ogre::RenderWindow * renderwindow = root->createRenderWindow("Legion::core::ogre", 800, 600, false, &params);
     
-    renderwindow->setVisible( true );
+    SDL_ShowWindow(win);
+    renderwindow->setVisible(true);
     
     SceneManager* scene = root->createSceneManager(Ogre::ST_GENERIC);
 
@@ -73,8 +88,12 @@ int main(int argc, char *argv[]) {
                 quit = true;
             }
         }
-        root->_fireFrameStarted();
+        //root->_fireFrameStarted();
         root->renderOneFrame();
+        
+#ifndef __APPLE__
+        SDL_GL_SwapWindow(win);
+#endif
     }
 
     SDL_DestroyWindow(win);    

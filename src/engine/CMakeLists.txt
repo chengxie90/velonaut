@@ -2,6 +2,8 @@ set(BULLET_ROOT ${LIB_DIR})
 set(ENV{OGRE_HOME} ${LIB_DIR})
 set(ENV{LUA_DIR} ${LIB_DIR})
 set(ENV{RAKNET_ROOT} ${LIB_DIR})
+set(ENV{SDL2DIR} ${LIB_DIR})
+set(SDL2_BUILDING_LIBRARY 1)
 
 find_package(Bullet REQUIRED)
 find_package(OGRE REQUIRED)
@@ -15,7 +17,7 @@ include_directories(${BULLET_INCLUDE_DIRS}
                     ${RakNet_INCLUDE_DIRS}
                     ${SDL2_INCLUDE_DIR})
 
-file(GLOB_RECURSE ENGINE_SRCS *.cpp)
+file(GLOB_RECURSE ENGINE_SRCS *.cpp *.h)
 
 add_executable(${PROJECT_NAME} ${ENGINE_SRCS})
 
