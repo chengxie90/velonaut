@@ -2,8 +2,9 @@
 #define MACOSX_H
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_system.h>
+#include <SDL2/SDL_syswm.h>
 #include <OGRE/Ogre.h>
+#include <Cocoa/Cocoa.h>
 
 Ogre::String osx_cocoa_view(SDL_Window * window) {
     SDL_SysWMinfo info;

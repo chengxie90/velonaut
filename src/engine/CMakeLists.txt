@@ -19,12 +19,12 @@ include_directories(${BULLET_INCLUDE_DIRS}
 
 file(GLOB_RECURSE ENGINE_SRCS *.cpp *.h)
 
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
 add_executable(${PROJECT_NAME} ${ENGINE_SRCS})
 
 if(APPLE)
-    set_source_files_properties(main.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-    #set_target_properties(${PROJECT_NAME}
-    #PROPERTIES LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework CoreVideo -framework ApplicationServices")
+    set_source_files_properties(app.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
 
 target_link_libraries(${PROJECT_NAME}   ${BULLET_LIBRARIES} 
