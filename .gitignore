@@ -5,3 +5,5 @@ build
 *.log
 velonaut
 3rdparty
+bin
+build2
