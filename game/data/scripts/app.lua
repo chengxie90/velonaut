@@ -3,8 +3,13 @@ dofile("data/scripts/utility.lua")
 local Scene = require("data/scripts/scene")
 local Matrix = require("data/scripts/matrix")
 
-App = {}
 
+function hello(x,y,m)
+	return Matrix:new(3, "I")
+end
+
+
+App = {}
 App._scenes = {}
 
 App.init = function()
@@ -14,6 +19,7 @@ App.init = function()
 	dofile("data/config.lua")
 
 end
+
 
 App.onConfigLoaded = function(config)
 
@@ -27,6 +33,3 @@ App.onConfigLoaded = function(config)
 	end
 
 end
-
-
-App.init()

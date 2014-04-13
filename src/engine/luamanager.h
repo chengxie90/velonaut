@@ -10,10 +10,19 @@ class LuaManager
 {
 public:
     LuaManager();
-    lua_State* L;
+    ~LuaManager();
+
+public:
+    void LoadScript(std::string file) const;
+    void SetMatrixParam(LUA_NUMBER*, int numElements)  const;
+    void Call(std::string func, std::string sig, ...) const;
+    void Call(std::string func) const;
+    void GetMatrixParam(LUA_NUMBER* result ) const;
+    void RegisterFunction(const char* name, lua_CFunction func) const;
 
 private:
-    void load(std::string file) const;
+    lua_State* L;
+
 };
 
 #endif // LUAMANAGER_H
