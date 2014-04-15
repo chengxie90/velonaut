@@ -1,18 +1,30 @@
 #ifndef APP_H
 #define APP_H
 
-class OgreTest;
+#include "common.h"
+
+class Graphics;
+class Input;
+class LuaManager;
 
 class App {
 public:
-    bool init();
+    bool init(int argc, char *argv[]);
     void run();
-#ifdef __APPLE__
-    void render();
-#endif
+    void shutdown();
+    void terminate();
+    
+    static App* GetApp();
+    static Graphics* GetGraphics();
+    static Input* GetInput();
+    static LuaManager* GetLuaManager();
     
 private:
-    OgreTest *test_;
+    bool terminated_ = false;
+    
+    Graphics* graphics_ = NULL;
+    Input* input_ = NULL;
+    LuaManager* luaManager_ = NULL;
 };
 
 #endif

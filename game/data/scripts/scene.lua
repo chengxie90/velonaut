@@ -1,16 +1,18 @@
-local Scene = createClass()
+require "utility"
+require "object"
 
-Scene._gameObjects = {}
+Scene = createClass()
 
-function Scene:find (name)
-	print("Scene find" .. name)
+function Scene:init(data)
+    self.handle = Graphics.createScene()
+    Graphics.setActiveScene(self)
+    self.objects = {}
+
+    for _, name in ipairs(data.objects) do
+        local obj = Object.new()
+        local data = loadData(name, "object")
+        obj:init(data)
+        table.insert(self.objects, obj)
+    end
 end
-
-function Scene:a()
-	print("a")
-end
-
-return Scene;
-
-
 

@@ -1,35 +1,27 @@
-dofile("data/scripts/utility.lua")
+package.path = "./data/scripts/?.lua;" .. package.path
 
-local Scene = require("data/scripts/scene")
-local Matrix = require("data/scripts/matrix")
+require "utility"
+require "scene"
 
+App = createClass() -- this is a singleton
 
-function hello(x,y,m)
-	return Matrix:new(3, "I")
+function App.init()
+    local config = loadData("config")
+    assert(config.scene)
+    App.loadScene(config.scene)
 end
 
-
-App = {}
-App._scenes = {}
-
-App.init = function()
-	print("App init")
-
-	-- load scene file
-	dofile("data/config.lua")
+function App.update()
 
 end
 
+function App.terminate()
+    
+end
 
-App.onConfigLoaded = function(config)
-
-	-- parse configs and build scenes
-	for key,sceneConfig in pairs(config.scenes) do
-		
-		print(sceneConfig.name)
-		local s = Scene:new{}
-		--and so forth		
-					
-	end
-
+function App.loadScene(name)
+    App.scene = Scene.new()
+    local data = loadData(name, "scene")
+    assert(data)
+    App.scene:init(data)
 end
