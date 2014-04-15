@@ -213,7 +213,6 @@ void LuaManager::SetReturnValues(const va_list& vl, const std::string params) co
 
     for( int i = 0; i < params.size(); ++i) {
 
-        StackDump();
         char c = params.at(i);
         switch (c) {
         case 'd':
@@ -308,25 +307,25 @@ void LuaManager::StackDump() const {
         switch(t) {
         case LUA_TSTRING:
         {
-            printf("'%s'", lua_tostring(L, i));
+            std::cout << lua_tostring(L, i) << std::endl;
             break;
         }
         case LUA_TBOOLEAN:
         {
-            printf(lua_toboolean(L,i) ? "true" : "false");
+            std::cout << (lua_toboolean(L,i) ? "true" : "false") << std::endl;
             break;
         }
         case LUA_TNUMBER:
         {
-            printf("'%g'", lua_tonumber(L, i));
+            std::cout << lua_tonumber(L, i) << std::endl;
             break;
         }
         default:
         {
             printf("'%s'", lua_typename(L, t));
+            std::cout << lua_typename(L,t) << std::endl;
         }
         }
-        printf("\n");
     }
-    printf("========================\n");
+    std::cout << "========================" << std::endl;
 }

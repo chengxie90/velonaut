@@ -8,13 +8,15 @@ static int lscript_test(lua_State* s) {
 
     int ri;
     const char* rs;
-    double rs;
+    double rd;
     LUA_NUMBER mat[9];
 
-    luaManager.GetParams("isdm", &ri, &rs, &rs, &mat);
+    luaManager.GetParams("isdm", &ri, &rs, &rd, &mat);
 
-    std::cout << rs << std::endl;
     std::cout << ri << std::endl;
+    std::cout << rs << std::endl;
+    std::cout << rd << std::endl;
+
 
     for (int i = 0; i < 9;++i) {
         std::cout << "mat: " << mat[i] << std::endl;
