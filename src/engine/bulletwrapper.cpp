@@ -7,12 +7,7 @@ static BulletWrapper& BulletWrapper::shared_instance()
 }
 
 
-BulletWrapper::BulletWrapper()
-{
-    rigid_bodies = new rigid_body_map();
-    collision_objects = new collision_object_map();
-    rigid_bodies_to_collision_objects = new std::map<btRigidBody*, btCollisionObject>();
-}
+BulletWrapper::BulletWrapper() {}
 
 
 

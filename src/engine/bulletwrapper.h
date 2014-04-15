@@ -21,37 +21,35 @@ typedef std::map<int, btCollisionObject*>::iterator collision_object_map_iterato
 class BulletWrapper
 {
 public:
-    static BulletWrapper& shared_instance();
+    static BulletWrapper& SharedInstance();
 
-    // World methods
-    static BulletWrapper& shared_instance();
+    // World stuff
+    static int CreateDynamicsWorld(lua_State* L);
+    static void SetWorldGravity(lua_State* L);
+    static void StepSimulation(lua_State* L);
 
-    // World methods
-    static int create_dynamics_world(lua_State* L);
-    static void step_simulation(lua_State* L);
+    // Rigid body stuff
+    static int CreateRigidBody(lua_State* L);
+    static int GetRigidBodyTransform(lua_State* L);
+    static int GetRigidBodyPosition(lua_State* L);
+    static int GetRigidBodyOrientation(lua_State* L);
+    static void SetRigidBodyTransform(lua_State* L);
+    static void SetRigidBodyPosition(lua_State* L);
+    static void SetRigidBodyOrientation(lua_State* L);
+    static void DeleteRigidBody(lua_State* L);
 
-    // Rigid body methods
-    static int create_rigid_body(lua_State* L);
-    static int get_transform(lua) const;
-    static int get_position(int handle) const;
-    static int get_oriantation(int handle) const;
-    static void set_transform(int handle, double* transform);
-    static void set_position(int handle, double* position);
-    static void set_orientation(int handle, double* orientation);
-    static int delete_rigid_body(int handle);
-
-    // Tunnel methods
-    static void create_tunnel(std::vector<btVector3> path, double radius, double circle);
-    static void reset_tunnel(std::vector<btVector3> path, double radius, double circle);
-
-    // Collision object methods
-    static int create_sphere_shape(double radius);
-    static int create_box_shape(double x, double y, double z);
-    static int create_cylinder_shape(double radius, double height);
-    static int create_triangle_mesh_shape(std::string filename);
-    static void set_shape_scaling(int handle, double x_scale, double y_scale, double z_scale);
-    static bool delete_shape(int handle);
-
+    // Collision shape stuff
+    static int CreateSphereCollisionShape(lua_State* L);
+    static int CreateBoxCollisionShape(lua_State* L);
+    static int CreateCylinderCollisionShape(lua_State* L);
+    static int CreateCapsuleCollisionShape(lua_State* L);
+    static int CreateCompoundCollisionShape(lua_State* L);
+    static void AddChildShapeToCompound(lua_State* L);
+    static int GetChildShapeByIndex(lua_State* l);
+    static void RemoveChildShapeByIndex(lua_State* L);
+    static void GetNumChildShapes(lua_State* L);
+    static void SetCollisionShapeLocalScaling(lua_State* L);
+    static void DeleteCollisionShape(lua_State* L);
 
 private:
     BulletWrapper();
