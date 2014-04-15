@@ -2,37 +2,36 @@ set(BULLET_ROOT ${LIB_DIR})
 set(ENV{OGRE_HOME} ${LIB_DIR})
 set(ENV{LUA_DIR} ${LIB_DIR})
 set(ENV{RAKNET_ROOT} ${LIB_DIR})
+set(ENV{SDL2DIR} ${LIB_DIR})
+set(SDL2_BUILDING_LIBRARY 1)
 
 find_package(Bullet REQUIRED)
 find_package(OGRE REQUIRED)
-find_package(OIS REQUIRED)
 find_package(Lua REQUIRED)
 find_package(RakNet REQUIRED)
+find_package(SDL2 REQUIRED)
 
 include_directories(${BULLET_INCLUDE_DIRS} 
                     ${OGRE_INCLUDE_DIRS}
                     ${LUA_INCLUDE_DIR}
                     ${RakNet_INCLUDE_DIRS}
-                    ${OIS_INCLUDE_DIRS}
-                    ${OGRE_Overlay_INCLUDE_DIRS})
+                    ${SDL2_INCLUDE_DIR})
 
-file(GLOB_RECURSE ENGINE_SRCS *.cpp)
+file(GLOB_RECURSE ENGINE_SRCS *.cpp *.h)
+
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
+add_executable(${PROJECT_NAME} ${ENGINE_SRCS})
 
 if(APPLE)
-    set_source_files_properties(main.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-    set_target_properties(${PROJECT_NAME}
-    PROPERTIES LINK_FLAGS "-framework IOKit -framework Cocoa -framework Carbon -framework CoreVideo -framework ApplicationServices")
+    set_source_files_properties(graphics.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
-
-add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${ENGINE_SRCS})
-
 
 target_link_libraries(${PROJECT_NAME}   ${BULLET_LIBRARIES} 
                                         ${OGRE_LIBRARIES}
                                         ${LUA_LIBRARIES}
                                         ${RakNet_LIBRARIES}
-                                        ${OIS_LIBRARIES}
-                                        ${OGRE_Overlay_LIBRARIES})
+                                        ${SDL2_LIBRARY})
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/game/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE})
 
