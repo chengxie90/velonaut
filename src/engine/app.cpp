@@ -1,55 +1,71 @@
 #include "app.h"
-#include "ogretest.h"
+#include <lua/lua.hpp>
+#include "graphics.h"
+#include "input.h"
 #include "luamanager.h"
 
-LuaManager luaManager;
+using namespace std;
 
-static int lscript_test(lua_State* s) {
+extern App g_app;
 
-    int ri;
-    const char* rs;
-    double rd;
-    LUA_NUMBER mat[9];
-
-    luaManager.GetParams("isdm", &ri, &rs, &rd, &mat);
-
-    std::cout << ri << std::endl;
-    std::cout << rs << std::endl;
-    std::cout << rd << std::endl;
-
-
-    for (int i = 0; i < 9;++i) {
-        std::cout << "mat: " << mat[i] << std::endl;
-    }
-
-    return 1;
-}
-
-bool App::init()
+bool App::init(int argc, char *argv[])
 {
-    test_ = new OgreTest();
-    test_->init();
+    graphics_ = new Graphics();
+    input_ = new Input();
+    luaManager_ = new LuaManager();
+    
+    graphics_->init();
+    input_->init();
+    luaManager_->init();
 
-    luaManager.LoadScript("data/scripts/app.lua");
-    luaManager.RegisterFunction("lscript_test", lscript_test);
+    luaManager_->Call("App.update", "s", "chello");
 
-    const char *b;
-    luaManager.Call("App.init", "d>s", 123.0, &b);
-
+    return true;
 }
 
 void App::run()
 {
-#ifndef __APPLE__
-    test_->run();
-#endif
+    while (!terminated_) {
+        input_->update();
+        luaManager_->update();
+        graphics_->render();
+    }
 }
 
-#ifdef __APPLE__
-void App::render()
+void App::shutdown()
 {
-    test_->render();
+    input_->shutdown();
+    graphics_->shutdown();
+    luaManager_->shutdown();
+    
+    delete luaManager_;
+    delete input_;
+    delete graphics_;
 }
-#endif
 
-#include "app.h"
+void App::terminate()
+{
+    terminated_ = true;
+}
+
+App *App::GetApp()
+{
+    return &g_app;
+}
+
+Graphics *App::GetGraphics()
+{
+    return g_app.graphics_;
+}
+
+Input *App::GetInput()
+{
+    return g_app.input_;
+}
+
+LuaManager *App::GetLuaManager()
+{
+    return g_app.luaManager_;
+}
+
+

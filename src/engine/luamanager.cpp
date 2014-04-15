@@ -6,15 +6,13 @@
 #include <exception>
 #include <assert.h>
 #include "luamanager.h"
+#include "app.h"
+#include "graphics.h"
 
-LuaManager::LuaManager(){
-    L = luaL_newstate();
-    luaL_openlibs(L);
-}
+using namespace std;
 
-LuaManager::~LuaManager(){
-    lua_close(L);
-}
+LuaManager::LuaManager() {}
+
 
 void LuaManager::GetParams(std::string params, ...) const {
     int num_args = lua_gettop(L);
@@ -29,6 +27,21 @@ void LuaManager::GetParams(std::string params, ...) const {
     va_start(vl, params.c_str() );
     SetLuaToCParams(vl, params);
     va_end(vl);
+}
+
+void LuaManager::SetMatrixParam(LUA_NUMBER* matrix, int num_elements) const {
+    lua_newtable(L);
+    int len = sqrt(num_elements);
+
+    for(int row = 0; row < len; row++) {
+
+        for(int col = 0; col < len; col++) {
+
+            lua_pushnumber(L, matrix[row*len+col]);
+            lua_rawseti(L, -2, row*len+col+1);
+
+        }
+    }
 }
 
 void LuaManager::Call(std::string func) const {
@@ -105,9 +118,12 @@ void LuaManager::Call(std::string func, std::string sig, ...) const {
 
     // call Lua function
     if (lua_pcall(L, narg, nres, 0) != 0) {
-        std::cout << "error" << std::endl;
-        lua_error(L);
+        std::string str = lua_tostring(L, lua_gettop(L));
+        lua_pop(L, 1);
+        std::cout << str << std::endl;
+        assert(false);
     }
+
 
     // Set return values passed
     if (nres > 0)
@@ -153,21 +169,6 @@ void LuaManager::PushMatrix(LUA_NUMBER* matrix, int num_elements) const {
         }
 
         lua_rawseti(L, -2, row+1);
-    }
-}
-
-void LuaManager::RegisterFunction(const char *name, lua_CFunction func) const {
-    lua_register(L, name, func);
-}
-
-void LuaManager::LoadScript(std::string file) const {
-    int error = luaL_dofile(L, file.c_str());
-
-    if(error)
-    {
-        std::string str = lua_tostring(L, lua_gettop(L));
-        lua_pop(L, 1);
-        std::cout << str << std::endl;
     }
 }
 
@@ -294,6 +295,59 @@ void LuaManager::GetMatrixReturn(LUA_NUMBER* result) const
             lua_pop(L, 1);
         }
         lua_pop(L, 1);
+    }
+}
+
+void LuaManager::RegisterFunction(const char *name, lua_CFunction func) const {
+    lua_register(L, name, func);
+}
+
+lua_State *LuaManager::state() const
+{
+    return L;
+}
+
+LuaManager *LuaManager::GetInstance()
+{
+    return App::GetApp()->GetLuaManager();
+}
+
+void LuaManager::init()
+{
+    L = luaL_newstate();
+    assert(L);
+    luaL_openlibs(L);
+
+    Graphics::GetInstance()->initLua();
+    
+    LoadScript("./data/scripts/app.lua");
+    Call("App.init");
+}
+
+void LuaManager::update()
+{
+    
+}
+
+void LuaManager::shutdown()
+{
+    lua_close(L);
+}
+
+void LuaManager::newlib(string libname, luaL_Reg reg[])
+{
+    luaL_newlib(L, reg);
+    lua_setglobal(L, libname.c_str());
+}
+
+void LuaManager::LoadScript(string file) const {
+    int error = luaL_dofile(L, file.c_str());
+    if (error)
+    {
+        std::string str = lua_tostring(L, lua_gettop(L));
+        lua_pop(L, 1);
+        std::cout << str << std::endl;
+        assert(false);
     }
 }
 
