@@ -9,7 +9,44 @@ static BulletWrapper& BulletWrapper::shared_instance()
 
 BulletWrapper::BulletWrapper() {}
 
+// World stuff
+static int CreateDynamicsWorld(lua_State* L)
+{
 
+}
+
+static void SetWorldGravity(lua_State* L)
+{
+
+}
+
+static void StepSimulation(lua_State* L)
+{
+
+}
+
+// Rigid body stuff
+static int CreateRigidBody(lua_State* L);
+static int GetRigidBodyTransform(lua_State* L);
+static int GetRigidBodyPosition(lua_State* L);
+static int GetRigidBodyOrientation(lua_State* L);
+static void SetRigidBodyTransform(lua_State* L);
+static void SetRigidBodyPosition(lua_State* L);
+static void SetRigidBodyOrientation(lua_State* L);
+static void DeleteRigidBody(lua_State* L);
+
+// Collision shape stuff
+static int CreateSphereCollisionShape(lua_State* L);
+static int CreateBoxCollisionShape(lua_State* L);
+static int CreateCylinderCollisionShape(lua_State* L);
+static int CreateCapsuleCollisionShape(lua_State* L);
+static int CreateCompoundCollisionShape(lua_State* L);
+static void AddChildShapeToCompound(lua_State* L);
+static int GetChildShapeByIndex(lua_State* l);
+static void RemoveChildShapeByIndex(lua_State* L);
+static void GetNumChildShapes(lua_State* L);
+static void SetCollisionShapeLocalScaling(lua_State* L);
+static void DeleteCollisionShape(lua_State* L);
 
 
 /*
