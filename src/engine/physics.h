@@ -12,7 +12,7 @@ class Physics
 public:
     void init();
     void initLua();
-    void render();
+    //void render();
     void shutdown();
 
     static Physics* GetInstance();
@@ -20,46 +20,49 @@ private:
     SINGLETON(Physics)
     friend class App;
 
-    void initWindow();
-    void initResources();
-
     // tmp
     void createWorld();
 
-    btDynamicsWorld* world = NULL;
+    btBroadphaseInterface* broadphase_ = NULL;
+    btDefaultCollisionConfiguration* collisionConfiguration_ = NULL;
+    btCollisionDispatcher* dispatcher_ = NULL;
+    btSequentialImpulseConstraintSolver* solver_ = NULL;
+    btDynamicsWorld* world_ = NULL;
 
 private:
     // World stuff
-    static int LWorldCreate(lua_State* L);
-    static int LWorldSetGravity(lua_State* L);
-    static int LWorldStep(lua_State* L);
+    static int LWorldCreate(lua_State* state);
+    static int LWorldSetGravity(lua_State* state);
+    static int LWorldStep(lua_State* state);
 
     // Rigid body stuff
-    static int LPhysicsCreate(lua_State* L);
-    static int LPhysicsGetTransform(lua_State* L);
-    static int LPhysicsGetPosition(lua_State* L);
-    static int LPhysicsGetOrientation(lua_State* L);
-    static int LPhysicsSetTransform(lua_State* L);
-    static int LPhysicsSetPosition(lua_State* L);
-    static int LPhysicsSetOrientation(lua_State* L);
-    static int LPhysicsDelete(lua_State* L);
+    static int LPhysicsCreate(lua_State* state);
+    static int LPhysicsGetTransform(lua_State* state);
+    static int LPhysicsGetPosition(lua_State* state);
+    static int LPhysicsGetOrientation(lua_State* state);
+    static int LPhysicsSetTransform(lua_State* state);
+    static int LPhysicsSetPosition(lua_State* state);
+    static int LPhysicsSetOrientation(lua_State* state);
+    static int LPhysicsDelete(lua_State* state);
+    /*
 
     // Simple collision shape stuff
-    static int LSimpleColliderCreateSphere(lua_State* L);
-    static int LSimpleColliderCreateBox(lua_State* L);
-    static int LSimpleColliderCreateCylinder(lua_State* L);
-    static int LSimpleColliderCreateCapsule(lua_State* L);
-    static int LSimpleColliderSetLocalScaling(lua_State* L);
-    static int LSimpleColliderDelete(lua_State* L);
+    static int LSimpleColliderCreateSphere(lua_State* state);
+    static int LSimpleColliderCreateBox(lua_State* state);
+    static int LSimpleColliderCreateCylinder(lua_State* state);
+    static int LSimpleColliderCreateCapsule(lua_State* state);
+    static int LSimpleColliderSetLocalScaling(lua_State* state);
+    static int LSimpleColliderDelete(lua_State* state);
 
     // Compound collision shape stuff
-    static int LCompoundColliderCreate(lua_State* L);
-    static int LCompoundColliderAddChild(lua_State* L);
-    static int LCompoundColliderGetChildByIndex(lua_State* l);
-    static int LCompoundColliderRemoveChildByIndex(lua_State* L);
-    static int LCompoundColliderGetNumChildren(lua_State* L);
-    static int LCompoundColliderSetLocalScaling(lua_State* L);
-    static int LCompoundColliderDelete(lua_State* L);
+    static int LCompoundColliderCreate(lua_State* state);
+    static int LCompoundColliderAddChild(lua_State* state);
+    static int LCompoundColliderGetChildByIndex(lua_State* state);
+    static int LCompoundColliderRemoveChildByIndex(lua_State* state);
+    static int LCompoundColliderGetNumChildren(lua_State* state);
+    static int LCompoundColliderSetLocalScaling(lua_State* state);
+    static int LCompoundColliderDelete(lua_State* state);
+    */
 };
 
 #endif // PHYSICS_H

@@ -66,4 +66,8 @@ LuaManager *App::GetLuaManager()
     return g_app.luaManager_;
 }
 
+Physics *App::GetPhysics()
+{
+    return g_app.physics_;
+}
 
