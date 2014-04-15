@@ -8,17 +8,32 @@ end
 function createClass(...)
 	local c = {}
 	local parents = {...}
-	setmetatable(c, {__index = function(t,k)
+	setmetatable(c, {__index = function(t, k)
 		return search(k, parents)
 	end })
 
 	c.__index = c
 
-	function c:new(o)
+	function c.new(o)
 		o = o or {}
-		setmetatable(o,c)
+		setmetatable(o, c)
 		return o
 	end
 
 	return c
 end
+
+function loadData(name, type)
+	local filename = "./data"
+	if type == "scene" then
+		filename = filename .. "/scenes"
+	elseif type == "object" then
+		filename = filename .."/objects"
+	end
+	filename = filename .. "/" .. name .. ".lua"
+	print(filename)
+	ret = dofile(filename)
+	assert(ret)
+	return ret
+end
+

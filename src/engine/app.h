@@ -1,25 +1,30 @@
 #ifndef APP_H
 #define APP_H
 
-#include <SDL2/SDL.h>
-#include <OGRE/Ogre.h>
+#include "common.h"
+
+class Graphics;
+class Input;
+class LuaManager;
 
 class App {
 public:
     bool init(int argc, char *argv[]);
     void run();
     void shutdown();
+    void terminate();
+    
+    static App* GetApp();
+    static Graphics* GetGraphics();
+    static Input* GetInput();
+    static LuaManager* GetLuaManager();
     
 private:
-    void initWindow();
-    void initLua();
-    void initScene();
+    bool terminated_ = false;
     
-    SDL_Window* window_ = NULL;
-    
-    Ogre::Root* root_ = NULL;
-    Ogre::RenderWindow* renderWindow_  = NULL;
-    Ogre::SceneManager* scene_ = NULL;
+    Graphics* graphics_ = NULL;
+    Input* input_ = NULL;
+    LuaManager* luaManager_ = NULL;
 };
 
 #endif
