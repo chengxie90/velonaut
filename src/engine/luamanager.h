@@ -23,6 +23,7 @@ private:
     void GetMatrixReturn(LUA_NUMBER* result ) const;
     void GetMatrixParam(LUA_NUMBER* result ) const;
     void PushMatrix(LUA_NUMBER*, int numElements)  const;
+    void PushVector(LUA_NUMBER*, int numElements)  const;
     void SetReturnValues(const va_list& vl, const std::string params)  const;
     void SetLuaToCParams(const va_list& vl, const std::string params)  const;
     void StackDump()  const;

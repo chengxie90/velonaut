@@ -4,16 +4,21 @@
 
 LuaManager luaManager;
 
-static int lscript_bla(lua_State* s) {
+static int lscript_test(lua_State* s) {
 
     int ri;
-    const char* ss;
-    double d;
-    luaManager.GetParams("isd", &ri, &ss, &d);
+    const char* rs;
+    double rs;
+    LUA_NUMBER mat[9];
 
-    std::cout << ss << std::endl;
+    luaManager.GetParams("isdm", &ri, &rs, &rs, &mat);
+
+    std::cout << rs << std::endl;
     std::cout << ri << std::endl;
-    std::cout << d << std::endl;
+
+    for (int i = 0; i < 9;++i) {
+        std::cout << "mat: " << mat[i] << std::endl;
+    }
 
     return 1;
 }
@@ -24,41 +29,11 @@ bool App::init()
     test_->init();
 
     luaManager.LoadScript("data/scripts/app.lua");
-    luaManager.RegisterFunction("lscript_bla", lscript_bla);
+    luaManager.RegisterFunction("lscript_test", lscript_test);
 
-    LUA_NUMBER m[9];
-    m[0] = 0;
-    m[1] = 1;
-    m[2] = 2;
+    const char *b;
+    luaManager.Call("App.init", "d>s", 123.0, &b);
 
-    double d1;
-    char s[1024];
-    int i;
-    luaManager.Call("hello", "dmdsi>dsi", 20.2, m, 23.3, "50 cent", 30,
-                                        &d1, &s, &i);
-    std::cout << d1 << std::endl;
-    std::cout << s << std::endl;
-    std::cout << i << std::endl;
-
-    luaManager.Call("App.init");
-
-    /*
-    LUA_NUMBER m[3];
-    m[0] = 0;
-    m[1] = 1;
-    m[2] = 2;
-
-    LUA_NUMBER returnedMatrix[9];
-    double d;
-    double d1;
-    luaManager.Call("hello", "dmd>m", 1.0, m, 2.0, &returnedMatrix);
-    for (int i = 0; i < 9;++i) {
-        std::cout << "ma: " << returnedMatrix[i] << std::endl;
-    }
-
-    std::cout << d << std::endl;
-    std::cout << d1 << std::endl;
-    */
 }
 
 void App::run()

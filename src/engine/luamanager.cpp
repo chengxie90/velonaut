@@ -31,149 +31,6 @@ void LuaManager::GetParams(std::string params, ...) const {
     va_end(vl);
 }
 
-void LuaManager::SetLuaToCParams(const va_list& vl, const std::string params) const {
-
-    StackDump();
-
-    int na = 1;
-
-    for( int i = 0; i < params.size(); ++i) {
-
-        char c = params.at(i);
-        switch (c) {
-        case 'd':
-        {
-            double d = lua_tonumber(L, na);
-            *va_arg(vl, double *) = d;
-            break;
-        }
-        case 'i':
-        {
-            double n = lua_tonumber(L, na);
-            *va_arg(vl, int *) = n;
-            break;
-        }
-        case 's':
-        {            
-            const char *s = lua_tostring(L, na);
-            *va_arg(vl, const char **) = s;
-            break;
-        }
-        case 'm':
-        {
-            GetMatrixParam(va_arg(vl, LUA_NUMBER*));
-            break;
-        }
-        }
-        ++na;
-    }
-}
-
-void LuaManager::SetReturnValues(const va_list& vl, const std::string params) const {
-
-    int na = -params.size();
-
-    for( int i = 0; i < params.size(); ++i) {
-        char c = params.at(i);
-        switch (c) {
-        case 'd':
-        {
-            double d = lua_tonumber(L, na);
-            *va_arg(vl, double *) = d;
-            break;
-        }
-        case 'i':
-        {
-            double n = lua_tonumber(L, na);
-            *va_arg(vl, int *) = n;
-            break;
-        }
-        case 's':{
-            const char *s = lua_tostring(L, na);
-            *va_arg(vl, const char **) = s;
-            break;
-        }
-        case 'm':
-        {
-            GetMatrixReturn(va_arg(vl, LUA_NUMBER*));
-            std::cout << "M" << std::endl;
-            break;
-        }
-        }
-        ++na;
-    }
-}
-
-void LuaManager::PushMatrix(LUA_NUMBER* matrix, int num_elements) const {
-
-    lua_newtable(L);
-    int len = sqrt(num_elements);
-
-    for(int row = 0; row < len; row++) {
-
-        for(int col = 0; col < len; col++) {
-
-            lua_pushnumber(L, matrix[row*len+col]);
-            lua_rawseti(L, -2, row*len+col+1);
-
-        }
-
-    }
-}
-
-void LuaManager::GetMatrixParam(LUA_NUMBER* result) const
-{
-    luaL_checktype(L, -1, LUA_TTABLE);
-    int len = lua_objlen(L, -1);
-
-    for(int row = 0; row < len; row++) {
-        lua_pushinteger(L, row+1);
-        lua_gettable(L, -2);
-
-        for(int col = 0; col < len; col++) {
-            lua_pushinteger(L, col+1);
-            lua_gettable(L, -2);
-
-            if(lua_isnumber(L, -1)) {
-
-                result[row*len+col] = lua_tonumber(L, -1);
-
-            } else {
-                std::cout << "not a number!" << std::endl;
-            }
-            lua_pop(L, 1);
-        }
-        lua_pop(L, 1);
-    }
-}
-
-void LuaManager::GetMatrixReturn(LUA_NUMBER* result) const
-{
-
-    luaL_checktype(L, 1, LUA_TTABLE);
-    int len = lua_objlen(L, 1);
-
-    for(int row = 0; row < len; row++) {
-        lua_pushinteger(L, row+1);
-        lua_gettable(L, 1);
-
-        for(int col = 0; col < len; col++) {
-            lua_pushinteger(L, col+1);
-            lua_gettable(L, -2);
-
-            if(lua_isnumber(L, -1)) {
-                int isNum;
-                result[row*len+col] = lua_tonumberx(L, -1, &isNum);
-
-            } else {
-                std::cout << "not a number!" << std::endl;
-            }
-            lua_pop(L, 1);
-        }
-        lua_pop(L, 1);
-    }
-}
-
 void LuaManager::Call(std::string func) const {
     Call(func, "");
 }
@@ -190,7 +47,6 @@ void LuaManager::Call(std::string func, std::string sig, ...) const {
     va_start(vl, sig.c_str() );
 
     // allow direct object access, if requested. e.g. 'App.init'
-
     size_t pos = func.find(".");
     if (pos != std::string::npos) {
         std::string table = func.substr (0, pos);
@@ -219,17 +75,21 @@ void LuaManager::Call(std::string func, std::string sig, ...) const {
             lua_pushstring(L, va_arg(vl, char *));
             break;
         case 'm':
-            PushMatrix(va_arg(vl, LUA_NUMBER*), 9);
 
-/*
+            // create new matrix object and store it on stack as argument
+
             lua_getglobal(L, "Matrix");
             lua_getfield(L, -1, "new");
+            lua_remove(L,-2);
 
-            if (lua_pcall(L, 1, 0, 0) != 0) {
+            lua_getglobal(L, "Matrix");
+            PushMatrix(va_arg(vl, LUA_NUMBER*), 9);
+
+            if (lua_pcall(L, 2, 1, 0) != 0) {
                 std::cout << "error" << std::endl;
                 lua_error(L);
             }
-*/
+
             break;
 
         case '>':
@@ -256,6 +116,46 @@ void LuaManager::Call(std::string func, std::string sig, ...) const {
     va_end(vl);
 }
 
+void LuaManager::PushVector(LUA_NUMBER* matrix, int num_elements) const {
+
+    lua_newtable(L);
+    int len = sqrt(num_elements);
+
+    for(int row = 0; row < len; row++) {
+
+        lua_newtable(L);
+
+        for(int col = 0; col < len; col++) {
+
+            lua_pushnumber(L, matrix[row*len+col]);
+            lua_rawseti(L, -2, col+1);
+
+        }
+
+        lua_rawseti(L, -2, row+1);
+    }
+}
+
+void LuaManager::PushMatrix(LUA_NUMBER* matrix, int num_elements) const {
+
+    lua_newtable(L);
+    int len = sqrt(num_elements);
+
+    for(int row = 0; row < len; row++) {
+
+        lua_newtable(L);
+
+        for(int col = 0; col < len; col++) {
+
+            lua_pushnumber(L, matrix[row*len+col]);
+            lua_rawseti(L, -2, col+1);
+
+        }
+
+        lua_rawseti(L, -2, row+1);
+    }
+}
+
 void LuaManager::RegisterFunction(const char *name, lua_CFunction func) const {
     lua_register(L, name, func);
 }
@@ -271,12 +171,139 @@ void LuaManager::LoadScript(std::string file) const {
     }
 }
 
+void LuaManager::SetLuaToCParams(const va_list& vl, const std::string params) const {
+
+    int na = 1;
+
+    for( int i = 0; i < params.size(); ++i) {
+
+        char c = params.at(i);
+        switch (c) {
+        case 'd':
+        {
+            double d = lua_tonumber(L, na);
+            *va_arg(vl, double *) = d;
+            break;
+        }
+        case 'i':
+        {
+            double n = lua_tonumber(L, na);
+            *va_arg(vl, int *) = n;
+            break;
+        }
+        case 's':
+        {
+            const char *s = lua_tostring(L, na);
+            *va_arg(vl, const char **) = s;
+            break;
+        }
+        case 'm':
+        {
+            GetMatrixParam(va_arg(vl, LUA_NUMBER*));
+            break;
+        }
+        }
+        ++na;
+    }
+}
+
+void LuaManager::SetReturnValues(const va_list& vl, const std::string params) const {
+
+    int na = -params.size();
+
+    for( int i = 0; i < params.size(); ++i) {
+
+        StackDump();
+        char c = params.at(i);
+        switch (c) {
+        case 'd':
+        {
+            double d = lua_tonumber(L, na);
+            *va_arg(vl, double *) = d;
+            break;
+        }
+        case 'i':
+        {
+            double n = lua_tonumber(L, na);
+            *va_arg(vl, int *) = n;
+            break;
+        }
+        case 's':{
+            const char *s = lua_tostring(L, na);
+            *va_arg(vl, const char **) = s;
+            break;
+        }
+        case 'm':
+        {
+            GetMatrixReturn(va_arg(vl, LUA_NUMBER*));
+            break;
+        }
+        }
+        lua_remove(L, na);
+        ++na;
+    }
+}
+
+void LuaManager::GetMatrixParam(LUA_NUMBER* result) const
+{
+
+    luaL_checktype(L, -1, LUA_TTABLE);
+    int len = lua_objlen(L, -1);
+
+    for(int row = 0; row < len; row++) {
+        lua_pushinteger(L, row+1);
+        lua_gettable(L, -2);
+
+        for(int col = 0; col < len; col++) {
+            lua_pushinteger(L, col+1);
+            lua_gettable(L, -2);
+
+            if(lua_isnumber(L, -1)) {
+
+                result[row*len+col] = lua_tonumber(L, -1);
+
+            } else {
+                std::cout << "not a number!" << std::endl;
+            }
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
+    }
+
+}
+
+void LuaManager::GetMatrixReturn(LUA_NUMBER* result) const
+{
+    luaL_checktype(L, 1, LUA_TTABLE);
+    int len = lua_objlen(L, 1);
+
+    for(int row = 0; row < len; row++) {
+        lua_pushinteger(L, row+1);
+        lua_gettable(L, 1);
+
+        for(int col = 0; col < len; col++) {
+            lua_pushinteger(L, col+1);
+            lua_gettable(L, -2);
+
+            if(lua_isnumber(L, -1)) {
+                int isNum;
+                result[row*len+col] = lua_tonumberx(L, -1, &isNum);
+
+            } else {
+                std::cout << "not a number!" << std::endl;
+            }
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
+    }
+}
+
 void LuaManager::StackDump() const {
 
     int i;
     int top = lua_gettop(L);
-    std::cout << "===== STACKDUMP " << top << "=======" << std::endl;
-    for (i = 1; i <= top; ++i) {
+    std::cout << "==== STACKDUMP len:" << top << " ===" << std::endl;
+    for (i = top; i >= 1; --i) {
         int t = lua_type(L,i);
         switch(t) {
         case LUA_TSTRING:
