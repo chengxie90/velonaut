@@ -1,5 +1,6 @@
 package.path = "./data/scripts/?.lua;" .. package.path
 
+Matrix = require("data/scripts/matrix")
 require "utility"
 require "scene"
 
@@ -11,8 +12,8 @@ function App.init()
     App.loadScene(config.scene)
 end
 
-function App.update()
-
+function App.update( u)
+	print("update" .. u) 
 end
 
 function App.terminate()

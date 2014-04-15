@@ -18,6 +18,8 @@ bool App::init(int argc, char *argv[])
     input_->init();
     luaManager_->init();
 
+    luaManager_->Call("App.update", "s", "chello");
+
     return true;
 }
 
