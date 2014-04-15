@@ -1,9 +1,5 @@
 #include "bullettest.h"
 
-#include <iostream>
-#include <btBulletDynamicsCommon.h>
-#include <bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
-
 BulletTest::BulletTest()
 {
 }
