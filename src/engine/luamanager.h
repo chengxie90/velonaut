@@ -13,12 +13,19 @@ public:
     ~LuaManager();
 
 public:
-    void LoadScript(std::string file) const;
-    void SetMatrixParam(LUA_NUMBER*, int numElements)  const;
+    void LoadScript(std::string file) const;    
     void Call(std::string func, std::string sig, ...) const;
     void Call(std::string func) const;
-    void GetMatrixParam(LUA_NUMBER* result ) const;
+    void GetParams(std::string params, ...) const;
     void RegisterFunction(const char* name, lua_CFunction func) const;
+
+private:
+    void GetMatrixReturn(LUA_NUMBER* result ) const;
+    void GetMatrixParam(LUA_NUMBER* result ) const;
+    void PushMatrix(LUA_NUMBER*, int numElements)  const;
+    void SetReturnValues(const va_list& vl, const std::string params)  const;
+    void SetLuaToCParams(const va_list& vl, const std::string params)  const;
+    void StackDump()  const;
 
 private:
     lua_State* L;

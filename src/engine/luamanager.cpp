@@ -3,6 +3,8 @@
 #include <vector>
 #include <stdarg.h>
 #include <cmath>
+#include <exception>
+#include <assert.h>
 #include "luamanager.h"
 
 LuaManager::LuaManager(){
@@ -14,7 +16,96 @@ LuaManager::~LuaManager(){
     lua_close(L);
 }
 
-void LuaManager::SetMatrixParam(LUA_NUMBER* matrix, int num_elements) const {
+void LuaManager::GetParams(std::string params, ...) const {
+    int num_args = lua_gettop(L);
+
+    if (num_args != params.size()) {
+        std::cout << "number of parameters much match the number of actual return values" << std::endl;
+        assert(false);
+        return;
+    }
+
+    va_list vl;
+    va_start(vl, params.c_str() );
+    SetLuaToCParams(vl, params);
+    va_end(vl);
+}
+
+void LuaManager::SetLuaToCParams(const va_list& vl, const std::string params) const {
+
+    StackDump();
+
+    int na = 1;
+
+    for( int i = 0; i < params.size(); ++i) {
+
+        char c = params.at(i);
+        switch (c) {
+        case 'd':
+        {
+            double d = lua_tonumber(L, na);
+            *va_arg(vl, double *) = d;
+            break;
+        }
+        case 'i':
+        {
+            double n = lua_tonumber(L, na);
+            *va_arg(vl, int *) = n;
+            break;
+        }
+        case 's':
+        {            
+            const char *s = lua_tostring(L, na);
+            *va_arg(vl, const char **) = s;
+            break;
+        }
+        case 'm':
+        {
+            GetMatrixParam(va_arg(vl, LUA_NUMBER*));
+            break;
+        }
+        }
+        ++na;
+    }
+}
+
+void LuaManager::SetReturnValues(const va_list& vl, const std::string params) const {
+
+    int na = -params.size();
+
+    for( int i = 0; i < params.size(); ++i) {
+        char c = params.at(i);
+        switch (c) {
+        case 'd':
+        {
+            double d = lua_tonumber(L, na);
+            *va_arg(vl, double *) = d;
+            break;
+        }
+        case 'i':
+        {
+            double n = lua_tonumber(L, na);
+            *va_arg(vl, int *) = n;
+            break;
+        }
+        case 's':{
+            const char *s = lua_tostring(L, na);
+            *va_arg(vl, const char **) = s;
+            break;
+        }
+        case 'm':
+        {
+            GetMatrixReturn(va_arg(vl, LUA_NUMBER*));
+            std::cout << "M" << std::endl;
+            break;
+        }
+        }
+        ++na;
+    }
+}
+
+void LuaManager::PushMatrix(LUA_NUMBER* matrix, int num_elements) const {
+
     lua_newtable(L);
     int len = sqrt(num_elements);
 
@@ -26,6 +117,7 @@ void LuaManager::SetMatrixParam(LUA_NUMBER* matrix, int num_elements) const {
             lua_rawseti(L, -2, row*len+col+1);
 
         }
+
     }
 }
 
@@ -55,6 +147,33 @@ void LuaManager::GetMatrixParam(LUA_NUMBER* result) const
     }
 }
 
+void LuaManager::GetMatrixReturn(LUA_NUMBER* result) const
+{
+
+    luaL_checktype(L, 1, LUA_TTABLE);
+    int len = lua_objlen(L, 1);
+
+    for(int row = 0; row < len; row++) {
+        lua_pushinteger(L, row+1);
+        lua_gettable(L, 1);
+
+        for(int col = 0; col < len; col++) {
+            lua_pushinteger(L, col+1);
+            lua_gettable(L, -2);
+
+            if(lua_isnumber(L, -1)) {
+                int isNum;
+                result[row*len+col] = lua_tonumberx(L, -1, &isNum);
+
+            } else {
+                std::cout << "not a number!" << std::endl;
+            }
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
+    }
+}
+
 void LuaManager::Call(std::string func) const {
     Call(func, "");
 }
@@ -71,6 +190,7 @@ void LuaManager::Call(std::string func, std::string sig, ...) const {
     va_start(vl, sig.c_str() );
 
     // allow direct object access, if requested. e.g. 'App.init'
+
     size_t pos = func.find(".");
     if (pos != std::string::npos) {
         std::string table = func.substr (0, pos);
@@ -99,8 +219,19 @@ void LuaManager::Call(std::string func, std::string sig, ...) const {
             lua_pushstring(L, va_arg(vl, char *));
             break;
         case 'm':
-            SetMatrixParam(va_arg(vl, LUA_NUMBER*), 9);
+            PushMatrix(va_arg(vl, LUA_NUMBER*), 9);
+
+/*
+            lua_getglobal(L, "Matrix");
+            lua_getfield(L, -1, "new");
+
+            if (lua_pcall(L, 1, 0, 0) != 0) {
+                std::cout << "error" << std::endl;
+                lua_error(L);
+            }
+*/
             break;
+
         case '>':
             goto endargs;
             break;
@@ -118,45 +249,9 @@ void LuaManager::Call(std::string func, std::string sig, ...) const {
         lua_error(L);
     }
 
-    // retrieve return values
-    i++; // jump over '>'
-    nres = -nres;
-    for (; i < sig.size(); ++i) {
-        luaL_checkstack(L, 1, "too many arguments");
-
-        switch(sig.at(i)) {
-        case 'd':
-        {
-            int isnum;
-            double n = lua_tonumberx(L, nres, &isnum);
-            *va_arg(vl, double *) = n;
-            break;
-        }
-        case 'i':
-        {
-            int isnum;
-            double n = lua_tointegerx(L, nres, &isnum);
-            *va_arg(vl, int *) = n;
-            break;
-        }
-        case 's':
-        {
-            const char *s = lua_tostring(L, nres);
-            *va_arg(vl, const char **) = s;
-            break;
-        }
-        case 'm':
-        {
-            GetMatrixParam(va_arg(vl, LUA_NUMBER*));
-            break;
-        }
-        default:
-            std::cout << "Error: Unhandled return type " << sig.at(i) << std::endl;
-            break;
-        }
-
-        ++nres;
-    }
+    // Set return values passed
+    if (nres > 0)
+        SetReturnValues(vl, sig.substr(++i));
 
     va_end(vl);
 }
@@ -174,4 +269,37 @@ void LuaManager::LoadScript(std::string file) const {
         lua_pop(L, 1);
         std::cout << str << std::endl;
     }
+}
+
+void LuaManager::StackDump() const {
+
+    int i;
+    int top = lua_gettop(L);
+    std::cout << "===== STACKDUMP " << top << "=======" << std::endl;
+    for (i = 1; i <= top; ++i) {
+        int t = lua_type(L,i);
+        switch(t) {
+        case LUA_TSTRING:
+        {
+            printf("'%s'", lua_tostring(L, i));
+            break;
+        }
+        case LUA_TBOOLEAN:
+        {
+            printf(lua_toboolean(L,i) ? "true" : "false");
+            break;
+        }
+        case LUA_TNUMBER:
+        {
+            printf("'%g'", lua_tonumber(L, i));
+            break;
+        }
+        default:
+        {
+            printf("'%s'", lua_typename(L, t));
+        }
+        }
+        printf("\n");
+    }
+    printf("========================\n");
 }
