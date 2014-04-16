@@ -1,6 +1,9 @@
 #ifndef GAMETEST_H
 #define GAMETEST_H
 
+#include "graphicstest.h"
+#include "inputtest.h"
+#include "physicstest.h"
 #include "common.h"
 
 class GraphicsTest;
@@ -21,6 +24,12 @@ public:
 
 private:
     bool terminated_ = false;
+
+    btRigidBody* sphereRB_ = NULL;
+    btRigidBody* planeRB_ = NULL;
+
+    Ogre::SceneNode* sphereSN_ = NULL;
+    Ogre::SceneNode* planeSN_ = NULL;
 
     GraphicsTest* graphics_ = NULL;
     InputTest* input_ = NULL;

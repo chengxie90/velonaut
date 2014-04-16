@@ -1,0 +1,20 @@
+material plane
+{
+	technique
+    	{
+
+	pass
+       {
+	  lighting on
+	  scene_blend alpha_blend
+	  depth_write off
+
+          texture_unit
+          {
+            	colour_op_ex source1 src_manual src_current 0.8 0 0.8
+		alpha_op_ex source1 src_manual src_current 0.8
+          }
+       }
+
+   }
+}
