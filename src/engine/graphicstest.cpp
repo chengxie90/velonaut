@@ -136,49 +136,52 @@ void GraphicsTest::createScene()
 
     camera->setAspectRatio((float)WINDOW_WIDTH / WINDOW_HEIGHT);
 
-    /*
-    //Entity* entity = scene_->createEntity("sphere",Ogre::SceneManager::PT_SPHERE);
-    Entity* entity = scene_->createEntity("ninja.mesh");
-    MaterialPtr material = MaterialManager::getSingleton().getByName("BaseWhite", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    entity->setMaterial(material);
-    SceneNode* node = scene_->getRootSceneNode()->createChildSceneNode();
-    node->attachObject(entity);
-
-    Entity* entity2 = scene_->createEntity("sphere",Ogre::SceneManager::PT_SPHERE);
-    entity2->setMaterialName("plane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    SceneNode* node2 = scene_->getRootSceneNode()->createChildSceneNode();
-    node2->setPosition(0,0,0);
-    node2->attachObject(entity2);
-    */
-
     scene_->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
+    scene_->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
 
-    SceneNode* camNode = scene_->getRootSceneNode()->createChildSceneNode();
+    camNode_ = scene_->getRootSceneNode()->createChildSceneNode();
 
-    camNode->setPosition(Vector3(500, 100, 0));
-    camNode->lookAt(Vector3(0, 0, 0), Node::TS_WORLD);
-
+    camNode_->setPosition(Vector3(7, 3, 7));
+    camNode_->lookAt(Vector3(0, 0, 0), Node::TS_WORLD);
     camera->setNearClipDistance(1);
-    camera->setFarClipDistance(1000);
+    camera->setFarClipDistance(100);
 
-    camNode->attachObject(camera);
+    camNode_->attachObject(camera);
+    camera->lookAt(0,0,-1);
 
     Ogre::Light* pointLight = scene_->createLight();
     pointLight->setType(Ogre::Light::LT_POINT);
-    pointLight->setPosition(camNode->getPosition());
+    pointLight->setPosition(Ogre::Vector3(3, 3, 0));
     pointLight->setDiffuseColour(0.7, 0.7, 1.0);
 }
 
-Ogre::SceneNode* GraphicsTest::createSphere(std::vector<double> position, std::vector<double> orientation, double radius)
+Ogre::SceneNode* GraphicsTest::createEllipsoid(std::vector<double> position, std::vector<double> orientation, std::vector<double> scale)
 {
     Entity* entity = GraphicsTest::GetInstance()->scene_->createEntity(Ogre::SceneManager::PT_SPHERE);
     MaterialPtr material = MaterialManager::getSingleton().getByName("BaseWhite", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    material->setReceiveShadows(true);
     entity->setMaterial(material);
+    entity->setCastShadows(true);
     SceneNode* node = GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
     node->attachObject(entity);
     node->setPosition(position[0], position[1], position[2]);
     node->setOrientation(orientation[0], orientation[1], orientation[2], orientation[3]);
-    node->scale(radius, radius, radius);
+    node->scale(scale[0]*0.01, scale[1]*0.01, scale[2]*0.01);
+    return node;
+}
+
+Ogre::SceneNode* GraphicsTest::createBox(std::vector<double> position, std::vector<double> orientation, std::vector<double> scale)
+{
+    Entity* entity = GraphicsTest::GetInstance()->scene_->createEntity(Ogre::SceneManager::PT_CUBE);
+    MaterialPtr material = MaterialManager::getSingleton().getByName("BaseWhite", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    material->setReceiveShadows(true);
+    entity->setMaterial(material);
+    entity->setCastShadows(true);
+    SceneNode* node = GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(entity);
+    node->setPosition(position[0], position[1], position[2]);
+    node->setOrientation(orientation[0], orientation[1], orientation[2], orientation[3]);
+    node->scale(scale[0]*0.01, scale[1]*0.01, scale[2]*0.01);
     return node;
 }
 
@@ -189,7 +192,9 @@ Ogre::SceneNode* GraphicsTest::createPlane(std::vector<double> position, std::ve
                                            1500, 1500, 20, 20, true, 1, 5, 5, Vector3::UNIT_Z);
     Entity* entity = GraphicsTest::GetInstance()->scene_->createEntity("plane");
     MaterialPtr material = MaterialManager::getSingleton().getByName("BaseWhite", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    material->setReceiveShadows(true);
     entity->setMaterial(material);
+    entity->setCastShadows(true);
     SceneNode* node = GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
     node->attachObject(entity);
     node->setPosition(position[0], position[1], position[2]);
@@ -226,4 +231,20 @@ std::vector<double> GraphicsTest::getSceneNodeOrientation(Ogre::SceneNode* node)
 void GraphicsTest::setSceneNodeOrientation(Ogre::SceneNode* node, std::vector<double> ori)
 {
     node->setOrientation(Quaternion(ori[0], ori[1], ori[2], ori[3]));
+}
+
+std::vector<double> GraphicsTest::getCameraPosition()
+{
+    std::vector<double> ret = std::vector<double> (3);
+    Ogre::Vector3 position = GraphicsTest::GetInstance()->camNode_->getPosition();
+    ret[0] = position.x;
+    ret[1] = position.y;
+    ret[2] = position.z;
+
+    return ret;
+}
+
+void GraphicsTest::setCameraPostion(std::vector<double> position)
+{
+    GraphicsTest::GetInstance()->camNode_->setPosition(position[0], position[1], position[2]);
 }

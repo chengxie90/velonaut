@@ -53,18 +53,33 @@ btRigidBody* PhysicsTest::createDynamicRigidBody(std::vector<double> position,
 {
     if (type == "SPHERE")
     {
-        btCollisionShape* sphere = new btSphereShape(scale[0]);
+        btCollisionShape* sphere = new btSphereShape(scale[0]/2);
         btTransform transform = btTransform(
                     btQuaternion(orientation[1], orientation[2], orientation[3], orientation[0]),
                     btVector3(position[0], position[1], position[2]));
         btDefaultMotionState* motionState = new btDefaultMotionState(transform);
         btScalar mass = 1;
-        btVector3 inertia(0,0,0);
-        sphere->calculateLocalInertia(mass,inertia);
-        btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass,motionState,sphere,inertia);
+        btVector3 inertia(0, 0, 0);
+        sphere->calculateLocalInertia(mass, inertia);
+        btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass, motionState, sphere, inertia);
         btRigidBody* sphereBody = new btRigidBody(rigidBodyCI);
         PhysicsTest::GetInstance()->world_->addRigidBody(sphereBody);
         return sphereBody;
+    }
+    if (type == "CUBE")
+    {
+        btCollisionShape* cube = new btBoxShape(btVector3(scale[0]/2, scale[1]/2, scale[2]/2));
+        btTransform transform = btTransform(
+                    btQuaternion(orientation[1], orientation[2], orientation[3], orientation[0]),
+                    btVector3(position[0], position[1], position[2]));
+        btDefaultMotionState* motionState = new btDefaultMotionState(transform);
+        btScalar mass = 1;
+        btVector3 inertia(0, 0, 0);
+        cube->calculateLocalInertia(mass, inertia);
+        btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass, motionState, cube, inertia);
+        btRigidBody* cubeBody = new btRigidBody(rigidBodyCI);
+        PhysicsTest::GetInstance()->world_->addRigidBody(cubeBody);
+        return cubeBody;
     }
     return NULL;
 }
@@ -86,6 +101,23 @@ btRigidBody* PhysicsTest::createStaticRigidBody(std::vector<double> position,
         btRigidBody* planeBody = new btRigidBody(rigidBodyCI);
         PhysicsTest::GetInstance()->world_->addRigidBody(planeBody);
         return planeBody;
+    }
+
+    if (type == "CUBE")
+    {
+        btCollisionShape* cube = new btBoxShape(btVector3(scale[0]/2, scale[1]/2, scale[2]/2));
+        btTransform transform = btTransform(
+                    btQuaternion(orientation[1], orientation[2], orientation[3], orientation[0]),
+                    btVector3(position[0], position[1], position[2]));
+        btDefaultMotionState* motionState = new btDefaultMotionState(transform);
+        btScalar mass = 0;
+        btVector3 inertia(0, 0, 0);
+        cube->calculateLocalInertia(mass, inertia);
+        btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass, motionState, cube, inertia);
+        btRigidBody* cubeBody = new btRigidBody(rigidBodyCI);
+        PhysicsTest::GetInstance()->world_->addRigidBody(cubeBody);
+        cubeBody->setGravity(btVector3(0,0,0));
+        return cubeBody;
     }
     return NULL;
 }

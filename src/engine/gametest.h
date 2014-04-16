@@ -25,11 +25,13 @@ public:
 private:
     bool terminated_ = false;
 
+    btRigidBody* cubeRB_ = NULL;
     btRigidBody* sphereRB_ = NULL;
     btRigidBody* planeRB_ = NULL;
 
     Ogre::SceneNode* sphereSN_ = NULL;
     Ogre::SceneNode* planeSN_ = NULL;
+    Ogre::SceneNode* cubeSN_ = NULL;
 
     GraphicsTest* graphics_ = NULL;
     InputTest* input_ = NULL;
