@@ -9,6 +9,7 @@ using namespace std;
 //
 // COMPOUND COLLIDER COMPONENT STUFF
 
+/*
 void Physics::InitLuaSimpleCollider()
 {
     luaL_Reg reg[] = {
@@ -25,6 +26,7 @@ void Physics::InitLuaSimpleCollider()
 
     LuaManager::GetInstance()->newlib("CompoundCollider", reg);
 }
+*/
 
 int Physics::LCompoundColliderCreate(lua_State* state)
 {

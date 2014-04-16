@@ -3,9 +3,9 @@
 
 #include "common.h"
 
-class Graphics;
-class Input;
-class Physics;
+class GraphicsTest;
+class InputTest;
+class PhysicsTest;
 
 class GameTest {
 public:
@@ -15,16 +15,16 @@ public:
     void terminate();
 
     static GameTest* GetApp();
-    static Graphics* GetGraphics();
-    static Input* GetInput();
-    static Physics* GetPhysics();
+    static GraphicsTest* GetGraphics();
+    static InputTest* GetInput();
+    static PhysicsTest* GetPhysics();
 
 private:
     bool terminated_ = false;
 
-    Graphics* graphics_ = NULL;
-    Input* input_ = NULL;
-    Physics* physics_ = NULL;
+    GraphicsTest* graphics_ = NULL;
+    InputTest* input_ = NULL;
+    PhysicsTest* physics_ = NULL;
 };
 
 #endif // GAMETEST_H

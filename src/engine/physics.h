@@ -32,8 +32,8 @@ private:
 private:
     // Lua setup
     void InitLuaPhysics();
-    void InitLuaSimpleCollider();
-    void InitLuaCompoundCollider();
+//    void InitLuaSimpleCollider();
+//    void InitLuaCompoundCollider();
 
     // World stuff
     static int LWorldSetGravity(lua_State* state);
