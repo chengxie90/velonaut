@@ -5,6 +5,10 @@
 
 using namespace std;
 
+//-------------------------------------------------------------------------------------------------
+//
+// GENERAL PHYSICS CLASS STUFF
+
 Physics::Physics() {}
 
 void Physics::init()
@@ -26,23 +30,9 @@ void Physics::init()
 
 void Physics::initLua()
 {
-    luaL_Reg reg[] = {   
-        {"setWorldGravity", Physics::LWorldSetGravity},
-        {"stepWorld", Physics::LWorldStep},
-/*
-        {"createPhysics", Physics::LPhysicsCreate},
-        {"getPhysicsTransform", Physics::LPhysicsGetTransform},
-        {"getPhysicsPosition", Physics::LPhysicsGetPosition},
-        {"getPhysicsOrientation", Physics::LPhysicsGetOrientation},
-        {"setPhysicsTransform", Physics::LPhysicsSetTransform},
-        {"setPhysicsPosition", Physics::LPhysicsSetPosition},
-        {"setPhysicsOrientation", Physics::LPhysicsSetOrientation},
-        {"deletePhysics", Physics::LPhysicsDelete},
-            */
-        {NULL, NULL}
-    };
-
-    LuaManager::GetInstance()->newlib("Physics", reg);
+    this->InitLuaPhysics();
+    //this->InitLuaSimpleCollider();
+    //this->InitLuaCompoundCollider();
 }
 
 void Physics::shutdown()
@@ -59,22 +49,55 @@ Physics* Physics::GetInstance()
     return App::GetApp()->GetPhysics();
 }
 
+//-------------------------------------------------------------------------------------------------
+//
+// PHYSICS WORLD STUFF
+
+void Physics::InitLuaPhysics()
+{
+    luaL_Reg reg[] = {
+        {"setWorldGravity", Physics::LWorldSetGravity},
+        {"stepWorld", Physics::LWorldStep},
+
+//        {"createPhysics", Physics::LPhysicsCreate},
+//        {"getPhysicsTransform", Physics::LPhysicsGetTransform},
+//        {"getPhysicsPosition", Physics::LPhysicsGetPosition},
+//        {"getPhysicsOrientation", Physics::LPhysicsGetOrientation},
+//        {"setPhysicsTransform", Physics::LPhysicsSetTransform},
+//        {"setPhysicsPosition", Physics::LPhysicsSetPosition},
+//        {"setPhysicsOrientation", Physics::LPhysicsSetOrientation},
+//        {"deletePhysics", Physics::LPhysicsDelete},
+
+        {NULL, NULL}
+    };
+
+    LuaManager::GetInstance()->newlib("Physics", reg);
+}
+
 int Physics::LWorldSetGravity(lua_State* state)
 {
+    // TODO: Change to Vector
+    double x, y, z;
+    LuaManager::GetInstance()->GetParams("ddd", x, y, z);
     Physics::GetInstance()->world_->setGravity(btVector3(0,-10,0));
     return 0;
 }
 
 int Physics::LWorldStep(lua_State* state)
 {
-    luaL_checktype(state, -1, LUA_TNUMBER);
-    double step = lua_tonumber(state, -1);
+    double step;
+    LuaManager::GetInstance()->GetParams("d", &step);
     Physics::GetInstance()->world_->stepSimulation(step,1);
     return 0;
 }
 
+//-------------------------------------------------------------------------------------------------
+//
+// PHYSICS COMPONENT STUFF
+
 int Physics::LPhysicsCreate(lua_State* state)
 {
+
     return 0; // TODO: implement
 }
 

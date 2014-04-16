@@ -3,5 +3,5 @@ require "utility"
 Collider = createClass()
 
 function Collider:init(data)
-    print("physics:init")
+    print("collider:init")
 end
