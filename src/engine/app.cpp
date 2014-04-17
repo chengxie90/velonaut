@@ -8,6 +8,22 @@ using namespace std;
 
 extern App g_app;
 
+
+static int LScript_Bla(lua_State* state) {
+
+    double d;
+    string s;
+
+    App::GetLuaManager()->extractParam(&d);
+    App::GetLuaManager()->extractParam(&s);
+    std::cout << "got from lua: " << d << std::endl;
+    std::cout << "got from lua: " << s << std::endl;
+
+    App::GetLuaManager()->addParam(45);
+    App::GetLuaManager()->addParam("hello from c");
+    return 2;
+}
+
 bool App::init(int argc, char *argv[])
 {
     graphics_ = new Graphics();
@@ -17,6 +33,23 @@ bool App::init(int argc, char *argv[])
     graphics_->init();
     input_->init();
     luaManager_->init();
+
+    luaManager_->registerFunction("LScript_Bla", LScript_Bla);
+
+    luaManager_->addFunction("App.init");
+    luaManager_->pCall();
+
+    double r0;
+    Ogre::Matrix3 r1;
+
+    luaManager_->addFunction("test");
+    luaManager_->addParam(9.0);
+    luaManager_->addParam(Ogre::Matrix3::IDENTITY);
+
+    luaManager_->pCall( 2, 2 );
+
+    luaManager_->extractParam(&r0);
+    luaManager_->extractParam(&r1);
 
     return true;
 }
