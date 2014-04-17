@@ -3,6 +3,7 @@
 #include "graphics.h"
 #include "input.h"
 #include "luamanager.h"
+#include "network.h"
 
 using namespace std;
 
@@ -29,27 +30,15 @@ bool App::init(int argc, char *argv[])
     graphics_ = new Graphics();
     input_ = new Input();
     luaManager_ = new LuaManager();
+    network_ = new Network();
     
     graphics_->init();
     input_->init();
     luaManager_->init();
 
-    luaManager_->registerFunction("LScript_Bla", LScript_Bla);
-
-    luaManager_->addFunction("App.init");
-    luaManager_->pCall();
-
-    double r0;
-    Ogre::Matrix3 r1;
-
-    luaManager_->addFunction("test");
-    luaManager_->addParam(9.0);
-    luaManager_->addParam(Ogre::Matrix3::IDENTITY);
-
-    luaManager_->pCall( 2, 2 );
-
-    luaManager_->extractParam(&r0);
-    luaManager_->extractParam(&r1);
+    network_->startServer();
+    sleep(0.5);
+    network_->startClient();
 
     return true;
 }
@@ -59,6 +48,7 @@ void App::run()
     while (!terminated_) {
         input_->update();
         luaManager_->update();
+        network_->poll();
         graphics_->render();
     }
 }
