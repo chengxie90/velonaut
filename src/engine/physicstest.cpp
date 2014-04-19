@@ -46,6 +46,11 @@ void PhysicsTest::stepWorld(double time)
     PhysicsTest::GetInstance()->world_->stepSimulation(time);
 }
 
+void PhysicsTest::setGravity(std::vector<double> gravity)
+{
+    PhysicsTest::GetInstance()->world_->setGravity(btVector3(gravity[0], gravity[1], gravity[2]));
+}
+
 btRigidBody* PhysicsTest::createDynamicRigidBody(std::vector<double> position,
                                                  std::vector<double> orientation,
                                                  std::vector<double> scale,
@@ -63,6 +68,7 @@ btRigidBody* PhysicsTest::createDynamicRigidBody(std::vector<double> position,
         sphere->calculateLocalInertia(mass, inertia);
         btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(mass, motionState, sphere, inertia);
         btRigidBody* sphereBody = new btRigidBody(rigidBodyCI);
+        sphereBody->setFriction(1000);
         PhysicsTest::GetInstance()->world_->addRigidBody(sphereBody);
         return sphereBody;
     }
@@ -163,4 +169,111 @@ void PhysicsTest::setRigidBodyOrientation(btRigidBody* node, std::vector<double>
     node->getMotionState()->getWorldTransform(transform);
     transform.setRotation(origin);
     node->getMotionState()->setWorldTransform(transform);
+}
+
+void PhysicsTest::setRigidBodyAngularVelocity(btRigidBody* node, std::vector<double> roll)
+{
+    node->setAngularVelocity(btVector3(roll[0], roll[1], roll[2]));
+}
+
+void PhysicsTest::addRigidBodyAngularVelocity(btRigidBody* node, std::vector<double> roll)
+{
+    btVector3 addAV = btVector3(roll[0], roll[1], roll[2]);
+    btVector3 curAV = node->getAngularVelocity();
+    addAV *= 0.51;
+    curAV *= 0.49;
+    addAV += curAV;
+    node->setAngularVelocity(addAV);
+}
+
+std::vector<double> PhysicsTest::getCameraPos(btRigidBody* ship, double camDis)
+{
+    btTransform transform;
+    ship->getMotionState()->getWorldTransform(transform);
+    btVector3 position = transform.getOrigin();
+    btQuaternion orientation = transform.getRotation();
+    btVector3 look = btVector3(0,0,-1);
+    look = look.rotate(orientation.getAxis(), orientation.getAngle());
+    look.normalize(); look *= (-1 * camDis);
+    position += look;
+    std::vector<double> ret = std::vector<double>(3);
+    ret[0] = position.x();
+    ret[1] = position.y();
+    ret[2] = position.z();
+    return ret;
+}
+
+void PhysicsTest::applyRigidBodyTorque(btRigidBody* node, std::vector<double> torque, std::vector<double> maxAngularVelocity)
+{
+    btVector3 currAngularVel = node->getAngularVelocity();
+    btVector3 torqueVec = btVector3(torque[0], torque[1], torque[2]);
+    node->activate(true);
+    node->applyTorque(torqueVec);
+}
+
+void PhysicsTest::applyRigidBodyForce(btRigidBody* node, std::vector<double> force, std::vector<double> maxVelocity)
+{
+    btVector3 forceVec = btVector3(force[0], force[1], force[2]);
+    node->activate(true);
+    node->applyCentralForce(forceVec);
+}
+
+std::vector<double> PhysicsTest::getRigidBodyLook(btRigidBody* node)
+{
+    btTransform transform;
+    node->getMotionState()->getWorldTransform(transform);
+    btQuaternion orientation = transform.getRotation();
+    btVector3 look = btVector3(0,0,-1);
+    look = look.rotate(orientation.getAxis(), orientation.getAngle());
+    look.normalize();
+    std::vector<double> ret = std::vector<double>(3);
+    ret[0] = look.x();
+    ret[1] = look.y();
+    ret[2] = look.z();
+    return ret;
+}
+
+std::vector<double> PhysicsTest::getRigidBodyUp(btRigidBody* node)
+{
+    btTransform transform;
+    node->getMotionState()->getWorldTransform(transform);
+    btQuaternion orientation = transform.getRotation();
+    btVector3 look = btVector3(0,1,0);
+    look = look.rotate(orientation.getAxis(), orientation.getAngle());
+    look.normalize();
+    std::vector<double> ret = std::vector<double>(3);
+    ret[0] = look.x();
+    ret[1] = look.y();
+    ret[2] = look.z();
+    return ret;
+}
+
+std::vector<double> PhysicsTest::getRigidBodyRight(btRigidBody* node)
+{
+    btTransform transform;
+    node->getMotionState()->getWorldTransform(transform);
+    btQuaternion orientation = transform.getRotation();
+    btVector3 look = btVector3(1,0,0);
+    look = look.rotate(orientation.getAxis(), orientation.getAngle());
+    look.normalize();
+    std::vector<double> ret = std::vector<double>(3);
+    ret[0] = look.x();
+    ret[1] = look.y();
+    ret[2] = look.z();
+    return ret;
+}
+
+btVector3 PhysicsTest::getRigidBodyVelocity(btRigidBody* node)
+{
+    return node->getLinearVelocity();
+}
+
+void PhysicsTest::setRigidBodyVelocity(btRigidBody* node, btVector3 velocity)
+{
+    node->setLinearVelocity(velocity);
+}
+
+void PhysicsTest::setDamping(btRigidBody* node, double linearDamping, double angularDamping)
+{
+    node->setDamping(linearDamping, angularDamping);
 }

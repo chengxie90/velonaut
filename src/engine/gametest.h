@@ -22,6 +22,13 @@ public:
     static InputTest* GetInput();
     static PhysicsTest* GetPhysics();
 
+    static void applyPlayerForce(std::vector<double> force);
+    static void applyPlayerTorque(std::vector<double> torque);
+    static std::vector<double> getPlayerLook();
+    static std::vector<double> getPlayerUp();
+    static std::vector<double> getPlayerRight();
+    static void rollPlayer(std::vector<double> roll);
+
 private:
     bool terminated_ = false;
 
@@ -36,6 +43,8 @@ private:
     GraphicsTest* graphics_ = NULL;
     InputTest* input_ = NULL;
     PhysicsTest* physics_ = NULL;
+
+
 };
 
 #endif // GAMETEST_H

@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <OGRE/Ogre.h>
+#include "beziertest.h"
 #include "common.h"
 
 #include <vector>
@@ -43,6 +44,12 @@ private:
 
     static std::vector<double> getCameraPosition();
     static void setCameraPostion(std::vector<double> position);
+    static void setCameraOrientation(std::vector<double> orientation);
+    static std::vector<double> getCameraDerivedDirection();
+    static std::vector<double> getCameraDerivedUp();
+
+    static void createTunnel(unsigned int seed);
+    static Ogre::Vector3 getRandomPoint(double min, double max);
 };
 
 
