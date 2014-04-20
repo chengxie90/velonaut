@@ -12,6 +12,9 @@ public:
     void initLua();
     void render();
     void shutdown();
+    Ogre::RenderWindow* renderWindow_ = NULL;
+    Ogre::Root* root_ = NULL;
+    Ogre::SceneManager* scene_ = NULL;
     
     static Graphics* GetInstance();
 private:
@@ -25,9 +28,7 @@ private:
     void createScene();
     
     SDL_Window* window_ = NULL;
-    Ogre::Root* root_ = NULL;
-    Ogre::RenderWindow* renderWindow_ = NULL;
-    Ogre::SceneManager* scene_ = NULL;
+
     
 private:
     static int LSceneCreate(lua_State* state);

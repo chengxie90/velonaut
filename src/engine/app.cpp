@@ -4,6 +4,7 @@
 #include "input.h"
 #include "luamanager.h"
 #include "network.h"
+#include "ui.h"
 
 using namespace std;
 
@@ -29,16 +30,23 @@ bool App::init(int argc, char *argv[])
 {
     graphics_ = new Graphics();
     input_ = new Input();
-    luaManager_ = new LuaManager();
+    ui_ = new Ui();
     network_ = new Network();
+    luaManager_ = new LuaManager();
     
     graphics_->init();
+    graphics_->scene_->addRenderQueueListener(ui_);
+
     input_->init();
+    ui_->init();
+    network_->init();
+
     luaManager_->init();
 
     network_->startServer();
-    sleep(0.5);
     network_->startClient();
+
+    input_->addListener( ui_);
 
     return true;
 }
@@ -58,10 +66,12 @@ void App::shutdown()
     input_->shutdown();
     graphics_->shutdown();
     luaManager_->shutdown();
+    ui_->shutdown();
     
     delete luaManager_;
     delete input_;
     delete graphics_;
+    delete ui_;
 }
 
 void App::terminate()
@@ -87,6 +97,11 @@ Input *App::GetInput()
 LuaManager *App::GetLuaManager()
 {
     return g_app.luaManager_;
+}
+
+Ui *App::GetUi()
+{
+    return g_app.ui_;
 }
 
 

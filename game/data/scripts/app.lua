@@ -16,11 +16,21 @@ function App.init()
     local config = loadData("config")
     assert(config.scene)
     App.loadScene(config.scene)
+	gui.loadFont("data/ui/Delicious-Bold.otf")
+	gui.loadFont("data/ui/Delicious-BoldItalic.otf")
+	gui.loadFont("data/ui/Delicious-Italic.otf")
+	gui.loadFont("data/ui/Delicious-Roman.otf")
+	gui.loadDocument("data/ui/demo.rml")
 
-	d, s = LScript_Bla(13.0, "hello from lua")
-	print(s)
-	print("got from c " .. d );
-	print("got from c " .. s );
+	local wu = "WUUUUUUUUU"
+
+	function onClick()
+		print("onClick! " .. wu)
+	end
+
+	gui.addEventListener("btn", "click", onClick)
+
+
 
 end
 
@@ -39,3 +49,5 @@ function App.loadScene(name)
     assert(data)
     App.scene:init(data)
 end
+
+App.init()

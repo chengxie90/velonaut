@@ -20,13 +20,14 @@ public:
     static Network* GetInstance();
 private:
     SINGLETON(Network)
+    friend class App;
 
     void onConnectionAccepted(RakNet::Packet* packet);
     void onGameInit(RakNet::Packet* packet);
     void onGameStart(RakNet::Packet* packet);
     void onGameUpdate(RakNet::Packet* packet);
     void onGameOver(RakNet::Packet* packet);
-    friend class App;
+
     NetworkServer* server_;
     RakNet::RakPeerInterface *peer;
     RakNet::BitStream bsOut;

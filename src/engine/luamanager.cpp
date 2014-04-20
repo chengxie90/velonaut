@@ -8,6 +8,7 @@
 #include "luamanager.h"
 #include "app.h"
 #include "graphics.h"
+#include "ui.h"
 
 using namespace std;
 
@@ -256,6 +257,7 @@ void LuaManager::init()
     luaL_openlibs(state_);
 
     Graphics::GetInstance()->initLua();
+    Ui::GetInstance()->initLua();
 
     doFile("./data/scripts/app.lua");
 }

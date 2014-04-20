@@ -60,7 +60,7 @@ void Graphics::render()
     root_->renderOneFrame();
     root_->_fireFrameRenderingQueued();
     root_->_fireFrameEnded();
-    
+
 #ifndef __APPLE__
     SDL_GL_SwapWindow(window_);
 #endif
