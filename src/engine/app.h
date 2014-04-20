@@ -9,8 +9,7 @@ class Input;
 class LuaManager;
 class Network;
 class Ui;
-
-
+class Physics;
 
 class App {
 public:
@@ -25,6 +24,7 @@ public:
     static LuaManager* GetLuaManager();
     static Network* GetNetwork();
     static Ui* GetUi();
+    static Physics* GetPhysics();
     
 private:
     bool terminated_ = false;
@@ -34,7 +34,7 @@ private:
     LuaManager* luaManager_ = NULL;
     Network* network_ = NULL;
     Ui* ui_ = NULL;
-
+    Physics* physics_ = NULL;
 };
 
 #endif

@@ -9,6 +9,7 @@
 #include "app.h"
 #include "graphics.h"
 #include "ui.h"
+#include "lua/luaconf.h"
 
 using namespace std;
 
@@ -45,7 +46,7 @@ void LuaManager::addParam(int value) const {
 }
 
 void LuaManager::extractParam(int *value) const {
-    *value = lua_tonumber(state_, 1);
+    *value = luaL_checknumber(state_, 1);
     lua_remove(state_, 1);
 }
 
@@ -54,16 +55,16 @@ void LuaManager::addParam(double value) const {
 }
 
 void LuaManager::extractParam(double *value)const {
-    *value = lua_tonumber(state_, 1);
+    *value = luaL_checknumber(state_, 1);
     lua_remove(state_, 1);
 }
 
 void LuaManager::addParam(string str) const {
-    lua_pushlstring(state_, str.c_str(), str.size());
+    lua_pushstring(state_, str.c_str());
 }
 
 void LuaManager::extractParam(string *str) const {
-    *str = lua_tostring(state_, 1);
+    *str = luaL_checkstring(state_, 1);
     lua_remove(state_, 1);
 }
 
@@ -71,7 +72,7 @@ void LuaManager::addParam(Ogre::Vector3 v) const {
 
     pushLuaMatrix();
 
-    LUA_NUMBER p[3] = {v.x, v.y, v.z};
+    lua_Number p[3] = {v.x, v.y, v.z};
     pushVector(p, 3);
 
     pCall(2,1);
@@ -79,7 +80,7 @@ void LuaManager::addParam(Ogre::Vector3 v) const {
 
 void LuaManager::extractParam(Ogre::Vector3 *v) const {
 
-    LUA_NUMBER result[3];
+    lua_Number result[3];
     removeVector(result, 1);
 
     v->x = result[0];
@@ -91,18 +92,23 @@ void LuaManager::addParam(Ogre::Matrix3 m) const {
 
     pushLuaMatrix();
 
-    LUA_NUMBER p[9] = {m.GetColumn(0).x, m.GetColumn(1).x, m.GetColumn(2).x,
+    lua_Number p[9] = {m.GetColumn(0).x, m.GetColumn(1).x, m.GetColumn(2).x,
                        m.GetColumn(0).y, m.GetColumn(1).y, m.GetColumn(2).y,
                        m.GetColumn(0).z, m.GetColumn(1).z, m.GetColumn(2).z,};
     pushMatrix(p, 9);
 
     pCall(2, 1);
+    
+}
 
+void LuaManager::addParam(void *p) const
+{
+    lua_pushlightuserdata(state_, p);
 }
 
 void LuaManager::extractParam(Ogre::Matrix3 *m) const {
 
-    LUA_NUMBER result[9];
+    lua_Number result[9];
     removeMatrix(result, 1);
 
     m->SetColumn(0, Ogre::Vector3(result[0],result[3], result[6]));
@@ -110,19 +116,27 @@ void LuaManager::extractParam(Ogre::Matrix3 *m) const {
     m->SetColumn(2, Ogre::Vector3(result[2],result[5], result[8]));
 }
 
-void LuaManager::pushVector(LUA_NUMBER* matrix, int num_elements) const {
+void LuaManager::extractParam(Ogre::ColourValue *c) const
+{
+    lua_Number result[4] = {0, 0, 0, 1};
+    removeVector(result, 1);
+    c->r = result[0];
+    c->g = result[1];
+    c->b = result[2];
+    c->a = result[3];
+}
+
+void LuaManager::pushVector(lua_Number* matrix, int num_elements) const {
 
     lua_newtable(state_);
 
     for(int i = 0; i < num_elements; i++) {
-
         lua_pushnumber(state_, matrix[i]);
         lua_rawseti(state_, -2, i+1);
-
     }
 }
 
-void LuaManager::removeVector(LUA_NUMBER* result, int index) const {
+void LuaManager::removeVector(lua_Number* result, int index) const {
 
     luaL_checktype(state_, index, LUA_TTABLE);
     int len = lua_rawlen(state_, index);
@@ -149,7 +163,7 @@ void LuaManager::removeVector(LUA_NUMBER* result, int index) const {
     lua_remove(state_, index);
 }
 
-void LuaManager::pushMatrix(LUA_NUMBER* matrix, int num_elements) const {
+void LuaManager::pushMatrix(lua_Number* matrix, int num_elements) const {
 
     lua_newtable(state_);
     int len = sqrt(num_elements);
@@ -169,9 +183,9 @@ void LuaManager::pushMatrix(LUA_NUMBER* matrix, int num_elements) const {
     }
 }
 
-void LuaManager::removeMatrix(LUA_NUMBER* result, int index) const {
+void LuaManager::removeMatrix(lua_Number* result, int index) const {
     luaL_checktype(state_, index, LUA_TTABLE);
-    int len = lua_objlen(state_, index);
+    int len = 0; // TODO (state_, index);
 
     for(int row = 0; row < len; row++) {
         lua_pushinteger(state_, row+1);
@@ -257,14 +271,20 @@ void LuaManager::init()
     luaL_openlibs(state_);
 
     Graphics::GetInstance()->initLua();
-    Ui::GetInstance()->initLua();
 
-    doFile("./data/scripts/app.lua");
+    Ui::GetInstance()->initLua();
 }
 
-void LuaManager::update()
+void LuaManager::start()
 {
+    doFile("./data/scripts/engine/app.lua");
+}
 
+void LuaManager::update(float dt)
+{
+    addFunction("App.update");
+    addParam((double)dt);
+    pCall(1);
 }
 
 void LuaManager::shutdown()
@@ -272,10 +292,14 @@ void LuaManager::shutdown()
     lua_close(state_);
 }
 
-void LuaManager::newlib(string libname, luaL_Reg reg[])
+void LuaManager::addlib(luaL_Reg* reg)
 {
     luaL_newlib(state_, reg);
-    lua_setglobal(state_, libname.c_str());
+}
+
+void LuaManager::requiref(string name, lua_CFunction func)
+{
+    luaL_requiref(state_, name.c_str(), func, false);
 }
 
 void LuaManager::doFile(string file) const {
@@ -289,3 +313,9 @@ void LuaManager::doFile(string file) const {
     }
 }
 
+void LuaManager::extractParam(void **p) const
+{
+    luaL_checktype(state_, 1, LUA_TLIGHTUSERDATA);
+    *p = lua_touserdata(state_, 1); 
+    lua_remove(state_, 1);
+}

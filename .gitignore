@@ -6,3 +6,4 @@ build
 velonaut
 3rdparty
 bin
+test.lua

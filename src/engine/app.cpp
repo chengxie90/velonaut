@@ -5,42 +5,31 @@
 #include "luamanager.h"
 #include "network.h"
 #include "ui.h"
+#include "physics.h"
+#include "SDL2/SDL.h"
+
 
 using namespace std;
 
 extern App g_app;
 
-
-static int LScript_Bla(lua_State* state) {
-
-    double d;
-    string s;
-
-    App::GetLuaManager()->extractParam(&d);
-    App::GetLuaManager()->extractParam(&s);
-    std::cout << "got from lua: " << d << std::endl;
-    std::cout << "got from lua: " << s << std::endl;
-
-    App::GetLuaManager()->addParam(45);
-    App::GetLuaManager()->addParam("hello from c");
-    return 2;
-}
-
 bool App::init(int argc, char *argv[])
 {
-    graphics_ = new Graphics();
-    input_ = new Input();
-    ui_ = new Ui();
-    network_ = new Network();
-    luaManager_ = new LuaManager();
+
+    input_ = new Input;
+    luaManager_ = new LuaManager;
+    physics_ = new Physics;
+    ui_ = new Ui;
+    network_ = new Network;
+    luaManager_ = new LuaManager;
     
     graphics_->init();
     graphics_->scene_->addRenderQueueListener(ui_);
 
     input_->init();
+    physics_->init();
     ui_->init();
     network_->init();
-
     luaManager_->init();
 
     network_->startServer();
@@ -53,9 +42,18 @@ bool App::init(int argc, char *argv[])
 
 void App::run()
 {
+    Uint32 oldTime = SDL_GetTicks();
+    
+    luaManager_->start();
+    
     while (!terminated_) {
+        Uint32 curTime = SDL_GetTicks();
+        float dt = (curTime - oldTime) / 1000.f;
+        oldTime = curTime;
+        
+        physics_->update(dt);
         input_->update();
-        luaManager_->update();
+        luaManager_->update(dt);
         network_->poll();
         graphics_->render();
     }
@@ -67,7 +65,10 @@ void App::shutdown()
     graphics_->shutdown();
     luaManager_->shutdown();
     ui_->shutdown();
+    physics_->shutdown();
+
     
+    delete physics_;
     delete luaManager_;
     delete input_;
     delete graphics_;
@@ -102,6 +103,11 @@ LuaManager *App::GetLuaManager()
 Ui *App::GetUi()
 {
     return g_app.ui_;
+}
+
+Physics *App::GetPhysics()
+{
+    return g_app.physics_;
 }
 
 
