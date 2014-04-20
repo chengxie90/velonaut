@@ -353,7 +353,7 @@ function matrix.det( m1 )
 	-- get determinant
 	-- using Gauss elimination and Laplace
 	-- start eliminating from below better for removals
-	-- get copy of matrix, set initial determinant
+	-- get copy of matrix, set _initial determinant
 	local mtx = matrix.copy( m1 )
 	local det = 1
 	-- get det up to the last element
