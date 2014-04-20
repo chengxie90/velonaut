@@ -4,18 +4,22 @@ return
     {
         {
             type = "Transform",
-            position = {0, 0, -500},
-            target = {0, 0, 0},
+            position = Vector(0, 0, 3),
+            target = Vector(0, 0, 0),
         },
         {
             type = "Camera",
-            near = 1,
+            near = 0.1,
             far = 1000,
+            fov = 45,
         },
         {
             type = "Light",
             lightType = "pointlight",
-            diffuse = {0.7, 0.7, 1.0}
+            diffuse = Color(0.7, 0.7, 1.0)
+        },
+        {
+            type = "Player"
         }
     }
 }

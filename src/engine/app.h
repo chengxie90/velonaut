@@ -6,6 +6,7 @@
 class Graphics;
 class Input;
 class LuaManager;
+class Physics;
 
 class App {
 public:
@@ -18,6 +19,7 @@ public:
     static Graphics* GetGraphics();
     static Input* GetInput();
     static LuaManager* GetLuaManager();
+    static Physics* GetPhysics();
     
 private:
     bool terminated_ = false;
@@ -25,6 +27,7 @@ private:
     Graphics* graphics_ = NULL;
     Input* input_ = NULL;
     LuaManager* luaManager_ = NULL;
+    Physics* physics_ = NULL;
 };
 
 #endif
