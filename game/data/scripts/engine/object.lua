@@ -37,7 +37,7 @@ function Object:addComponent(typename, data, start)
     assert(self._components[typename] == nil, "Duplicated components")
     local classobject = rawget(_G, typename)
     if classobject == nil then
-        require(typename)
+        require(typename:lower())
         classobject = _G[typename]
         assert(classobject)
     end
