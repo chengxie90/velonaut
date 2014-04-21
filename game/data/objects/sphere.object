@@ -3,11 +3,11 @@ return
     components = {
         {
             type = "Transform",
-            position = Vector(-2, 0, 0)
+            position = Vector(2, 0, 0)
         },
         {
             type = "MeshRenderer",
-            mesh = "cube",
+            mesh = "sphere",
             material = "lambert1"
         },
     }
