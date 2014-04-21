@@ -22,9 +22,6 @@ private:
     void initWindow();
     void initResources();
     
-    // tmp
-    void createScene();
-    
     SDL_Window* window_ = NULL;
     Ogre::Root* root_ = NULL;
     Ogre::RenderWindow* renderWindow_ = NULL;
@@ -32,33 +29,23 @@ private:
     Ogre::Camera* defaultCamera_ = NULL;
     Ogre::Viewport* viewport_ = NULL;
     
+    // we need to keep shared pointers to keep them from being deleted
+    std::map<Ogre::Mesh*, Ogre::MeshPtr> meshMap_;
+    std::map<Ogre::Material*, Ogre::MaterialPtr> materialMap_;
+    
     // lua bindings
 private:
-    static int lcreateScene(lua_State *);
-    // TODO: destroy
-    
     static int lsetActiveScene(lua_State *);
     static int lsetBackgroundColor(lua_State *);
     
     struct Scene {
-        static int lcreateNode(lua_State *);
-        // TODO: destroy
-        
-        static int lcreateCamera(lua_State *);
-        // TODO: destroy
-        
+        static int lcreate(lua_State *);
         static int lsetMainCamera(lua_State *);
-        
-        static int lcreateLight(lua_State *);
-        // TODO: destroy
-        
         static int lsetAmbientLight(lua_State *);
-        
-        static int lcreateEntity(lua_State *);
-        // TODO: destroy
     };
     
     struct Node {
+        static int lcreate(lua_State *);
         static int lsetPosition(lua_State *);
         static int lposition(lua_State *);
         static int llookAt(lua_State *); 
@@ -66,18 +53,37 @@ private:
     };
     
     struct Camera {
+        static int lcreate(lua_State *);
         static int lsetNear(lua_State *); 
         static int lsetFar(lua_State *);
         static int lsetFOV(lua_State *);
     };
     
     struct Light {
+        static int lcreate(lua_State *);
         static int lsetType(lua_State *);
         static int lsetDiffuse(lua_State *); 
     };
     
     struct Entity {
-        
+        static int lcreate(lua_State *);
+        static int lsetMaterial(lua_State *);
+    };
+    
+    struct Mesh {
+        static int lcreate(lua_State *);
+    };
+    
+    struct MeshBuilder {
+        static int lcreate(lua_State *);
+        static int lposition(lua_State *);
+        static int lnormal(lua_State *);
+        static int lindex(lua_State *);
+        static int lgetMesh(lua_State *);
+    };
+    
+    struct Material {
+        static int lcreate(lua_State *);
     };
 };
 

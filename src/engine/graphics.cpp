@@ -44,6 +44,9 @@ void Graphics::init()
 
 void Graphics::shutdown()
 {
+    meshMap_.clear();
+    materialMap_.clear();
+    
     delete root_;
     
     SDL_DestroyWindow(window_);    
@@ -54,7 +57,6 @@ void Graphics::initLua()
 {
     LuaManager::GetInstance()->requiref("engine.graphics.c", [](lua_State* state) {
         luaL_Reg reg[] = {
-            {"createScene", Graphics::lcreateScene},
             {"setActiveScene", Graphics::lsetActiveScene},
             {"setBackgroundColor", Graphics::lsetBackgroundColor},
             {NULL, NULL}
@@ -65,12 +67,9 @@ void Graphics::initLua()
     
     LuaManager::GetInstance()->requiref("engine.graphics.scene.c", [](lua_State* state) {
         luaL_Reg reg[] = {
-            {"createNode", Graphics::Scene::lcreateNode},
-            {"createCamera", Graphics::Scene::lcreateCamera},
+            {"create", Graphics::Scene::lcreate},
             {"setMainCamera", Graphics::Scene::lsetMainCamera},
             {"setAmbientLight", Graphics::Scene::lsetAmbientLight},
-            {"createLight", Graphics::Scene::lcreateLight},
-            {"createEntity", Graphics::Scene::lcreateEntity},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -79,6 +78,7 @@ void Graphics::initLua()
     
     LuaManager::GetInstance()->requiref("engine.graphics.node.c", [](lua_State* state) {
         luaL_Reg reg[] = {
+            {"create", Graphics::Node::lcreate},
             {"setPosition", Graphics::Node::lsetPosition},
             {"position", Graphics::Node::lposition},
             {"attachObject", Graphics::Node::lattachObject},
@@ -91,6 +91,7 @@ void Graphics::initLua()
     
     LuaManager::GetInstance()->requiref("engine.graphics.camera.c", [](lua_State* state) {
         luaL_Reg reg[] = {
+            {"create", Graphics::Camera::lcreate},
             {"setNear", Graphics::Camera::lsetNear},
             {"setFar", Graphics::Camera::lsetFar},
             {"setFOV", Graphics::Camera::lsetFOV},
@@ -102,8 +103,50 @@ void Graphics::initLua()
     
     LuaManager::GetInstance()->requiref("engine.graphics.light.c", [](lua_State* state) {
         luaL_Reg reg[] = {
+            {"create", Graphics::Light::lcreate},
             {"setType", Graphics::Light::lsetType},
             {"setDiffuse", Graphics::Light::lsetDiffuse},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
+    
+    LuaManager::GetInstance()->requiref("engine.graphics.entity.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"create", Graphics::Entity::lcreate},
+            {"setMaterial", Graphics::Entity::lsetMaterial},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
+    
+    LuaManager::GetInstance()->requiref("engine.graphics.mesh.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"create", Graphics::Mesh::lcreate},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
+    
+    LuaManager::GetInstance()->requiref("engine.graphics.material.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"create", Graphics::Material::lcreate},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
+    
+    LuaManager::GetInstance()->requiref("engine.graphics.meshbuilder.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"create", Graphics::MeshBuilder::lcreate},
+            {"position", Graphics::MeshBuilder::lposition},
+            {"normal", Graphics::MeshBuilder::lnormal},
+            {"index", Graphics::MeshBuilder::lindex},
+            {"getMesh", Graphics::MeshBuilder::lgetMesh},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -189,7 +232,7 @@ void Graphics::initResources()
     resGroupManager.loadResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
 
-int Graphics::lcreateScene(lua_State *)
+int Graphics::Scene::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->root_->createSceneManager(Ogre::ST_GENERIC);
     LuaManager::GetInstance()->addParam((void *)scene);
@@ -212,7 +255,7 @@ int Graphics::lsetBackgroundColor(lua_State *)
     return 0;
 }
 
-int Graphics::Scene::lcreateCamera(lua_State *)
+int Graphics::Camera::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->scene_;
     string name;
@@ -236,7 +279,7 @@ int Graphics::Scene::lsetMainCamera(lua_State *)
     return 0;
 }
 
-int Graphics::Scene::lcreateLight(lua_State *)
+int Graphics::Light::lcreate(lua_State *)
 {
     Ogre::Light* light = Graphics::GetInstance()->scene_->createLight();
     LuaManager::GetInstance()->addParam((void *)light);
@@ -251,14 +294,33 @@ int Graphics::Scene::lsetAmbientLight(lua_State *)
     return 0;
 }
 
-int Graphics::Scene::lcreateEntity(lua_State *)
+int Graphics::Entity::lcreate(lua_State *)
 {
-    string meshfile;
-    LuaManager::GetInstance()->extractParam(&meshfile);
-    meshfile += ".mesh";
-    Ogre::Entity* entity = Graphics::GetInstance()->scene_->createEntity(meshfile);
+    Ogre::Mesh* pmesh = NULL;
+    LuaManager::GetInstance()->extractParam((void **)&pmesh);
+        
+    MeshPtr mesh = Graphics::GetInstance()->meshMap_[pmesh];
+    
+    Ogre::Entity* entity = Graphics::GetInstance()->scene_->createEntity(mesh);
+    
     LuaManager::GetInstance()->addParam((void *)entity);
+    
     return 1;
+}
+
+int Graphics::Entity::lsetMaterial(lua_State *)
+{
+    Ogre::Entity* entity;
+    LuaManager::GetInstance()->extractParam((void **)&entity);
+    
+    Ogre::Material* pmat = NULL;
+    LuaManager::GetInstance()->extractParam((void **)&pmat);
+
+    MaterialPtr mat = Graphics::GetInstance()->materialMap_[pmat];
+    
+    entity->setMaterial(mat);
+    
+    return 0;
 }
 
 int Graphics::Node::lsetPosition(lua_State *)
@@ -305,7 +367,7 @@ int Graphics::Node::lattachObject(lua_State *)
     return 0;
 }
 
-int Graphics::Scene::lcreateNode(lua_State *)
+int Graphics::Node::lcreate(lua_State *)
 {
     SceneNode* node = Graphics::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
     LuaManager::GetInstance()->addParam((void *)node);
@@ -381,4 +443,121 @@ int Graphics::Light::lsetDiffuse(lua_State *)
     
     light->setDiffuseColour(color);
     return 0;
+}
+
+
+int Graphics::Mesh::lcreate(lua_State *)
+{
+    string name;
+    LuaManager::GetInstance()->extractParam(&name);
+    
+    name += ".mesh";
+    
+    MeshPtr mesh = MeshManager::getSingleton().create(name, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+    Ogre::Mesh* pmesh = mesh.get();
+    
+    Graphics::GetInstance()->meshMap_[pmesh] = mesh;
+    
+    LuaManager::GetInstance()->addParam((void *)pmesh);
+    return 1;
+}
+
+
+int Graphics::Material::lcreate(lua_State *)
+{
+    string name;
+    LuaManager::GetInstance()->extractParam(&name);
+    
+    //name += ".material";
+    
+    MaterialPtr mat = MaterialManager::getSingleton().getByName(name, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+    Ogre::Material* pmat = mat.get();
+    
+    Graphics::GetInstance()->materialMap_[pmat] = mat;
+    
+    LuaManager::GetInstance()->addParam((void *)pmat);
+    
+    return 1;
+}
+
+
+int Graphics::MeshBuilder::lcreate(lua_State *)
+{
+    ManualObject* mo = Graphics::GetInstance()->scene_->createManualObject();
+    
+    string primitive;
+    LuaManager::GetInstance()->extractParam(&primitive);
+    
+    if (primitive == "TriangleStrip") {
+        mo->begin("BaseWhite", RenderOperation::OT_TRIANGLE_STRIP);
+    }
+    else if (primitive == "LineStrip") {
+        mo->begin("BaseWhite", RenderOperation::OT_LINE_STRIP);
+    }
+    else {
+        assert(false);
+    }
+    
+    LuaManager::GetInstance()->addParam((void *)mo);
+    
+    return 1;
+    
+}
+
+int Graphics::MeshBuilder::lposition(lua_State *)
+{
+    ManualObject* mo;
+    LuaManager::GetInstance()->extractParam((void **)&mo);
+    
+    Ogre::Vector3 pos;
+    LuaManager::GetInstance()->extractParam(&pos);
+    
+    mo->position(pos);
+    
+    return 0;
+}
+
+int Graphics::MeshBuilder::lnormal(lua_State *)
+{
+    ManualObject* mo;
+    LuaManager::GetInstance()->extractParam((void **)&mo);
+    
+    Ogre::Vector3 n;
+    LuaManager::GetInstance()->extractParam(&n);
+    
+    mo->normal(n);
+    
+    return 0;
+}
+
+int Graphics::MeshBuilder::lindex(lua_State *)
+{
+    ManualObject* mo;
+    LuaManager::GetInstance()->extractParam((void **)&mo);
+    
+    int index;
+    LuaManager::GetInstance()->extractParam(&index);
+    
+    mo->index(index);
+    
+    return 0;
+}
+
+int Graphics::MeshBuilder::lgetMesh(lua_State *)
+{
+    static string name = "mesh";
+    static int count = 0;
+    
+    ManualObject* mo;
+    LuaManager::GetInstance()->extractParam((void **)&mo);
+    
+    mo->end();
+    
+    MeshPtr mesh = mo->convertToMesh(name + std::to_string(count++));
+    Ogre::Mesh* p = mesh.get();
+    Graphics::GetInstance()->meshMap_[p] = mesh;
+    
+    LuaManager::GetInstance()->addParam((void *)p);
+    
+    return 1;
 }

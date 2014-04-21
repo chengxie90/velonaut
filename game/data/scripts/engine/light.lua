@@ -1,13 +1,13 @@
 require "engine.utility"
 require "engine.component"
-local gfxscene = require "engine.graphics.scene.c"
+
 local gfxlight = require "engine.graphics.light.c"
 local gfxnode = require "engine.graphics.node.c"
 
 Light = class(Component)
 
 function Light:_init()
-    self._handle = gfxscene.createLight()
+    self._handle = gfxlight.create()
 end
 
 function Light:load(data)
