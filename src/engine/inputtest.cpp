@@ -59,7 +59,7 @@ void InputTest::update()
         GameTest::GetApp()->applyPlayerTorque(torque);
     }
     if (keys[SDL_SCANCODE_SPACE]) {
-        double scale = 10000;
+        double scale = 100;
         std::vector<double> force = GameTest::GetApp()->getPlayerLook();
         force[0] *= scale; force[1] *= scale; force[2] *= scale;
         GameTest::GetApp()->applyPlayerForce(force);

@@ -145,7 +145,7 @@ void GraphicsTest::createScene()
     camNode_->setPosition(Vector3(0, 0, 10));
     camNode_->lookAt(Vector3(0, 0, 0), Node::TS_WORLD);
     camera->setNearClipDistance(0.001);
-    camera->setFarClipDistance(10000);
+    camera->setFarClipDistance(1000);
 
     camNode_->attachObject(camera);
     camera->lookAt(0,0,-1);
@@ -287,17 +287,28 @@ void GraphicsTest::createTunnel(unsigned int seed)
     int numCurves = 8;
     int samplesPerCurve = 100;
     int ringSamples = 30;
-    double minControlRad = 200;
-    double maxControlRad = 300;
-    double minAnchorRad = 200;
-    double maxAnchorRad = 300;
-    double ringRadius = 800;
-    double looseningTerm = 0.5;
+    double minControlRad = 8;
+    double maxControlRad = 10;
+    double minAnchorRad = 8;
+    double maxAnchorRad = 10;
+    double ringRadius = 6;
+    double looseningTerm = 1;
     double loosen; double oldLength;
     unsigned  int testSeed = 774265562;
 
     srand(testSeed);
     std::vector<BezierTest> curves = std::vector<BezierTest>(numCurves);
+
+    // TODO: REMOVE TESTING STUFF
+    std::vector<double> size = std::vector<double> (3);
+    size[0] = 0.01; size[1] = 0.01; size[2] = 0.01;
+//    std::vector<double> derSize = std::vector<double> (3);
+//    derSize[0] = 0.01; derSize[1] = 0.01; derSize[2] = 0.01;
+    std::vector<double> ori = std::vector<double> (4);
+    ori[0] = 1; ori[1] = 0; ori[2] = 0; ori[3] = 0;
+    std::vector<double> pos = std::vector<double>(3);
+//    std::vector<double> tanRefPos = std::vector<double>(3);
+//    std::vector<double> norRefPos = std::vector<double>(3);
 
     // FIRST CURVE
     Ogre::Vector3 p0 = Ogre::Vector3(0,0,0);
@@ -363,16 +374,6 @@ void GraphicsTest::createTunnel(unsigned int seed)
     curves[numCurves-1] = last;
 
 
-    // TODO: REMOVE TESTING STUFF
-    std::vector<double> size = std::vector<double> (3);
-    size[0] = 0.01; size[1] = 0.01; size[2] = 0.01;
-//    std::vector<double> derSize = std::vector<double> (3);
-//    derSize[0] = 0.01; derSize[1] = 0.01; derSize[2] = 0.01;
-    std::vector<double> ori = std::vector<double> (4);
-    ori[0] = 1; ori[1] = 0; ori[2] = 0; ori[3] = 0;
-    std::vector<double> pos = std::vector<double>(3);
-//    std::vector<double> tanRefPos = std::vector<double>(3);
-//    std::vector<double> norRefPos = std::vector<double>(3);
 
     // CREATE SAMPLES
     Ogre::Vector3 normalHelper = Ogre::Vector3(0,1,0);
