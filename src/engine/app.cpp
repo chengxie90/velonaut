@@ -85,8 +85,5 @@ Physics *App::GetPhysics()
 {
     return g_app.physics_;
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> 97aecd76b5128820d155788862393ebdc5ee2c9a
 
