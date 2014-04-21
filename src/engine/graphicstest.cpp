@@ -297,7 +297,7 @@ std::vector<double> GraphicsTest::getCameraDerivedUp()
 void GraphicsTest::createTunnel(unsigned int seed)
 {
     // PARAMS
-    int numCurves = 4;
+    int numCurves = 6;
     int samplesPerCurve = 100;
     int ringSamples = 30;
     double minControlRad = 100;
@@ -309,12 +309,6 @@ void GraphicsTest::createTunnel(unsigned int seed)
     // TODO: REMOVE TESTING STUFF
     seed = 774265562;
     std::vector<double> size = std::vector<double> (3);
-    //    pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
-    //    pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
-    //    pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
-    //    pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
-    //    GraphicsTest::GetInstance()->createLine(p0,p1);
-    //    GraphicsTest::GetInstance()->createLine(p2,p3);
     size[0] = ringRadius; size[1] = ringRadius; size[2] = ringRadius;
     std::vector<double> ori = std::vector<double> (4);
     ori[0] = 1; ori[1] = 0; ori[2] = 0; ori[3] = 0;
@@ -335,12 +329,12 @@ void GraphicsTest::createTunnel(unsigned int seed)
     Ogre::Vector3 p2 = p1 +  getRandomPoint(minAnchorRad, maxAnchorRad);
     Ogre::Vector3 p3 = p2 + getRandomPoint(minAnchorRad, maxAnchorRad);
     BezierTest first = BezierTest(p0, p1, p2, p3);
-//    pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
-//    pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
-//    pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
-//    pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
-//    GraphicsTest::GetInstance()->createLine(p0,p1);
-//    GraphicsTest::GetInstance()->createLine(p2,p3);
+    pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+    pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+    pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+    pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+    GraphicsTest::GetInstance()->createLine(p0,p1);
+    GraphicsTest::GetInstance()->createLine(p2,p3);
     curves[0] = first;
 
     // MIDDLE OF SPLINE
@@ -353,12 +347,12 @@ void GraphicsTest::createTunnel(unsigned int seed)
         p2 = p1 + getRandomPoint(minControlRad, maxControlRad);
         p3 = p2 + getRandomPoint(minAnchorRad, maxAnchorRad);
         curves[i] = BezierTest(p0, p1, p2, p3);
-//        pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
-//        pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
-//        pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
-//        pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
-//        GraphicsTest::GetInstance()->createLine(p0,p1);
-//        GraphicsTest::GetInstance()->createLine(p2,p3);
+        pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+        pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+        pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+        pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+        GraphicsTest::GetInstance()->createLine(p0,p1);
+        GraphicsTest::GetInstance()->createLine(p2,p3);
     }
 
     // LAST CURVE
@@ -489,7 +483,6 @@ void GraphicsTest::createTunnel(unsigned int seed)
     //GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode()->attachObject(tunnel);
     GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode()->attachObject(tunnelMesh);
     GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode()->attachObject(path);
-std::cout << "P1----> " << p1 << std::endl;
 }
 
 Ogre::Vector3 GraphicsTest::getRandomPoint(double min, double max)

@@ -17,6 +17,7 @@ function App.start()
     local config = dofile("./data/game.config")
     assert(config.scene)
     App.loadScene(config.scene)
+	math.epsilon = 0.000001
 end
 
 function App.update(dt)
