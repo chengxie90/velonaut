@@ -24,7 +24,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 add_executable(${PROJECT_NAME} ${ENGINE_SRCS})
 
 if(APPLE)
-    set_source_files_properties(graphics.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+    set_source_files_properties(graphics.cpp graphicstest.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif()
 
 target_link_libraries(${PROJECT_NAME}   ${BULLET_LIBRARIES} 

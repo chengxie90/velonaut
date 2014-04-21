@@ -2,9 +2,6 @@
 #include <OGRE/Ogre.h>
 #include <SDL2/SDL_syswm.h>
 #include "common.h"
-#ifdef __APPLE__
-#include "macosx.h"
-#endif
 #include "gametest.h"
 
 using namespace Ogre;
@@ -88,7 +85,6 @@ void GraphicsTest::initWindow()
     NameValuePairList params;
 #ifdef __APPLE__
     params["externalGLControl"] = "1";
-    params["externalWindowHandle"] = osx_cocoa_view(window_);
     params["macAPI"] = "cocoa";
     params["macAPICocoaUseNSView"] = "true";
 #elif __LINUX__
