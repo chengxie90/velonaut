@@ -10,8 +10,16 @@ return
             prefab = "cube"
         },
         {
+            name = "sphere",
+            prefab = "sphere"
+        },
+        {
             name = "player",
             prefab = "player"
+        },
+        {
+            name = "tunnel",
+            prefab = "tunnel"
         }
     }
 }

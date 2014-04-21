@@ -5,7 +5,7 @@ local gfxscene = require "engine.graphics.scene.c"
 Scene = class()
 
 function Scene:_init(data)
-    self._handle = gfx.createScene()
+    self._handle = gfxscene.create()
     gfx.setActiveScene(self._handle)
     self._objects = {}
 end

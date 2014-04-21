@@ -43,9 +43,10 @@ function Object:addComponent(typename, data, start)
     end
     local comp = classobject(self)
     comp:setOwner(self)
-    comp:load(data)
+    if data then comp:load(data) else comp:load() end
     self._components[typename] = comp
-    if start == nil or start == true then component:start() end
+    if start == nil or start == true then comp:start() end
+    return comp
 end
 
 function Object:getComponent(cls)
