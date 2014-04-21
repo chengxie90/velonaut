@@ -134,7 +134,11 @@ function matrix:new( rows, columns, value )
 	if type( rows ) == "table" then
 		-- check for vector
 		if type(rows[1]) ~= "table" then -- expect a vector
-			return setmetatable( {{rows[1]},{rows[2]},{rows[3]}},matrix_meta )
+			local ret = {}
+			for i = 1, #rows do
+				ret[i] = {rows[i]}
+			end
+			return setmetatable( ret, matrix_meta )
 		end
 		return setmetatable( rows,matrix_meta )
 	end
@@ -349,7 +353,7 @@ function matrix.det( m1 )
 	-- get determinant
 	-- using Gauss elimination and Laplace
 	-- start eliminating from below better for removals
-	-- get copy of matrix, set initial determinant
+	-- get copy of matrix, set _initial determinant
 	local mtx = matrix.copy( m1 )
 	local det = 1
 	-- get det up to the last element

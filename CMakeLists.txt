@@ -10,8 +10,14 @@ if(NOT UNIX)
     message(FATAL_ERROR "Platform not supported")
 endif()
 
+if(NOT APPLE)
+    set(CMAKE_CXX_COMPILER "g++-4.8")
+endif()
+
 set(LIB_DIR ${PROJECT_SOURCE_DIR}/lib/${CMAKE_SYSTEM_NAME})
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+include(cotire)
 
 add_subdirectory("src/engine")

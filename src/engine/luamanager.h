@@ -2,47 +2,57 @@
 #define LUAMANAGER_H
 
 #include <lua/lua.hpp>
+#include <Ogre.h>
 #include "common.h"
 
 class LuaManager
 {
 public:
-    void LoadScript(std::string file) const;    
-    void Call(std::string func, std::string sig, ...) const;
-    void Call(std::string func) const;
-    void GetParams(std::string params, ...) const;
-
     void init();
-    void update();
+    void start();
+    void update(float dt);
     void shutdown();
-    
-    void newlib(string libname, luaL_Reg reg[]);
-    
-    void dofile(string file) const;
-    void SetMatrixParam(LUA_NUMBER*, int numElements)  const;
-    void GetMatrixParam(LUA_NUMBER* result ) const;
 
-    void RegisterFunction(const char* name, lua_CFunction func) const;
+    void doFile(std::string file) const;
+    void addlib(luaL_Reg *reg);
+    void requiref(std::string name, lua_CFunction func);
+    void pCall(int nargs = 0, int nresults = 0) const;
+    void registerFunction(const char* name, lua_CFunction func) const;
+    
+    void dumpStack() const;
+
+    void addFunction(std::string str) const;
+
+    void addParam(int value) const;
+    void addParam(double value) const;
+    void addParam(std::string str) const;
+    void addParam(Ogre::Vector3 v) const;
+    void addParam(Ogre::Matrix3 m) const;
+    void addParam(void *) const;
+    
+    void extractParam(int *value) const;
+    void extractParam(double *value) const;
+    void extractParam(std::string *str) const;
+    void extractParam(Ogre::Vector3 *v) const;
+    void extractParam(Ogre::Matrix3 *m) const;
+    void extractParam(Ogre::ColourValue *c) const;
+    void extractParam(void**) const;
 
     lua_State *state() const;
     
     static LuaManager* GetInstance();
-    
 private:
+    void pushMatrix(lua_Number*, int numElements)  const;
+    void pushLuaMatrix()  const;
+    void pushVector(lua_Number*, int numElements)  const;
+    void removeVector(lua_Number*, int index)  const;
+    void removeMatrix(lua_Number*, int index)  const;
 
-    void GetMatrixReturn(LUA_NUMBER* result ) const;
-    void PushMatrix(LUA_NUMBER*, int numElements)  const;
-    void PushVector(LUA_NUMBER*, int numElements)  const;
-    void SetReturnValues(const va_list& vl, const std::string params)  const;
-    void SetLuaToCParams(const va_list& vl, const std::string params)  const;
-    void StackDump()  const;
-
-    lua_State* L;
+    lua_State* state_;
 
     friend class App;
     SINGLETON(LuaManager)
     
-    //lua_State* state_;
 };
 
 #endif // LUAMANAGER_H

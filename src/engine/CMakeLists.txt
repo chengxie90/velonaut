@@ -33,6 +33,8 @@ target_link_libraries(${PROJECT_NAME}   ${BULLET_LIBRARIES}
                                         ${RakNet_LIBRARIES}
                                         ${SDL2_LIBRARY})
 
+cotire(${PROJECT_NAME})
+
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/game/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE})
 
 

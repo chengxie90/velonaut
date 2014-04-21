@@ -1,3 +1,0 @@
-return {
-    scene = "hello"
-}

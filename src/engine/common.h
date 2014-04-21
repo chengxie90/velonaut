@@ -2,7 +2,6 @@
 #define COMMON_H
 
 #include <string>
-using std::string;
 #include <iostream>
 #include <assert.h>
 

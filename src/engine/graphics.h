@@ -14,6 +14,7 @@ public:
     void shutdown();
     
     static Graphics* GetInstance();
+    
 private:
     SINGLETON(Graphics)
     friend class App;
@@ -28,24 +29,56 @@ private:
     Ogre::Root* root_ = NULL;
     Ogre::RenderWindow* renderWindow_ = NULL;
     Ogre::SceneManager* scene_ = NULL;
+    Ogre::Camera* defaultCamera_ = NULL;
+    Ogre::Viewport* viewport_ = NULL;
     
+    // lua bindings
 private:
-    static int LSceneCreate(lua_State* state);
-    static int LSceneSetActive(lua_State* state);
+    static int lcreateScene(lua_State *);
+    // TODO: destroy
     
-    static int LNodeCreate(lua_State* state);
-    static int LNodeSetPosition(lua_State* state);
-    static int LNodeLookAt(lua_State* state);
-    static int LNodeAttachObject(lua_State* state);
+    static int lsetActiveScene(lua_State *);
+    static int lsetBackgroundColor(lua_State *);
     
-    static int LCameraCreate(lua_State* state);
-    static int LCameraSetNear(lua_State* state);
-    static int LCameraSetFar(lua_State* state);
+    struct Scene {
+        static int lcreateNode(lua_State *);
+        // TODO: destroy
+        
+        static int lcreateCamera(lua_State *);
+        // TODO: destroy
+        
+        static int lsetMainCamera(lua_State *);
+        
+        static int lcreateLight(lua_State *);
+        // TODO: destroy
+        
+        static int lsetAmbientLight(lua_State *);
+        
+        static int lcreateEntity(lua_State *);
+        // TODO: destroy
+    };
     
-    static int LLightCreate(lua_State* state);
-    static int LLightSetDiffuse(lua_State* state);
+    struct Node {
+        static int lsetPosition(lua_State *);
+        static int lposition(lua_State *);
+        static int llookAt(lua_State *); 
+        static int lattachObject(lua_State *);
+    };
     
-    static int LEntityCreate(lua_State* state);
+    struct Camera {
+        static int lsetNear(lua_State *); 
+        static int lsetFar(lua_State *);
+        static int lsetFOV(lua_State *);
+    };
+    
+    struct Light {
+        static int lsetType(lua_State *);
+        static int lsetDiffuse(lua_State *); 
+    };
+    
+    struct Entity {
+        
+    };
 };
 
 #endif // GRAPHICS_H
