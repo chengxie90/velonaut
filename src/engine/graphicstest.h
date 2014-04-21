@@ -33,9 +33,10 @@ private:
     Ogre::SceneManager* scene_ = NULL;
     Ogre::SceneNode* camNode_ = NULL;
 
-    static Ogre::SceneNode* createEllipsoid(std::vector<double> position, std::vector<double> orientation, std::vector<double> scale);
+    static Ogre::SceneNode* createEllipsoid(std::vector<double> position, std::vector<double> orientation, std::vector<double> scale, std::string material);
     static Ogre::SceneNode* createBox(std::vector<double> position, std::vector<double> orientation, std::vector<double> scale);
     static Ogre::SceneNode* createPlane(std::vector<double> position, std::vector<double> orientation);
+    static Ogre::SceneNode* createLine(Ogre::Vector3 a, Ogre::Vector3 b);
 
     static std::vector<double> getSceneNodePosition(Ogre::SceneNode* node);
     static void setSceneNodePosition(Ogre::SceneNode* node, std::vector<double>pos);

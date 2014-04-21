@@ -156,10 +156,10 @@ void GraphicsTest::createScene()
 //    pointLight->setDiffuseColour(0.7, 0.7, 1.0);
 }
 
-Ogre::SceneNode* GraphicsTest::createEllipsoid(std::vector<double> position, std::vector<double> orientation, std::vector<double> scale)
+Ogre::SceneNode* GraphicsTest::createEllipsoid(std::vector<double> position, std::vector<double> orientation, std::vector<double> scale, std::string materialName)
 {
     Entity* entity = GraphicsTest::GetInstance()->scene_->createEntity(Ogre::SceneManager::PT_SPHERE);
-    MaterialPtr material = MaterialManager::getSingleton().getByName("BaseWhite", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     material->setReceiveShadows(true);
     entity->setMaterial(material);
     entity->setCastShadows(true);
@@ -200,6 +200,19 @@ Ogre::SceneNode* GraphicsTest::createPlane(std::vector<double> position, std::ve
     node->attachObject(entity);
     node->setPosition(position[0], position[1], position[2]);
     node->setOrientation(orientation[0], orientation[1], orientation[2], orientation[3]);
+    return node;
+}
+
+Ogre::SceneNode* GraphicsTest::createLine(Ogre::Vector3 a, Ogre::Vector3 b)
+{
+    ManualObject* line = GraphicsTest::GetInstance()->scene_->createManualObject();
+    line->begin("BaseWhite", RenderOperation::OT_LINE_LIST);
+    line->position(a);
+    line->position(b);
+    line->end();
+
+    SceneNode* node = GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
+    node->attachObject(line);
     return node;
 }
 
@@ -284,93 +297,86 @@ std::vector<double> GraphicsTest::getCameraDerivedUp()
 void GraphicsTest::createTunnel(unsigned int seed)
 {
     // PARAMS
-    int numCurves = 8;
+    int numCurves = 4;
     int samplesPerCurve = 100;
     int ringSamples = 30;
-    double minControlRad = 8;
-    double maxControlRad = 10;
-    double minAnchorRad = 8;
-    double maxAnchorRad = 10;
+    double minControlRad = 100;
+    double maxControlRad = 150;
+    double minAnchorRad = 200;
+    double maxAnchorRad = 250;
     double ringRadius = 6;
-    double looseningTerm = 1;
-    double loosen; double oldLength;
-    unsigned  int testSeed = 774265562;
-
-    srand(testSeed);
-    std::vector<BezierTest> curves = std::vector<BezierTest>(numCurves);
 
     // TODO: REMOVE TESTING STUFF
+    seed = 774265562;
     std::vector<double> size = std::vector<double> (3);
-    size[0] = 0.01; size[1] = 0.01; size[2] = 0.01;
-//    std::vector<double> derSize = std::vector<double> (3);
-//    derSize[0] = 0.01; derSize[1] = 0.01; derSize[2] = 0.01;
+    //    pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+    //    pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+    //    pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+    //    pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+    //    GraphicsTest::GetInstance()->createLine(p0,p1);
+    //    GraphicsTest::GetInstance()->createLine(p2,p3);
+    size[0] = ringRadius; size[1] = ringRadius; size[2] = ringRadius;
     std::vector<double> ori = std::vector<double> (4);
     ori[0] = 1; ori[1] = 0; ori[2] = 0; ori[3] = 0;
     std::vector<double> pos = std::vector<double>(3);
-//    std::vector<double> tanRefPos = std::vector<double>(3);
-//    std::vector<double> norRefPos = std::vector<double>(3);
+
+    srand(seed);
+    std::vector<BezierTest> curves = std::vector<BezierTest>(numCurves);
 
     // FIRST CURVE
     Ogre::Vector3 p0 = Ogre::Vector3(0,0,0);
     Ogre::Vector3 p1 = Ogre::Vector3(0,0,-1);
-    double r_p1 = (double) rand() / RAND_MAX;
-    r_p1 = minControlRad + r_p1 * (maxControlRad - minControlRad);
-    p1 *= r_p1;
+    double r = (double) rand() / RAND_MAX; r = minControlRad + r * (maxControlRad - minControlRad);
+
     // Ensure that first control point is on xz plane,
     // thus making first normal the up vector
     if (p1.x < 0.0001 && p1.z < 0.0001)
         p1.x = minControlRad;
-    p1.y = 0;
-    Ogre::Vector3 p2 = p1 + getRandomPoint(minControlRad, maxControlRad);
+    Ogre::Vector3 p2 = p1 +  getRandomPoint(minAnchorRad, maxAnchorRad);
     Ogre::Vector3 p3 = p2 + getRandomPoint(minAnchorRad, maxAnchorRad);
-    loosen = looseningTerm*((2*M_PI)-((p0-p1).angleBetween(p3-p2)).valueRadians());
-    oldLength = p1.length(); p1 = p1.normalisedCopy()*oldLength*loosen;
-    oldLength = p2.length(); p2 = p2.normalisedCopy()*oldLength*loosen;
     BezierTest first = BezierTest(p0, p1, p2, p3);
+//    pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+//    pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+//    pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+//    pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+//    GraphicsTest::GetInstance()->createLine(p0,p1);
+//    GraphicsTest::GetInstance()->createLine(p2,p3);
     curves[0] = first;
 
     // MIDDLE OF SPLINE
     for (int i = 1; i < numCurves-1; i++)
     {
         p0 = curves[i-1].p3_;
-        p1 = p0 - curves[i-1].p2_;
-        p1.normalise();
-        r_p1 = (double) rand() / RAND_MAX;
-        r_p1 = minControlRad + r_p1 * (maxControlRad - minControlRad);
-        p1 *= r_p1;
-        p1 = p0 + p1;
-        Ogre::Vector3 a2p = curves[i-1].p2_-curves[i-1].p3_;
-        Ogre::Vector3 a2c = p1-p0;
+        p1 = (p0 - curves[i-1].p2_).normalisedCopy();
+        r = (double) rand() / RAND_MAX; r = minControlRad + r * (maxControlRad - minControlRad);
+        p1 = p0 + (p1*r);
         p2 = p1 + getRandomPoint(minControlRad, maxControlRad);
         p3 = p2 + getRandomPoint(minAnchorRad, maxAnchorRad);
-        /*
-        if ((double)i/numCurves >= goHome)
-        {
-            double curWeight = ((double)(i/numCurves) - goHome)/(1-goHome);
-            double endWeight = 1 - curWeight;
-            p3 = ((curWeight) * p3) + ((endWeight) * first.p0_);
-        }
-        */
-        loosen = looseningTerm*((2*M_PI)-((p0-p1).angleBetween(p3-p2)).valueRadians());
-        oldLength = p1.length(); p1 = p1.normalisedCopy()*oldLength*loosen;
-        oldLength = p2.length(); p2 = p2.normalisedCopy()*oldLength*loosen;
         curves[i] = BezierTest(p0, p1, p2, p3);
+//        pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+//        pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+//        pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+//        pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+//        GraphicsTest::GetInstance()->createLine(p0,p1);
+//        GraphicsTest::GetInstance()->createLine(p2,p3);
     }
 
     // LAST CURVE
     p0 = curves[numCurves-2].p3_;
-    p1 = p0 - curves[numCurves-2].p2_;
-    p1.normalise();
-    double r = (double) rand() / RAND_MAX;
-    r = minControlRad + r * (maxControlRad - minControlRad);
-    p1 *= r;
-    p1 = p0 + p1;
+    p1 = (p0 - curves[numCurves-2].p2_).normalisedCopy();
+    r = (double) rand() / RAND_MAX; r = minControlRad + r * (maxControlRad - minControlRad);
+    p1 = p0 + (p1 * r);
     p3 = first.p0_;
-    p2 = p3 - first.p1_;
-    p2.normalise();
+    p2 = (p3 - first.p1_).normalisedCopy();
     p2 *= (p3-p1).length() + (p1-p1).length();
     p2 = p3 + p2;
     BezierTest last = BezierTest(p0, p1, p2, p3);
+//    pos[0] = p0.x; pos[1] = p0.y; pos[2] = p0.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+//    pos[0] = p1.x; pos[1] = p1.y; pos[2] = p1.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+//    pos[0] = p2.x; pos[1] = p2.y; pos[2] = p2.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "BaseWhite");
+//    pos[0] = p3.x; pos[1] = p3.y; pos[2] = p3.z; GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size, "plane");
+//    GraphicsTest::GetInstance()->createLine(p0,p1);
+//    GraphicsTest::GetInstance()->createLine(p2,p3);
     curves[numCurves-1] = last;
 
 
@@ -409,7 +415,7 @@ void GraphicsTest::createTunnel(unsigned int seed)
 //            pos[0] = point.x; pos[1] = point.y; pos[2] = point.z;
 //            tanRefPos[0] = tanRefPoint.x; tanRefPos[1] = tanRefPoint.y; tanRefPos[2] = tanRefPoint.z;
 //            norRefPos[0] = norRefPoint.x; norRefPos[1] = norRefPoint.y; norRefPos[2] = norRefPoint.z;
-//            GraphicsTest::GetInstance()->createEllipsoid(pos, ori, size);
+//            GraphicsTest::GetInstance()->createEllipstd::cout << "P1----> " << p1 << std::endl;soid(pos, ori, size);
 //            GraphicsTest::GetInstance()->createEllipsoid(tanRefPos, ori, derSize);
 //            GraphicsTest::GetInstance()->createEllipsoid(norRefPos, ori, derSize);
 
@@ -417,35 +423,36 @@ void GraphicsTest::createTunnel(unsigned int seed)
     }
 
     // CREATE MESH
-    ManualObject* tunnel = GraphicsTest::GetInstance()->scene_->createManualObject("tunnel");
-    tunnel->begin("BaseWhite", RenderOperation::OT_TRIANGLE_STRIP);
-    int numRings = numCurves*samplesPerCurve;
-    for (int ringIndex = 0; ringIndex < numRings; ringIndex++)
-    {
-        for (int ringSample = 0; ringSample < ringSamples; ringSample++)
-        {
-            tunnel->position(samples[(ringIndex*ringSamples)+ringSample]);
-            Ogre::Vector3 n = samples[(ringIndex*ringSamples)+ringSample]-curve[ringIndex];
-            //std::cout << n << std::endl;
-            tunnel->normal(1*n);
-        }
-    }
-    for (int ringIndex = 0; ringIndex < numRings; ringIndex++)
-    {
-        int currRingSampleBase = (ringIndex*ringSamples);
-        int nextRingSampleBase = (currRingSampleBase+ringSamples)%vertCount;
-        for (int j = 0; j < ringSamples; j++)
-        {
-            tunnel->index(nextRingSampleBase+j);
-            tunnel->index(currRingSampleBase+j);
-        }
-    }
 
-    tunnel->end();
+//    ManualObject* tunnel = GraphicsTest::GetInstance()->scene_->createManualObject("tunnel");
+//    tunnel->begin("BaseWhite", RenderOperation::OT_TRIANGLE_STRIP);
+//    int numRings = numCurves*samplesPerCurve;
+//    for (int ringIndex = 0; ringIndex < numRings; ringIndex++)
+//    {
+//        for (int ringSample = 0; ringSample < ringSamples; ringSample++)
+//        {
+//            tunnel->position(samples[(ringIndex*ringSamples)+ringSample]);
+//            Ogre::Vector3 n = samples[(ringIndex*ringSamples)+ringSample]-curve[ringIndex];
+//            //std::cout << n << std::endl;
+//            tunnel->normal(1*n);
+//        }
+//    }
+//    for (int ringIndex = 0; ringIndex < numRings; ringIndex++)
+//    {
+//        int currRingSampleBase = (ringIndex*ringSamples);
+//        int nextRingSampleBase = (currRingSampleBase+ringSamples)%vertCount;
+//        for (int j = 0; j < ringSamples; j++)
+//        {
+//            tunnel->index(nextRingSampleBase+j);
+//            tunnel->index(currRingSampleBase+j);
+//        }
+//    }
+
+//    tunnel->end();
 
     ManualObject* tunnelMesh = GraphicsTest::GetInstance()->scene_->createManualObject("tunnelMesh");
     tunnelMesh->begin("plane", RenderOperation::OT_LINE_STRIP);
-    numRings = numCurves*samplesPerCurve;
+    int numRings = numCurves*samplesPerCurve;
     for (int ringIndex = 0; ringIndex < numRings; ringIndex++)
     {
         for (int ringSample = 0; ringSample < ringSamples; ringSample++)
@@ -469,7 +476,7 @@ void GraphicsTest::createTunnel(unsigned int seed)
 
     tunnelMesh->end();
 
-    // CREATE PAT
+    // CREATE PATH
     ManualObject* path = GraphicsTest::GetInstance()->scene_->createManualObject("path");
     path->begin("plane", RenderOperation::OT_LINE_STRIP);
     for (int i = 0; i < curvCount; i++)
@@ -479,10 +486,10 @@ void GraphicsTest::createTunnel(unsigned int seed)
     }
     path->end();
 
-    GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode()->attachObject(tunnel);
+    //GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode()->attachObject(tunnel);
     GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode()->attachObject(tunnelMesh);
     GraphicsTest::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode()->attachObject(path);
-
+std::cout << "P1----> " << p1 << std::endl;
 }
 
 Ogre::Vector3 GraphicsTest::getRandomPoint(double min, double max)
@@ -494,7 +501,8 @@ Ogre::Vector3 GraphicsTest::getRandomPoint(double min, double max)
     dir.normalise();
     double r = (double) rand() / RAND_MAX;
     r = min + r * (max - min);
+    std::cout << "random radius: " << r << std::endl;
     dir = dir * r;
     std::cout << dir.x << " " << dir.y << " " << dir.z << std::endl;
-    return dir * r;
+    return dir;
 }
