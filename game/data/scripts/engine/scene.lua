@@ -5,9 +5,10 @@ local gfxscene = require "engine.graphics.scene.c"
 Scene = class()
 
 function Scene:_init(data)
-    self._handle = gfx.createScene()
+    self._handle = gfxscene.create()
     gfx.setActiveScene(self._handle)
     self._objects = {}
+    self._started = false
 end
 
 function Scene:load(data)
@@ -15,7 +16,9 @@ function Scene:load(data)
         local name = objectData.name
         local prefab = objectData.prefab
         assert(name and name ~= "")
-        self:createObject(name, prefab, false)
+        local obj = self:createObject(name)
+        local data = loadDataFile(objectData.prefab, "object")
+        obj:load(data)
     end
 
     local obj = self:findObject(data.mainCamera)
@@ -33,9 +36,11 @@ function Scene:load(data)
 end
 
 function Scene:start()
+    assert(self._started == false)
     for k, v in pairs(self._objects) do
         v:start()
     end
+    self._started = true
 end
 
 function Scene:update(dt)
@@ -48,19 +53,11 @@ function Scene:setMainCamera(cam)
     gfxscene.setMainCamera(cam._handle)
 end
 
-function Scene:createObject(name, prefab, start)
+function Scene:createObject(name)
     assert(self._objects[name] == nil)
-    local obj = nil
-    if prefab then
-        local data = loadDataFile(prefab, "object")
-        obj = Object(name)
-        obj:load(data)
-    else
-        obj = Object(name)
-    end
-    assert(obj)
+    local obj = Object(name)
     self._objects[name] = obj
-    if start == nil or start == true then obj:start() end
+    if self._started then obj:start() end
     return obj
 end
 

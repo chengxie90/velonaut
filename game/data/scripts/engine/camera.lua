@@ -1,13 +1,12 @@
 require "engine.component"
 require "engine.transform"
-local gfxscene = require "engine.graphics.scene.c"
 local gfxcam = require "engine.graphics.camera.c"
 local gfxnode = require "engine.graphics.node.c"
 
 Camera = class(Component)
 
 function Camera:_init(object)
-    self._handle = gfxscene.createCamera(object.name)
+    self._handle = gfxcam.create(object.name)
 end
 
 function Camera:load(data)

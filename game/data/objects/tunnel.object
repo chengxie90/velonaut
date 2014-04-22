@@ -6,9 +6,7 @@ return
             position = Vector(0, 0, 0)
         },
         {
-            type = "MeshRenderer",
-            mesh = "cube",
-            material = "lambert1"
-        },
+            type = "Tunnel"
+        }
     }
 }

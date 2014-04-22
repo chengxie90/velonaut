@@ -11,20 +11,24 @@ Object = class()
 
 function Object:_init(name)
     self._components = {}
+    self._started = false
     self.name = name
 end
 
 function Object:load(data)
     for _, componentData in ipairs(data.components) do
         local typename = componentData.type
-        self:addComponent(typename, componentData, false)
+        local comp = self:addComponent(typename)
+        comp:load(componentData)
     end
 end
 
 function Object:start()
+    assert(self._started == false)
     for k, v in pairs(self._components) do
         v:start()
     end
+    self._started = true
 end
 
 function Object:update(dt)
@@ -33,7 +37,7 @@ function Object:update(dt)
     end
 end
 
-function Object:addComponent(typename, data, start)
+function Object:addComponent(typename)
     assert(self._components[typename] == nil, "Duplicated components")
     local classobject = rawget(_G, typename)
     if classobject == nil then
@@ -43,18 +47,18 @@ function Object:addComponent(typename, data, start)
     end
     local comp = classobject(self)
     comp:setOwner(self)
-    comp:load(data)
     self._components[typename] = comp
-    if start == nil or start == true then component:start() end
+    if self._started then comp:start() end
+    return comp
 end
 
-function Object:getComponent(cls)
-    return self._components[cls];
+function Object:getComponent(typename)
+    return self._components[typename];
 end
 
-function Object:removeComponent(cls)
-    self._components[cls]._object = nil
-    self._components[cls] = nil
+function Object:removeComponent(typename)
+    self._components[typename]._object = nil
+    self._components[typename] = nil
 end
 
 function Object:transform()

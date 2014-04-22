@@ -1,11 +1,10 @@
-local gfxscene = require "engine.graphics.scene.c"
 local gfxnode = require "engine.graphics.node.c"
 require "engine.component"
 
 Transform = class(Component)
 
 function Transform:_init()
-    self._handle = gfxscene.createNode()
+    self._handle = gfxnode.create()
 end
 
 function Transform:load(data)
@@ -19,10 +18,6 @@ end
 
 function Transform:setPosition(pos)
     gfxnode.setPosition(self._handle, pos)
-end
-
-function Transform:position()
-    return gfxnode.position(self._handle)
 end
 
 function Transform:lookAt(target)

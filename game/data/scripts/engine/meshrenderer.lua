@@ -1,17 +1,25 @@
 require "engine.component"
 require "engine.mesh"
+require "engine.material"
 
-local gfxscene = require "engine.graphics.scene.c"
+local gfxentity = require "engine.graphics.entity.c"
 local gfxnode = require "engine.graphics.node.c"
 
 MeshRenderer = class(Component)
 
 function MeshRenderer:_init()
-    self._handle = gfxscene.createEntity("cube") -- TODO
+    
 end
 
 function MeshRenderer:load(data)
+    assert(data.mesh)
+    local mesh = Mesh(data.mesh)
+    self:setMesh(mesh)
     
+    if data.material then
+        local mat = Material(data.material)
+        self:setMaterial(mat)
+    end
 end
 
 function MeshRenderer:start()
@@ -20,18 +28,23 @@ function MeshRenderer:start()
     gfxnode.attachObject(trans._handle, self._handle)
 end
 
-function MeshRenderer:setMesh()
-
+function MeshRenderer:setMesh(mesh)
+    self._handle = gfxentity.create(mesh._handle)
+    self._mesh = mesh
+    -- TODO: destroy the former one
 end
 
 function MeshRenderer:mesh()
-
+    return self._mesh
 end
 
-function MeshRenderer:setMaterial()
-
+-- this must be called after setMesh, due to Ogre
+function MeshRenderer:setMaterial(material)
+    assert(self._handle) 
+    self._material = material
+    gfxentity.setMaterial(self._handle, material._handle)
 end
 
 function MeshRenderer:material()
-
+    return self._material
 end
