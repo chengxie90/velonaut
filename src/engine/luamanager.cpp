@@ -72,7 +72,7 @@ void LuaManager::extractParam(Ogre::Vector3 *v) const {
     extractParam(numbers, 3);
     v->x = numbers[0];
     v->y = numbers[1];
-    v->y = numbers[2];
+    v->z = numbers[2];
 }
 
 void LuaManager::addParam(void *p) const

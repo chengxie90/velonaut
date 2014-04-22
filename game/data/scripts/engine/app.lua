@@ -14,6 +14,7 @@ require "engine.scene"
 App = class() -- this is a singleton
 
 function App.start()
+	math.epsilon = 0.00001
     local config = dofile("./data/game.config")
     assert(config.scene)
     App.loadScene(config.scene)
