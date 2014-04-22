@@ -67,37 +67,12 @@ void LuaManager::extractParam(string *str) const {
     lua_remove(state_, 1);
 }
 
-void LuaManager::addParam(Ogre::Vector3 v) const {
-
-    pushLuaMatrix();
-
-    lua_Number p[3] = {v.x, v.y, v.z};
-    pushVector(p, 3);
-
-    pCall(2,1);
-}
-
 void LuaManager::extractParam(Ogre::Vector3 *v) const {
-
-    lua_Number result[3];
-    removeVector(result, 1);
-
-    v->x = result[0];
-    v->y = result[1];
-    v->z = result[2];
-}
-
-void LuaManager::addParam(Ogre::Matrix3 m) const {
-
-    pushLuaMatrix();
-
-    lua_Number p[9] = {m.GetColumn(0).x, m.GetColumn(1).x, m.GetColumn(2).x,
-                       m.GetColumn(0).y, m.GetColumn(1).y, m.GetColumn(2).y,
-                       m.GetColumn(0).z, m.GetColumn(1).z, m.GetColumn(2).z,};
-    pushMatrix(p, 9);
-
-    pCall(2, 1);
-    
+    lua_Number numbers[3];
+    extractParam(numbers, 3);
+    v->x = numbers[0];
+    v->y = numbers[1];
+    v->y = numbers[2];
 }
 
 void LuaManager::addParam(void *p) const
@@ -105,115 +80,14 @@ void LuaManager::addParam(void *p) const
     lua_pushlightuserdata(state_, p);
 }
 
-void LuaManager::extractParam(Ogre::Matrix3 *m) const {
-
-    lua_Number result[9];
-    removeMatrix(result, 1);
-
-    m->SetColumn(0, Ogre::Vector3(result[0],result[3], result[6]));
-    m->SetColumn(1, Ogre::Vector3(result[1],result[4], result[7]));
-    m->SetColumn(2, Ogre::Vector3(result[2],result[5], result[8]));
-}
-
 void LuaManager::extractParam(Ogre::ColourValue *c) const
 {
-    lua_Number result[4] = {0, 0, 0, 1};
-    removeVector(result, 1);
-    c->r = result[0];
-    c->g = result[1];
-    c->b = result[2];
-    c->a = result[3];
-}
-
-void LuaManager::pushVector(lua_Number* matrix, int num_elements) const {
-
-    lua_newtable(state_);
-
-    for(int i = 0; i < num_elements; i++) {
-        lua_pushnumber(state_, matrix[i]);
-        lua_rawseti(state_, -2, i+1);
-    }
-}
-
-void LuaManager::removeVector(lua_Number* result, int index) const {
-
-    luaL_checktype(state_, index, LUA_TTABLE);
-    int len = lua_rawlen(state_, index);
-
-    for(int row = 0; row < len; row++) {
-        lua_pushinteger(state_, row+1);
-        lua_gettable(state_, -2);
-
-        lua_pushinteger(state_, 1);
-        lua_gettable(state_, -2);
-
-        if(lua_isnumber(state_, -1)) {
-
-            result[row] = lua_tonumber(state_, -1);
-
-        } else {
-            std::cout << "not a number!" << std::endl;
-            assert(false);
-        }
-        lua_pop(state_, 1);
-        lua_pop(state_, 1);
-    }
-
-    lua_remove(state_, index);
-}
-
-void LuaManager::pushMatrix(lua_Number* matrix, int num_elements) const {
-
-    lua_newtable(state_);
-    int len = sqrt(num_elements);
-
-    for(int row = 0; row < len; row++) {
-
-        lua_newtable(state_);
-
-        for(int col = 0; col < len; col++) {
-
-            lua_pushnumber(state_, matrix[row*len+col]);
-            lua_rawseti(state_, -2, col+1);
-
-        }
-
-        lua_rawseti(state_, -2, row+1);
-    }
-}
-
-void LuaManager::removeMatrix(lua_Number* result, int index) const {
-    luaL_checktype(state_, index, LUA_TTABLE);
-    int len = 0; // TODO (state_, index);
-
-    for(int row = 0; row < len; row++) {
-        lua_pushinteger(state_, row+1);
-        lua_gettable(state_, -2);
-
-        for(int col = 0; col < len; col++) {
-            lua_pushinteger(state_, col+1);
-            lua_gettable(state_, -2);
-
-            if(lua_isnumber(state_, -1)) {
-
-                result[row*len+col] = lua_tonumber(state_, -1);
-
-            } else {
-                std::cout << "not a number!" << std::endl;
-            }
-            lua_pop(state_, 1);
-        }
-        lua_pop(state_, 1);
-    }
-
-    lua_remove(state_, index);
-}
-
-void LuaManager::pushLuaMatrix() const {
-    lua_getglobal(state_, "Matrix");
-    lua_getfield(state_, -1, "new");
-    lua_remove(state_,-2);
-    lua_getglobal(state_, "Matrix");
+    lua_Number numbers[4] = {0, 0, 0, 1};
+    extractParam(numbers, 4);
+    c->r = numbers[0];
+    c->g = numbers[1];
+    c->b = numbers[2];
+    c->a = numbers[3];
 }
 
 void LuaManager::dumpStack() const {
@@ -315,4 +189,18 @@ void LuaManager::extractParam(void **p) const
     luaL_checktype(state_, 1, LUA_TLIGHTUSERDATA);
     *p = lua_touserdata(state_, 1); 
     lua_remove(state_, 1);
+}
+
+void LuaManager::extractParam(lua_Number *array, int len) const
+{
+    luaL_checktype(state_, 1, LUA_TTABLE);
+    int tablelen = luaL_len(state_, 1);
+    for (int i = 1; i <= std::min(tablelen, len); i++) {
+        lua_pushnumber(state_, i);
+        lua_gettable(state_, 1);
+        lua_Number num = luaL_checknumber(state_, -1);
+        array[i-1] = num;
+        lua_pop(state_, 1);
+    }
+    lua_pop(state_, 1);
 }

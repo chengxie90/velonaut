@@ -20,10 +20,6 @@ function Transform:setPosition(pos)
     gfxnode.setPosition(self._handle, pos)
 end
 
-function Transform:position()
-    return gfxnode.position(self._handle)
-end
-
 function Transform:lookAt(target)
     gfxnode.lookAt(self._handle, target)
 end
