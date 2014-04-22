@@ -32,6 +32,7 @@ bool App::init(int argc, char *argv[])
     luaManager_->init();
 
     input_->addListener( ui_);
+    input_->addListener( luaManager_);
 
     return true;
 }

@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include <vector>
+#include <map>
 #include "common.h"
 #include "inputlistener.h"
 
@@ -12,14 +13,18 @@ public:
     void update();
     void shutdown();
     void addListener( InputListener* listener );
-    
+
     static Input* GetInstance();
+
+    std::map<uint, std::string> dictionary_;
     
 private:
     friend class App;
     SINGLETON(Input)
-    void callListeners();
 
+    void FillDictionary();
+
+    void callListeners();
     std::vector<InputListener*> listeners_;
 };
 

@@ -153,6 +153,7 @@ void LuaManager::init()
 void LuaManager::start()
 {
     doFile("./data/scripts/engine/app.lua");
+    AddDictionary();
 }
 
 void LuaManager::update(float dt)
@@ -207,4 +208,67 @@ void LuaManager::extractParam(lua_Number *array, int len) const
         lua_pop(state_, 1);
     }
     lua_pop(state_, 1);
+}
+
+void LuaManager::onMouseDown( SDL_Event e )
+{
+    addFunction("Input.onMouseDown");
+
+    int modifierState = 0;
+    addParam( Input::GetInstance()->dictionary_[e.button.button] );
+    addParam(modifierState);
+
+    pCall(2);
+}
+
+void LuaManager::onMouseUp( SDL_Event e)
+{
+    addFunction("Input.onMouseUp");
+
+    int modifierState = 0;
+    addParam( Input::GetInstance()->dictionary_[e.button.button] );
+    addParam(modifierState);
+
+    pCall(2);
+}
+
+void LuaManager::onMouseMove( SDL_Event e )
+{
+
+    addFunction("Input.onMouseMove");
+
+    int modifierState = 0;
+    addParam( e.motion.x );
+    addParam( e.motion.y );
+    addParam(modifierState);
+
+    pCall(3);
+}
+
+void LuaManager::onKeyDown( SDL_Event e )
+{
+    addFunction("Input.onKeyDown");
+    addParam( Input::GetInstance()->dictionary_[e.key.keysym.sym] );
+    pCall(1);
+}
+
+void LuaManager::onKeyUp( SDL_Event e )
+{
+    addFunction("Input.onKeyUp");
+    addParam( Input::GetInstance()->dictionary_[e.key.keysym.sym] );
+    pCall(1);
+}
+
+void LuaManager::AddDictionary()
+{
+    std::map<uint, std::string>::iterator it;
+    int count = 0;
+
+    addFunction("Input.createDictionary");
+    for (it = Input::GetInstance()->dictionary_.begin(); it !=Input::GetInstance()->dictionary_.end(); it++)
+    {
+        addParam( it->second );
+        count++;
+    }
+    pCall(count);
 }

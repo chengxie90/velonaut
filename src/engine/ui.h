@@ -22,6 +22,9 @@ public:
     virtual void onMouseUp(SDL_Event e );
     virtual void onMouseMove(SDL_Event e );
 
+    virtual void onKeyDown( SDL_Event e );
+    virtual void onKeyUp( SDL_Event e );
+
     static Ui* GetInstance();
 
     Rocket::Core::ElementDocument *doc_;

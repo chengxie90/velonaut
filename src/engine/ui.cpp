@@ -121,6 +121,16 @@ void Ui::onMouseUp(SDL_Event e ) {
     context_->ProcessMouseButtonUp(0, 0);
 }
 
+void Ui::onKeyDown( SDL_Event e )
+{
+
+}
+
+void Ui::onKeyUp( SDL_Event e )
+{
+
+}
+
 // Called from Ogre before a queue group is rendered.
 void Ui::renderQueueStarted(Ogre::uint8 queueGroupId, const Ogre::String& invocation, bool& ROCKET_UNUSED(skipThisInvocation))
 {
