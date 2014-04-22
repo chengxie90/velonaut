@@ -12,15 +12,13 @@ function MeshRenderer:_init()
 end
 
 function MeshRenderer:load(data)
-    if data then
-        assert(data.mesh)
-        local mesh = Mesh(data.mesh)
-        self:setMesh(mesh)
-        
-        if data.material then
-            local mat = Material(data.material)
-            self:setMaterial(mat)
-        end
+    assert(data.mesh)
+    local mesh = Mesh(data.mesh)
+    self:setMesh(mesh)
+    
+    if data.material then
+        local mat = Material(data.material)
+        self:setMaterial(mat)
     end
 end
 
