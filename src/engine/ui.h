@@ -17,7 +17,6 @@ public:
     void shutdown();
 
     virtual void renderQueueStarted(Ogre::uint8 queueGroupId, const Ogre::String& invocation, bool& skipThisInvocation);
-    virtual void renderQueueEnded(Ogre::uint8 queueGroupId, const Ogre::String& invocation, bool& repeatThisInvocation);
 
     virtual void onMouseDown(SDL_Event e );
     virtual void onMouseUp(SDL_Event e );
@@ -32,17 +31,14 @@ private:
     friend class App;
     void configureRenderSystem();
 
+    static int lLoadDocument(lua_State* state);
+    static int lLoadMouseCursor(lua_State* state);
+    static int lLoadFont(lua_State* state);
+    static int lAddEventListener(lua_State* state);
 
-
+private:
     Rocket::Core::Context* context_;
     Ogre::Matrix4 projection_matrix;
-    static int r;
-
-    static int LSceneLoadDocument(lua_State* state);
-    static int LSceneLoadMouseCursor(lua_State* state);
-    static int LSceneLoadFont(lua_State* state);
-    static int LSceneAddEventListener(lua_State* state);
-
 };
 
 #endif // UI_H

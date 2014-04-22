@@ -17,6 +17,7 @@ bool App::init(int argc, char *argv[])
 {
 
     input_ = new Input;
+    graphics_ = new Graphics;
     luaManager_ = new LuaManager;
     physics_ = new Physics;
     ui_ = new Ui;
@@ -24,16 +25,11 @@ bool App::init(int argc, char *argv[])
     luaManager_ = new LuaManager;
     
     graphics_->init();
-    graphics_->scene_->addRenderQueueListener(ui_);
-
     input_->init();
     physics_->init();
     ui_->init();
     network_->init();
     luaManager_->init();
-
-    network_->startServer();
-    network_->startClient();
 
     input_->addListener( ui_);
 
@@ -45,6 +41,7 @@ void App::run()
     Uint32 oldTime = SDL_GetTicks();
     
     luaManager_->start();
+    graphics_->scene_->addRenderQueueListener(ui_);
     
     while (!terminated_) {
         Uint32 curTime = SDL_GetTicks();
@@ -103,6 +100,11 @@ LuaManager *App::GetLuaManager()
 Ui *App::GetUi()
 {
     return g_app.ui_;
+}
+
+Network *App::GetNetwork()
+{
+    return g_app.network_;
 }
 
 Physics *App::GetPhysics()

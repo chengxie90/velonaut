@@ -14,15 +14,18 @@ Ui::Ui()
 }
 
 void Ui::initLua() {
-    luaL_Reg reg[] = {
-        {"loadDocument", Ui::LSceneLoadDocument},
-        {"loadCursor", Ui::LSceneLoadMouseCursor},
-        {"loadFont", Ui::LSceneLoadFont},
-        {"addEventListener", Ui::LSceneAddEventListener},
-        {NULL, NULL}
-    };
 
-    LuaManager::GetInstance()->newlib("gui", reg);
+    LuaManager::GetInstance()->requiref("engine.gui.c",[](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"loadDocument", Ui::lLoadDocument},
+            {"loadCursor", Ui::lLoadMouseCursor},
+            {"loadFont", Ui::lLoadFont},
+            {"addEventListener", Ui::lAddEventListener},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    } );
 }
 
 void Ui::init() {
@@ -60,7 +63,7 @@ void Ui::shutdown() {
 
 }
 
-int Ui::LSceneLoadDocument(lua_State *state)
+int Ui::lLoadDocument(lua_State *state)
 {
     std::string doc;
     LuaManager::GetInstance()->extractParam(&doc);
@@ -72,7 +75,7 @@ int Ui::LSceneLoadDocument(lua_State *state)
     }
 }
 
-int Ui::LSceneLoadMouseCursor(lua_State *state)
+int Ui::lLoadMouseCursor(lua_State *state)
 {
     // Load the mouse cursor and release the caller's reference.
     Rocket::Core::ElementDocument* cursor = Ui::GetInstance()->context_->LoadMouseCursor("data/ui/cursor.rml");
@@ -80,37 +83,26 @@ int Ui::LSceneLoadMouseCursor(lua_State *state)
         cursor->RemoveReference();
 }
 
-int Ui::r = 0;
-
-int Ui::LSceneAddEventListener(lua_State *state) {
-
-    // store reference to the calling object in registry
+int Ui::lAddEventListener(lua_State *state) {
 
     std::string id;
     std::string event;
-    std::string listener;
 
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&event);
 
-
-    std::cout << "id: " << id << std::endl;
-    std::cout << "event: " << event << std::endl;
-
     int r = luaL_ref(state, LUA_REGISTRYINDEX);
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->AddEventListener(event.c_str(), new RocketEventListener(r), true );
-
-
-
-
 }
+
+// TODO: Add RemoveEventListener function
 
 Ui *Ui::GetInstance()
 {
     return App::GetApp()->GetUi();
 }
 
-int Ui::LSceneLoadFont(lua_State *state)
+int Ui::lLoadFont(lua_State *state)
 {
     std::string s;
     LuaManager::GetInstance()->extractParam(&s);
@@ -140,13 +132,6 @@ void Ui::renderQueueStarted(Ogre::uint8 queueGroupId, const Ogre::String& invoca
         context_->Render();
     }
 }
-
-// Called from Ogre after a queue group is rendered.
-void Ui::renderQueueEnded(Ogre::uint8 ROCKET_UNUSED(queueGroupId), const Ogre::String& ROCKET_UNUSED(invocation), bool& ROCKET_UNUSED(repeatThisInvocation))
-{
-    // std::cout << "rendering Ended" << std::endl;
-}
-
 
 void Ui::configureRenderSystem()
 {

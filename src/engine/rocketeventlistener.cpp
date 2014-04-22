@@ -6,11 +6,9 @@ RocketEventListener::RocketEventListener(int r):r(r)
 {
 }
 
-
 void RocketEventListener::ProcessEvent(Rocket::Core::Event &event) {
-    std::cout << "processing event" << std::endl;
     lua_rawgeti(LuaManager::GetInstance()->state(), LUA_REGISTRYINDEX, r);
-    LuaManager::GetInstance()->pCall(0,0);
+    LuaManager::GetInstance()->pCall();
 }
 
 void RocketEventListener::OnAttach(Rocket::Core::Element* ROCKET_UNUSED(element)) {

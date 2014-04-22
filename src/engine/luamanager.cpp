@@ -9,6 +9,7 @@
 #include "app.h"
 #include "graphics.h"
 #include "ui.h"
+#include "network.h"
 #include "lua/luaconf.h"
 
 using namespace std;
@@ -271,7 +272,7 @@ void LuaManager::init()
     luaL_openlibs(state_);
 
     Graphics::GetInstance()->initLua();
-
+    Network::GetInstance()->initLua();
     Ui::GetInstance()->initLua();
 }
 

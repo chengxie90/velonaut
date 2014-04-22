@@ -1,9 +1,11 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <functional>
 
+#include "RakNet/StringCompressor.h"
+#include "RakNet/RPC4Plugin.h"
 #include "networkserver.h"
-
 
 using namespace RakNet;
 using namespace std;
@@ -13,33 +15,32 @@ static void* callHandle(void* data) {
   h->handle();
 }
 
-NetworkServer::NetworkServer()
+NetworkServer::NetworkServer(int port):port_(port)
 {
 }
 
 void NetworkServer::start() {
+    server_ = RakPeerInterface::GetInstance();
+    server_->AttachPlugin(&rpc_);
+
+    rpc_.RegisterFunction("humbug", [](RakNet::BitStream* s, Packet* p) {
+        std::cout << "RPC CALL humbug" << std::endl;
+    });
 
     pthread_create(&thread_, NULL, &callHandle, static_cast<void*>(this) );
+}
 
+void NetworkServer::shutdown() {
+    server_->Shutdown(300);
+}
+
+void NetworkServer::setMaxIncomingConnections(int numCon) {
+    server_->SetMaximumIncomingConnections(numCon);
 }
 
 void NetworkServer::onClientConnect(Packet* packet) {
     std::cout << "onClientConnect" << std::endl;
     clients_.push_back(packet->guid);
-
-    bsOut.Reset();
-    bsOut.Write((MessageID)GAME_INIT);
-    peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
-
-    /*
-
-    bsOut.Write((int)clients_.size());
-    bsOut.Reset();
-    sleep(3);
-    bsOut.Write((MessageID)YOUR_TURN);
-    peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
-    */
-
 }
 
 void NetworkServer::onClientAlreadyConnected(Packet *packet) {
@@ -54,55 +55,70 @@ void NetworkServer::onClientConnectionLost(Packet *packet) {
     cout << "onClientConnectionLost" << endl;
 }
 
-void NetworkServer::onPlayerReady(Packet *packet) {
-    cout << "onPlayerReady" << endl;
-    bsOut.Reset();
-    bsOut.Write((MessageID)GAME_START);
-    peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
+void NetworkServer::onServerRequest(Packet *packet) {
+    std::cout << "Server::onServerRequest" << std::endl;
+    RakNet::RakString rs;
+    BitStream bsIn(packet->data,packet->length,false);
+    bsIn.IgnoreBytes(sizeof(MessageID));
+    RakNet::StringCompressor compressor;
+    compressor.DecodeString(&rs, 1000, &bsIn);
 }
 
-void NetworkServer::onPlayerUpdate(Packet *packet) {
-    cout << "onPlayerUpdate" << endl;
-    bsOut.Reset();
-    bsOut.Write((MessageID)GAME_UPDATE);
-    peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
+void NetworkServer::onGameMessageReceived(Packet *packet) {
+    RakNet::RakString rs;
+    BitStream bsIn(packet->data,packet->length,false);
+    bsIn.IgnoreBytes(sizeof(MessageID));
+    RakNet::StringCompressor compressor;
+    compressor.DecodeString(&rs, 1000, &bsIn);
 
     bsOut.Reset();
-    bsOut.Write((MessageID)GAME_OVER);
-    peer->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0,packet->systemAddress,false);
+    bsOut.Write((MessageID)GAME_MESSAGE);
+    compressor.EncodeString(&rs, rs.GetLength()+1, &bsOut );
+    // TODO: directly forward encoded message instead of decoding and encoding
+    sendToAllExcept(&bsOut, packet->guid);
+}
+
+void NetworkServer::sendToAllExcept(BitStream *stream, RakNetGUID except) {
+    for(int i = 0; i < clients_.size(); i++) {
+        server_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
+    }
+}
+
+void NetworkServer::sendToAll(BitStream *stream) {
+    for(int i = 0; i < clients_.size(); i++) {
+        server_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
+    }
 }
 
 void NetworkServer::handle() {
 
-    peer = RakPeerInterface::GetInstance();
     Packet *packet;
-
-    static RakNet::SocketDescriptor desc(SERVER_PORT,0);
-    peer->Startup(MAX_CLIENTS, &desc, 1);
-
+    static RakNet::SocketDescriptor desc(port_,0);
+    server_->Startup(MAX_CLIENTS, &desc, 1);
     cout << "Starting the server" << endl;
 
-    peer->SetMaximumIncomingConnections(MAX_CLIENTS);
+    timer t;
+    t.restart();
 
     while (1)
     {
+        /*
+        if (t.isTimeout(2.0)) {
 
-        for (packet=peer->Receive(); packet; peer->DeallocatePacket(packet), packet=peer->Receive())
+            RakNet::StringCompressor compressor;
+            bsOut.Reset();
+            bsOut.Write((MessageID)SERVER_RESPONSE);
+            string resp = "{ 'Player 1', 'Player 2', 'Player 3' }";
+            compressor.EncodeString( resp.c_str(), resp.size()+1, &bsOut );
+            // TODO: directly forward encoded message instead of decoding and encoding
+            sendToAll(&bsOut);
+
+            t.restart();
+        }
+        */
+
+        for (packet=server_->Receive(); packet; server_->DeallocatePacket(packet), packet=server_->Receive())
         {
-            BitStream bsIn(packet->data,packet->length,false);
-            bsIn.IgnoreBytes(sizeof(MessageID));
-            bsIn.Read(rs);
-
-            /*
-            std::cout << "Client List:\n";
-            for(int i=0; i < (int)clients_.size(); ++i)
-            {
-                cout << i+1 << " - " << clients_[i].g << endl;
-            }
-            */
-
-            //cout << "\n\nNew Packet from:" << packet->guid.g << endl;
-
             switch (packet->data[0])
             {
                 case ID_NEW_INCOMING_CONNECTION:
@@ -117,11 +133,11 @@ void NetworkServer::handle() {
                 case ID_CONNECTION_LOST:
                     onClientConnectionLost(packet);
                     break;
-                case PLAYER_READY:
-                    onPlayerReady(packet);
-                    break;
-                case PLAYER_UPDATE:
-                    onPlayerUpdate(packet);
+                case GAME_MESSAGE:
+                    onGameMessageReceived(packet);
+                    break;                    
+                case SERVER_REQUEST:
+                    onServerRequest(packet);
                     break;
 
                 default:
@@ -134,6 +150,6 @@ void NetworkServer::handle() {
         }
     }
 
-    RakPeerInterface::DestroyInstance(peer);
+    RakPeerInterface::DestroyInstance(server_);
 
 }
