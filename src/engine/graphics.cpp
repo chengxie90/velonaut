@@ -80,7 +80,6 @@ void Graphics::initLua()
         luaL_Reg reg[] = {
             {"create", Graphics::Node::lcreate},
             {"setPosition", Graphics::Node::lsetPosition},
-            {"position", Graphics::Node::lposition},
             {"attachObject", Graphics::Node::lattachObject},
             {"lookAt", Graphics::Node::llookAt},
             {NULL, NULL}
@@ -333,15 +332,6 @@ int Graphics::Node::lsetPosition(lua_State *)
 
     node->setPosition(pos);
     return 0;
-}
-
-int Graphics::Node::lposition(lua_State *)
-{
-    SceneNode *node;
-    LuaManager::GetInstance()->extractParam((void **)&node);
-    assert(node);
-    LuaManager::GetInstance()->addParam(node->getPosition());
-    return 1;
 }
 
 int Graphics::Node::llookAt(lua_State *)
