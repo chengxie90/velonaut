@@ -192,7 +192,3 @@ void Ui::configureRenderSystem()
     // Disable depth bias.
     render_system->_setDepthBias(0, 0);
 }
-
-
-
-
