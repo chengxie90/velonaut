@@ -10,7 +10,7 @@
 #include "graphics.h"
 #include "ui.h"
 #include "network.h"
-#include "lua/luaconf.h"
+#include "physics.h"
 
 using namespace std;
 
@@ -64,9 +64,50 @@ void LuaManager::addParam(string str) const {
     lua_pushstring(state_, str.c_str());
 }
 
+void LuaManager::addParam(const btVector3 &v) const
+{
+    lua_Number array[3] = {v.x(), v.y(), v.z()};
+    addParam(array, 3);
+}
+
+void LuaManager::addParam(const btQuaternion &q) const
+{
+    lua_Number array[4] = {q.x(), q.y(), q.z(), q.w()};
+    addParam(array, 4);
+}
+
+void LuaManager::addParam(const Ogre::Vector3& v) const
+{
+    lua_Number array[3] = {v.x, v.y, v.z};
+    addParam(array, 3);
+}
+
+void LuaManager::addParam(const Ogre::Quaternion& q) const
+{
+    lua_Number array[4] = {q.x, q.y, q.z, q.w};
+    addParam(array, 4);
+}
+
 void LuaManager::extractParam(string *str) const {
     *str = luaL_checkstring(state_, 1);
     lua_remove(state_, 1);
+}
+
+void LuaManager::extractParam(btVector3 *v) const {
+    lua_Number numbers[3];
+    extractParam(numbers, 3);
+    v->setX(numbers[0]);
+    v->setY(numbers[1]);
+    v->setZ(numbers[2]);
+}
+
+void LuaManager::extractParam(btQuaternion *q) const {
+    lua_Number numbers[4];
+    extractParam(numbers, 4);
+    q->setW(numbers[3]);
+    q->setX(numbers[0]);
+    q->setY(numbers[1]);
+    q->setZ(numbers[2]);
 }
 
 void LuaManager::extractParam(Ogre::Vector3 *v) const {
@@ -77,9 +118,30 @@ void LuaManager::extractParam(Ogre::Vector3 *v) const {
     v->z = numbers[2];
 }
 
+void LuaManager::extractParam(Ogre::Quaternion *q) const {
+    lua_Number numbers[4];
+    extractParam(numbers, 4);
+    q->w = numbers[3];
+    q->x = numbers[0];
+    q->y = numbers[1];
+    q->z = numbers[2];
+}
+
 void LuaManager::addParam(void *p) const
 {
     lua_pushlightuserdata(state_, p);
+}
+
+void LuaManager::addParam(lua_Number *array, int len) const
+{
+    lua_getglobal(state_, "Vector");
+    for (int i = 0; i < len; i++) {
+        lua_pushnumber(state_, array[i]);
+    }
+    
+    lua_getfield(state_, 1, "__call");
+
+    lua_call(state_, len + 1, 1);
 }
 
 void LuaManager::extractParam(Ogre::ColourValue *c) const
@@ -146,6 +208,7 @@ void LuaManager::init()
     luaL_openlibs(state_);
 
     Graphics::GetInstance()->initLua();
+    Physics::GetInstance()->initLua();
     Network::GetInstance()->initLua();
     Ui::GetInstance()->initLua();
 }
@@ -153,6 +216,7 @@ void LuaManager::init()
 void LuaManager::start()
 {
     doFile("./data/scripts/engine/app.lua");
+    AddDictionary();
 }
 
 void LuaManager::update(float dt)
@@ -207,4 +271,67 @@ void LuaManager::extractParam(lua_Number *array, int len) const
         lua_pop(state_, 1);
     }
     lua_pop(state_, 1);
+}
+
+void LuaManager::onMouseDown( SDL_Event e )
+{
+    addFunction("Input.onMouseDown");
+
+    int modifierState = 0;
+    addParam( Input::GetInstance()->dictionary_[e.button.button] );
+    addParam(modifierState);
+
+    pCall(2);
+}
+
+void LuaManager::onMouseUp( SDL_Event e)
+{
+    addFunction("Input.onMouseUp");
+
+    int modifierState = 0;
+    addParam( Input::GetInstance()->dictionary_[e.button.button] );
+    addParam(modifierState);
+
+    pCall(2);
+}
+
+void LuaManager::onMouseMove( SDL_Event e )
+{
+
+    addFunction("Input.onMouseMove");
+
+    int modifierState = 0;
+    addParam( e.motion.x );
+    addParam( e.motion.y );
+    addParam(modifierState);
+
+    pCall(3);
+}
+
+void LuaManager::onKeyDown( SDL_Event e )
+{
+    addFunction("Input.onKeyDown");
+    addParam( Input::GetInstance()->dictionary_[e.key.keysym.sym] );
+    pCall(1);
+}
+
+void LuaManager::onKeyUp( SDL_Event e )
+{
+    addFunction("Input.onKeyUp");
+    addParam( Input::GetInstance()->dictionary_[e.key.keysym.sym] );
+    pCall(1);
+}
+
+void LuaManager::AddDictionary()
+{
+    std::map<uint, std::string>::iterator it;
+    int count = 0;
+
+    addFunction("Input.createDictionary");
+    for (it = Input::GetInstance()->dictionary_.begin(); it !=Input::GetInstance()->dictionary_.end(); it++)
+    {
+        addParam( it->second );
+        count++;
+    }
+    pCall(count);
 }

@@ -10,16 +10,20 @@ find_path(LIBROCKET_INCLUDE_DIR Rocket/Core.h
 		  $ENV{ROCKET_DIR}
 		  PATH_SUFFIXES include Rocket)
 
-find_library(LIBROCKET_LIBRARY_CORE NAMES RocketCore RocketCore_d HINTS
+find_library(LIBROCKET_LIBRARY_CORE 
+  NAMES RocketCore RocketCore_d RocketCoreOSX
+  HINTS 
   $ENV{ROCKET_DIR}
   PATH_SUFFIXES lib)
 
-find_library(LIBROCKET_LIBRARY_CONTROLS NAMES RocketControls RocketControls_d HINTS
-  $ENV{ROCKET_DIR}
+find_library(LIBROCKET_LIBRARY_CONTROLS 
+  NAMES RocketControls RocketControls_d RocketControlsOSX
+  HINTS $ENV{ROCKET_DIR}
   PATH_SUFFIXES lib)
 
-find_library(LIBROCKET_LIBRARY_DEBUGGER NAMES RocketDebugger RocketDebugger_d HINTS
-  $ENV{ROCKET_DIR}
+find_library(LIBROCKET_LIBRARY_DEBUGGER 
+  NAMES RocketDebugger RocketDebugger_d RocketDebuggerOSX
+  HINTS $ENV{ROCKET_DIR}
   PATH_SUFFIXES lib)
 
 set(LIBROCKET_LIBRARIES ${LIBROCKET_LIBRARY_CORE} ${LIBROCKET_LIBRARY_CONTROLS} ${LIBROCKET_LIBRARY_DEBUGGER})

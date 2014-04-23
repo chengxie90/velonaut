@@ -50,9 +50,13 @@ private:
     
     struct Node {
         static int lcreate(lua_State *);
+        static int lposition(lua_State *);
         static int lsetPosition(lua_State *);
+        static int lorientation(lua_State *);
+        static int lsetOrientation(lua_State *);
         static int llookAt(lua_State *); 
         static int lattachObject(lua_State *);
+        static int lscale(lua_State *);
     };
     
     struct Camera {
@@ -69,7 +73,9 @@ private:
     };
     
     struct Entity {
-        static int lcreate(lua_State *);
+        static int lcreateMesh(lua_State *);
+        static int lcreateSphere(lua_State *);
+        static int lcreateBox(lua_State *);
         static int lsetMaterial(lua_State *);
     };
     

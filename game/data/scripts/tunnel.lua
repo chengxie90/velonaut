@@ -43,28 +43,18 @@ function Tunnel:_init(object)
 	local radius = minAnchorRadius + (math.random() * (maxControlRadius - minControlRadius))
 	p1 = p1 * radius
 	local rando = getRandomPoint(minControlRadius, maxControlRadius)
-print("RANDO")
---print(rando)
 	local p2 = p1 + rando
-print("P2") --print(p2)
 	rando = getRandomPoint(minAnchorRadius, maxAnchorRadius)
-print("RANDO")
---print(rando)
 	local p3 = p2 + rando
-print("P3") --print(p3)
 	local first = Bezier(p0, p1, p2, p3)
 	curves[1] = first
 
 	-- Middle of spline
 	for i = 2, numCurves do
 		p0 = curves[i-1].p3
-print("P0") --print(p0)
 		p1 = (p0 - curves[i-1].p2)
 		p1 = p1:getNormalized()
 		radius = minAnchorRadius + (math.random() * (maxControlRadius - minControlRadius))
-print("TEST")
-local test = (p1 * radius)
---print(test)
 		p1 = p0 + (p1 * radius)
 		p2 = p1 + getRandomPoint(minControlRadius, maxControlRadius)
 		p3 = p2 + getRandomPoint(minAnchorRadius, maxAnchorRadius)
@@ -110,17 +100,13 @@ local test = (p1 * radius)
 		end
 	end
 
-	print("made samples: " .. #ringSamples .. " ring samples, " .. #curveSamples .. " curve samples")
-
 	-- CREATE THE MESH ----------------------------------------------------------------------------
 
 	local numRings = numCurves * ringsPerCurve
 	local mb = MeshBuilder("LineStrip")
-	print("noRings: " ..numRings)
 	for ringIndex = 0, numRings-1 do
 		for ringSampleIndex = 0, samplesPerRing-1 do
 			local ind = ((ringIndex * samplesPerRing) + ringSampleIndex) + 1 
-			print("ring iterator: " .. ringIndex .. "sample iterator: " .. ringSampleIndex .. " index: " ..ind)
 			local ringSample = ringSamples [ ((ringIndex * samplesPerRing) + ringSampleIndex) + 1 ]
 			local sampleNormal = ringSample-curveSamples[ringIndex + 1]			
 			mb:position(ringSample)

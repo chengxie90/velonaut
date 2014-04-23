@@ -4,8 +4,7 @@ return
     {
         {
             type = "Transform",
-            position = Vector(0, 0, 10),
-            target = Vector(0, 0, 0),
+            position = Vector(0, 0, 30),
         },
         {
             type = "Camera",

@@ -1,3 +1,5 @@
+require "engine.class"
+
 Bezier = class()
 
 function Bezier:_init(p0, p1, p2, p3)

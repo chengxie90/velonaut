@@ -1,0 +1,17 @@
+material skybox
+{
+	technique
+	{
+		pass
+		{
+			fog_override true none
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				texture Space.jpg
+			}
+		}
+	}
+}

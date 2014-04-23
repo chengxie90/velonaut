@@ -11,7 +11,6 @@
 class Ui : public Ogre::RenderQueueListener, InputListener
 {
 public:
-
     void init();
     void initLua();
     void shutdown();
@@ -21,6 +20,9 @@ public:
     virtual void onMouseDown(SDL_Event e );
     virtual void onMouseUp(SDL_Event e );
     virtual void onMouseMove(SDL_Event e );
+
+    virtual void onKeyDown( SDL_Event e );
+    virtual void onKeyUp( SDL_Event e );
 
     static Ui* GetInstance();
 

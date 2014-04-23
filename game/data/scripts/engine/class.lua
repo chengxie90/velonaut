@@ -26,6 +26,7 @@ function class(parent)
         if obj._init then obj:_init(...) end
         return obj
     end
+    c.__call = mt.__call
     setmetatable(c, mt)
 
     return c
