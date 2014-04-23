@@ -14,7 +14,7 @@ function Vector.__index(table, key)
 	if key == "y" then return table[2] end
 	if key == "z" then return table[3] end
 	if key == "w" then return table[4] end
-	return rawget(Vector, key)
+	return Vector[key]
 end
 
 function Vector.__add(v1, v2)

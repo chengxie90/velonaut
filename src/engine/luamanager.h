@@ -3,6 +3,7 @@
 
 #include <lua/lua.hpp>
 #include <Ogre.h>
+#include "bullet/btBulletDynamicsCommon.h"
 #include "common.h"
 
 class LuaManager
@@ -26,8 +27,9 @@ public:
     void addParam(int value) const;
     void addParam(double value) const;
     void addParam(std::string str) const;
-
+    void addParam(const btVector3& v) const;
     void addParam(void *) const;
+    void addParam(lua_Number* array, int len) const;
     
     void extractParam(int *value) const;
     void extractParam(double *value) const;
