@@ -75,6 +75,14 @@ void LuaManager::extractParam(string *str) const {
     lua_remove(state_, 1);
 }
 
+void LuaManager::extractParam(btVector3 *v) const {
+    lua_Number numbers[3];
+    extractParam(numbers, 3);
+    v->setX(numbers[0]);
+    v->setY(numbers[1]);
+    v->setZ(numbers[2]);
+}
+
 void LuaManager::extractParam(Ogre::Vector3 *v) const {
     lua_Number numbers[3];
     extractParam(numbers, 3);
@@ -108,15 +116,6 @@ void LuaManager::extractParam(Ogre::ColourValue *c) const
     c->g = numbers[1];
     c->b = numbers[2];
     c->a = numbers[3];
-}
-
-void LuaManager::extractParam(btVector3 *v) const
-{
-    lua_Number numbers[3] = {0, 0, 0};
-    extractParam(numbers, 3);
-    v->setX(numbers[0]);
-    v->setY(numbers[1]);
-    v->setZ(numbers[2]);
 }
 
 void LuaManager::dumpStack() const {
