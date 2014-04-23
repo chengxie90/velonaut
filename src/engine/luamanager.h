@@ -3,10 +3,10 @@
 
 #include <lua/lua.hpp>
 #include <Ogre.h>
-#include "bullet/btBulletDynamicsCommon.h"
+#include "input.h"
 #include "common.h"
 
-class LuaManager
+class LuaManager : public InputListener
 {
 public:
     void init();
@@ -39,6 +39,14 @@ public:
     void extractParam(void**) const;
     void extractParam(lua_Number* array, int len) const;
 
+    virtual void onMouseDown( SDL_Event e );
+    virtual void onMouseUp( SDL_Event e);
+    virtual void onMouseMove( SDL_Event e );
+
+    virtual void onKeyDown( SDL_Event e );
+    virtual void onKeyUp( SDL_Event e );
+
+
     lua_State *state() const;
     
     static LuaManager* GetInstance();
@@ -47,7 +55,8 @@ private:
 
     friend class App;
     SINGLETON(LuaManager)
-    
+
+    void AddDictionary();
 };
 
 #endif // LUAMANAGER_H
