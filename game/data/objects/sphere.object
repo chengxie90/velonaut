@@ -7,7 +7,7 @@ return
         },
         {
             type = "MeshRenderer",
-            mesh = "sphere",
+            mesh = "cube",
             material = "lambert1"
         },
         {
