@@ -17,6 +17,17 @@ return
             mass = 1,
         },
         {
+            type = "Light",
+            lightType = "pointlight",
+            diffuse = Color(1.0, 1.0, 1.0)
+        },
+        {
+            type = "Camera",
+            near = 0.1,
+            far = 10000,
+            fov = 45,
+        },
+        {
             type = "Ship"
         }
     }

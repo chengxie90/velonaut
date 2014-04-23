@@ -23,10 +23,10 @@ function Tunnel:_init(object)
 	local tunnelRadius = 6
 	local ringsPerCurve = 100
 	local samplesPerRing = 30
-	local minControlRadius = 100
-	local maxControlRadius = 150
-	local minAnchorRadius = 200
-	local maxAnchorRadius = 250
+	local minControlRadius = 400
+	local maxControlRadius = 450
+	local minAnchorRadius = 400
+	local maxAnchorRadius = 450
 
 	--TODO: set seed globally somewhere else
 	local tunnelSeed = 123456789

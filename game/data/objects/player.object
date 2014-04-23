@@ -6,12 +6,7 @@ return
             type = "Transform",
             position = Vector(0, 0, 30),
         },
-        {
-            type = "Camera",
-            near = 0.1,
-            far = 1000,
-            fov = 45,
-        },
+        
         {
             type = "Light",
             lightType = "pointlight",

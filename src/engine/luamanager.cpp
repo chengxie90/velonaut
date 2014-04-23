@@ -135,11 +135,13 @@ void LuaManager::addParam(void *p) const
 void LuaManager::addParam(lua_Number *array, int len) const
 {
     lua_getglobal(state_, "Vector");
+    lua_getfield(state_, 1, "__call");
+    lua_pushvalue(state_, 1);
+    lua_remove(state_, 1);
+
     for (int i = 0; i < len; i++) {
         lua_pushnumber(state_, array[i]);
     }
-    
-    lua_getfield(state_, 1, "__call");
 
     lua_call(state_, len + 1, 1);
 }

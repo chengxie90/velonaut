@@ -34,3 +34,15 @@ end
 function Transform:setOrientation(ori)
 	gfxnode.setOrientation(self._handle, ori)
 end
+
+function Transform:localX()
+	return gfxnode.localX(self._handle)
+end
+
+function Transform:localY()
+	return gfxnode.localY(self._handle)
+end
+
+function Transform:localZ()
+	return gfxnode.localZ(self._handle)
+end

@@ -2,13 +2,13 @@ return
 {
     ambient = Color(0.3, 0.3, 0.3),
     --backgroundColor = Vector(0, 0, 0.1),
-    mainCamera = "player",
+    mainCamera = "sphere",
     objects = 
     {
-        {
-            name = "cube",
-            prefab = "cube"
-        },
+        --{
+        --    name = "cube",
+        --    prefab = "cube"
+        --},
         {
             name = "sphere",
             prefab = "sphere"

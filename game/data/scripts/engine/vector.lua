@@ -39,8 +39,10 @@ function Vector.__tostring(v)
 end
 
 function Vector.__unm(v)
+    print(#v)
     local ret = Vector()
     for i = 1, #v do
+
         ret[i] = -v[i]
     end
     return ret

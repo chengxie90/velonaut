@@ -47,7 +47,17 @@ void Physics::update(float dt)
     world_->stepSimulation(dt);
     
     int numManifolds = world_->getDispatcher()->getNumManifolds();
-    
+
+
+
+    btCollisionObject* obj = world_->getCollisionObjectArray()[0];
+    btRigidBody* rObj = (btRigidBody*) obj;
+
+    std::cout << " ang damping: " << rObj->getAngularDamping() <<
+                 " lin damping: " << rObj->getLinearDamping() <<
+                 " inv mass: " << rObj->getInvMass() <<
+                 " forces: " << rObj->getTotalForce().x() << " " << rObj->getTotalForce().y() << " " <<  rObj->getTotalForce().z()  <<
+                 std::endl;
 }
 
 void Physics::shutdown()
@@ -183,6 +193,7 @@ int Physics::RigidBody::lapplyCentralForce(lua_State *)
     LuaManager::GetInstance()->extractParam((void **)&body);
     LuaManager::GetInstance()->extractParam(&force);
 
+    body->activate(true);
     body->applyCentralForce(force);
 
     return 0;
@@ -197,6 +208,7 @@ int Physics::RigidBody::lapplyForce(lua_State *)
     LuaManager::GetInstance()->extractParam(&force);
     LuaManager::GetInstance()->extractParam(&relativePosition);
 
+    body->activate(true);
     body->applyForce(force, relativePosition);
 
     return 0;
@@ -209,6 +221,7 @@ int Physics::RigidBody::lapplyTorque(lua_State *)
     LuaManager::GetInstance()->extractParam((void **)&body);
     LuaManager::GetInstance()->extractParam(&torque);
 
+    body->activate(true);
     body->applyTorque(torque);
 
     return 0;
