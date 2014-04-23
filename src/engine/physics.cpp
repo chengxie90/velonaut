@@ -52,12 +52,6 @@ void Physics::update(float dt)
 
     btCollisionObject* obj = world_->getCollisionObjectArray()[0];
     btRigidBody* rObj = (btRigidBody*) obj;
-
-    std::cout << " ang damping: " << rObj->getAngularDamping() <<
-                 " lin damping: " << rObj->getLinearDamping() <<
-                 " inv mass: " << rObj->getInvMass() <<
-                 " forces: " << rObj->getTotalForce().x() << " " << rObj->getTotalForce().y() << " " <<  rObj->getTotalForce().z()  <<
-                 std::endl;
 }
 
 void Physics::shutdown()

@@ -27,7 +27,11 @@ void Graphics::init()
     root_->loadPlugin("RenderSystem_GL");
 #elif __LINUX__
     // TODO: fix Linux path problem
-    root_->loadPlugin("./Linux/Debug/RenderSystem_GL.so");   
+    char* buffer = new char[1024];
+    getcwd(buffer, 1024);
+    std::cout << buffer << std::endl;
+    delete buffer;
+    root_->loadPlugin("./Linux/Debug/RenderSystem_GL.so");
 #endif
     
     RenderSystem* renderer = root_->getAvailableRenderers()[0];
@@ -242,7 +246,7 @@ void Graphics::initResources()
 int Graphics::Scene::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->root_->createSceneManager(Ogre::ST_GENERIC);
-    scene->setSkyDome(true, "skybox", 5, 1, 5000, true);
+    scene->setSkyDome(true, "skybox", 1, 1, 5000, true);
     LuaManager::GetInstance()->addParam((void *)scene);
     return 1;
 }

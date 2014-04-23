@@ -7,11 +7,7 @@ return
             position = Vector(0, 0, 30),
         },
         
-        {
-            type = "Light",
-            lightType = "pointlight",
-            diffuse = Color(1.0, 1.0, 1.0)
-        },
+        
         {
             type = "Player"
         }

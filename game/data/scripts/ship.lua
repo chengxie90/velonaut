@@ -21,13 +21,13 @@ function Ship:update(dt)
 
 
 	local rotScale = 3
-	local linScale = 2000
+	local linScale = 800
 
 	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * rotScale) end
 	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * -rotScale) end
 	if Input.getKey("key_left") then self.RigidBody:applyTorque(up * rotScale) end
 	if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
-	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * rotScale) end
-	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * -rotScale) end
+	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
+	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
 	if Input.getKey("key_space") then self.RigidBody:applyCentralForce(look * linScale) end
 end
