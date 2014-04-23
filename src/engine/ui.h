@@ -11,7 +11,6 @@
 class Ui : public Ogre::RenderQueueListener, InputListener
 {
 public:
-
     void init();
     void initLua();
     void shutdown();

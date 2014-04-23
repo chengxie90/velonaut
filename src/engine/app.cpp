@@ -15,7 +15,6 @@ extern App g_app;
 
 bool App::init(int argc, char *argv[])
 {
-
     input_ = new Input;
     graphics_ = new Graphics;
     luaManager_ = new LuaManager;
@@ -65,7 +64,6 @@ void App::shutdown()
     ui_->shutdown();
     physics_->shutdown();
 
-    
     delete physics_;
     delete luaManager_;
     delete input_;

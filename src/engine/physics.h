@@ -1,15 +1,15 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-
 #include "common.h"
 #include "btBulletDynamicsCommon.h"
-
+#include "luamanager.h"
 
 class Physics
 {
 public:
     void init();
+    void initLua();
     void update(float dt);
     void shutdown();
     
@@ -23,7 +23,13 @@ private:
     btDbvtBroadphase* overlappingPairCache_;
     btCollisionDispatcher* dispatcher_;
     btDefaultCollisionConfiguration* collisionConfiguration_;
-    btSequentialImpulseConstraintSolver* solver_;
+    btSequentialImpulseConstraintSolver* solver_;    
+    
+    struct RigidBody {
+        static int lcreate(lua_State *);
+        static int lsetShape(lua_State *);
+        static int lposition(lua_State *);
+    };
 };
 
 #endif // PHYSICS_H

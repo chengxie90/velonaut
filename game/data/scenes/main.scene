@@ -17,9 +17,9 @@ return
             name = "player",
             prefab = "player"
         },
-        {
-            name = "tunnel",
-            prefab = "tunnel"
-        }
+        -- {
+        --     name = "tunnel",
+        --     prefab = "tunnel"
+        -- }
     }
 }

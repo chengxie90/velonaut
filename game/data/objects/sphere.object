@@ -10,12 +10,11 @@ return
             mesh = "sphere",
             material = "lambert1"
         },
-        -- {
-        --     type = "RigidBody",
-        --     shape = "Sphere",
-        --     radius = 1,
-        --     mass = 1,
-
-        -- }
+        {
+            type = "RigidBody",
+            shape = "Sphere",
+            radius = 1,
+            mass = 1,
+        }
     }
 }

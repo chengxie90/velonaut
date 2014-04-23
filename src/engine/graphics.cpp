@@ -63,7 +63,7 @@ void Graphics::initLua()
         };
         LuaManager::GetInstance()->addlib(reg);
         return 1;
-    } );
+    });
     
     LuaManager::GetInstance()->requiref("engine.graphics.scene.c", [](lua_State* state) {
         luaL_Reg reg[] = {

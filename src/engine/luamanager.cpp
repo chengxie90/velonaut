@@ -10,7 +10,7 @@
 #include "graphics.h"
 #include "ui.h"
 #include "network.h"
-#include "lua/luaconf.h"
+#include "physics.h"
 
 using namespace std;
 
@@ -64,6 +64,12 @@ void LuaManager::addParam(string str) const {
     lua_pushstring(state_, str.c_str());
 }
 
+void LuaManager::addParam(const btVector3 &v) const
+{
+    lua_Number array[3] = {v.x(), v.y(), v.z()};
+    addParam(array, 3);
+}
+
 void LuaManager::extractParam(string *str) const {
     *str = luaL_checkstring(state_, 1);
     lua_remove(state_, 1);
@@ -80,6 +86,18 @@ void LuaManager::extractParam(Ogre::Vector3 *v) const {
 void LuaManager::addParam(void *p) const
 {
     lua_pushlightuserdata(state_, p);
+}
+
+void LuaManager::addParam(lua_Number *array, int len) const
+{
+    lua_getglobal(state_, "Vector");
+    for (int i = 0; i < len; i++) {
+        lua_pushnumber(state_, array[i]);
+    }
+    
+    lua_getfield(state_, 1, "__call");
+
+    lua_call(state_, len + 1, 1);
 }
 
 void LuaManager::extractParam(Ogre::ColourValue *c) const
@@ -146,6 +164,7 @@ void LuaManager::init()
     luaL_openlibs(state_);
 
     Graphics::GetInstance()->initLua();
+    Physics::GetInstance()->initLua();
     Network::GetInstance()->initLua();
     Ui::GetInstance()->initLua();
 }
