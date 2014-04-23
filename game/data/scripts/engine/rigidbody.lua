@@ -12,8 +12,7 @@ function RigidBody:load(data)
 end
 
 function RigidBody:start()
-	local force = Vector(100,0,100)
-	self:applyCentralForce(force)
+
 end
 
 function RigidBody:update()
@@ -32,34 +31,40 @@ end
 
 function RigidBody:applyCentralForce(force)
 	assert(force)
+	assert(type(force) == "table")
 	assert(force._class == Vector)
 	phyrigidbody.applyCentralForce(self._handle, force)
 end
 
 function RigidBody:applyForce(force, relativePosition)
 	assert(force)
-	assert(relativePosition)
+	assert(type(force) == "table")
 	assert(force._class == Vector)
+	assert(relativePosition)
+	assert(type(relativePosition) == "table")
 	assert(relativePosition._class == Vector)
 	phyrigidbody.applyCentralForce(self._handle, force, relativePosition)
 end
 
 function RigidBody:applyTorque(torque)
 	assert(torque)
-	assert(force._class == Vector)
+	assert(type(torque) == "table")
+	assert(torque._class == Vector)
 	phyrigidbody.applyTorque(self._handle, torque)
 end
 
 function RigidBody:setLinearVelocity(velocity)
 	assert(velocity)
-	assert(force._class == Vector)
+	assert(type(velocity) == "table")
+	assert(velocity._class == Vector)
 	phyrigidbody.setLinearVelocity(self._handle, velocity)
 end
 
 function RigidBody:setAngularVelocity(velocity)
 	assert(velocity)
-	assert(force._class == Vector)
-	phyrigidbody.setAngularVelocity(self._handle, veloctiy)
+	assert(type(velocity) == "table")
+	assert(velocity._class == Vector)
+	phyrigidbody.setAngularVelocity(self._handle, velocity)
 end
 
 function RigidBody:setDamping(linearDamping, angularDamping)
