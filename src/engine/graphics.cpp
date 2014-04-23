@@ -113,7 +113,9 @@ void Graphics::initLua()
     
     LuaManager::GetInstance()->requiref("engine.graphics.entity.c", [](lua_State* state) {
         luaL_Reg reg[] = {
-            {"create", Graphics::Entity::lcreate},
+            {"createMesh", Graphics::Entity::lcreateMesh},
+            {"createSphere", Graphics::Entity::lcreateSphere},
+            {"createBox", Graphics::Entity::lcreateBox},
             {"setMaterial", Graphics::Entity::lsetMaterial},
             {NULL, NULL}
         };
@@ -234,6 +236,7 @@ void Graphics::initResources()
 int Graphics::Scene::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->root_->createSceneManager(Ogre::ST_GENERIC);
+    scene->setSkyDome(true, "skybox", 5, 1, 500, true);
     LuaManager::GetInstance()->addParam((void *)scene);
     return 1;
 }
@@ -293,7 +296,7 @@ int Graphics::Scene::lsetAmbientLight(lua_State *)
     return 0;
 }
 
-int Graphics::Entity::lcreate(lua_State *)
+int Graphics::Entity::lcreateMesh(lua_State *)
 {
     Ogre::Mesh* pmesh = NULL;
     LuaManager::GetInstance()->extractParam((void **)&pmesh);
@@ -304,6 +307,24 @@ int Graphics::Entity::lcreate(lua_State *)
     
     LuaManager::GetInstance()->addParam((void *)entity);
     
+    return 1;
+}
+
+int Graphics::Entity::lcreateSphere(lua_State *)
+{
+    Ogre::Entity* entity = Graphics::GetInstance()->scene_->createEntity(Ogre::SceneManager::PT_SPHERE);
+
+    LuaManager::GetInstance()->addParam((void *)entity);
+
+    return 1;
+}
+
+int Graphics::Entity::lcreateBox(lua_State *)
+{
+    Ogre::Entity* entity = Graphics::GetInstance()->scene_->createEntity(Ogre::SceneManager::PT_CUBE);
+
+    LuaManager::GetInstance()->addParam((void *)entity);
+
     return 1;
 }
 
@@ -320,6 +341,13 @@ int Graphics::Entity::lsetMaterial(lua_State *)
     entity->setMaterial(mat);
     
     return 0;
+}
+
+int Graphics::Node::lcreate(lua_State *)
+{
+    SceneNode* node = Graphics::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
+    LuaManager::GetInstance()->addParam((void *)node);
+    return 1;
 }
 
 int Graphics::Node::lsetPosition(lua_State *)
@@ -357,11 +385,14 @@ int Graphics::Node::lattachObject(lua_State *)
     return 0;
 }
 
-int Graphics::Node::lcreate(lua_State *)
+int Graphics::Node::lscale(lua_State *)
 {
-    SceneNode* node = Graphics::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
-    LuaManager::GetInstance()->addParam((void *)node);
-    return 1;
+    SceneNode* node;
+    LuaManager::GetInstance()->extractParam((void **)&node);
+    assert(node);
+    Vector3 scale;
+    LuaManager::GetInstance()->extractParam(&scale);
+    node->scale(scale);
 }
 
 int Graphics::Camera::lsetNear(lua_State *)
