@@ -436,6 +436,7 @@ int Graphics::Node::lscale(lua_State *)
     Vector3 scale;
     LuaManager::GetInstance()->extractParam(&scale);
     node->scale(scale);
+    return 0;
 }
 
 int Graphics::Camera::lsetNear(lua_State *)

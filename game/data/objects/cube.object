@@ -3,12 +3,18 @@ return
     components = {
         {
             type = "Transform",
-            position = Vector(0, 0, 0)
+            position = Vector(-10, -10, 0)
         },
         {
             type = "MeshRenderer",
             mesh = "cube",
             material = "lambert1"
+        },
+        {
+            type = "RigidBody",
+            shape = "box",
+            mass = 0,
+            boxHalfExtents = Vector(1, 1, 1)
         }
     }
 }

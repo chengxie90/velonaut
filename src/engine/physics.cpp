@@ -25,7 +25,6 @@ void Physics::initLua()
         luaL_Reg reg[] = {
             {"create", Physics::RigidBody::lcreate},
             {"position", Physics::RigidBody::lposition},
-            {"position", Physics::RigidBody::lposition},
             {"setPosition", Physics::RigidBody::lsetPosition},
             {"orientation", Physics::RigidBody::lorientation},
             {"setOrientation", Physics::RigidBody::lsetOrientation},
@@ -47,16 +46,8 @@ void Physics::update(float dt)
 {
     world_->stepSimulation(dt);
     
-//    int num = world_->getNumCollisionObjects();
+    int numManifolds = world_->getDispatcher()->getNumManifolds();
     
-//    btRigidBody* body = btRigidBody::upcast(world_->getCollisionObjectArray()[0]);
-
-//    btTransform trans;
-//    body->getMotionState()->getWorldTransform(trans);
-    
-//    btVector3 pos = trans.getOrigin();
-    
-//    cout << pos.y() << endl;
 }
 
 void Physics::shutdown()
@@ -75,9 +66,32 @@ Physics *Physics::GetInstance()
 
 int Physics::RigidBody::lcreate(lua_State *)
 {
+    double mass;
+    LuaManager::GetInstance()->extractParam(&mass);
+    
+    string shapename;
+    LuaManager::GetInstance()->extractParam(&shapename);
+    
+    btCollisionShape* shape = NULL;
+    
+    if (shapename == "box") {
+        btVector3 extents;
+        LuaManager::GetInstance()->extractParam(&extents);
+        shape = new btBoxShape(extents);
+    }
+    else {
+        assert(false);
+    }
+    
     btDefaultMotionState *motionState = new btDefaultMotionState();
-    btEmptyShape* sprShape = new btEmptyShape;
-    btRigidBody *body = new btRigidBody(1, motionState, sprShape);
+
+    btVector3 inertia;
+    shape->calculateLocalInertia(mass, inertia);
+    
+    btRigidBody *body = new btRigidBody(mass, motionState, shape, inertia);
+    
+    //body->setCollisionFlags(body->getCollisionFlags() | btRigidBody::CF_NO_CONTACT_RESPONSE);
+    
     Physics::GetInstance()->world_->addRigidBody(body);
     
     LuaManager::GetInstance()->addParam((void *)body);
@@ -85,23 +99,9 @@ int Physics::RigidBody::lcreate(lua_State *)
     return 1;
 }
 
-int Physics::RigidBody::lsetShape(lua_State *)
+int Physics::RigidBody::ldestroy(lua_State *)
 {
-//    string shape;
-//    LuaManager::GetInstance()->extractParam(&shape);
-    
-//    btCollisionShape* shape = NULL;
-    
-//    if (shape == "box") {
-//        shape = btBoxShape({1, 1, 1});
-//    }
-//    else if (shape == "sphere") {
-//        shape = btSphereShape(1);
-//    }
-//    else {
-//        assert(false);
-//    }
-    
+    return 0;
 }
 
 int Physics::RigidBody::lposition(lua_State *)
@@ -122,14 +122,20 @@ int Physics::RigidBody::lposition(lua_State *)
 int Physics::RigidBody::lsetPosition(lua_State *)
 {
     btRigidBody *body;
-    btVector3 position;
     LuaManager::GetInstance()->extractParam((void **)&body);
-    LuaManager::GetInstance()->extractParam(&position);
+
+    btVector3 pos;
+    LuaManager::GetInstance()->extractParam(&pos);
 
     btTransform trans;
-    body->getMotionState()->getWorldTransform(trans);
-    trans.setOrigin(position);
-    body->getMotionState()->setWorldTransform(trans);
+    trans = body->getCenterOfMassTransform();
+
+    trans.setOrigin(pos);
+
+    body->setCenterOfMassTransform(trans);
+
+    btMotionState* ms = body->getMotionState();
+    ms->setWorldTransform(trans);
 
     return 0;
 }
@@ -152,14 +158,20 @@ int Physics::RigidBody::lorientation(lua_State *)
 int Physics::RigidBody::lsetOrientation(lua_State *)
 {
     btRigidBody *body;
-    btQuaternion orientation;
     LuaManager::GetInstance()->extractParam((void **)&body);
+
+    btQuaternion orientation;
     LuaManager::GetInstance()->extractParam(&orientation);
 
     btTransform trans;
-    body->getMotionState()->getWorldTransform(trans);
+    trans = body->getCenterOfMassTransform();
+
     trans.setRotation(orientation);
-    body->getMotionState()->setWorldTransform(trans);
+
+    body->setCenterOfMassTransform(trans);
+
+    btMotionState* ms = body->getMotionState();
+    ms->setWorldTransform(trans);
 
     return 0;
 }

@@ -22,7 +22,12 @@ function Transform:update()
 
 end
 
+function Transform:position()
+    return self._position
+end
+
 function Transform:setPosition(pos)
+    self._position = pos
     gfxnode.setPosition(self._handle, pos)
 end
 

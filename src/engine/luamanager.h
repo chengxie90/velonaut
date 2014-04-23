@@ -33,7 +33,6 @@ public:
     void addParam(const Ogre::Vector3& v) const;
     void addParam(const Ogre::Quaternion& q) const;
     void addParam(void *) const;
-    void addParam(lua_Number* array, int len) const;
     
     void extractParam(int *value) const;
     void extractParam(double *value) const;
@@ -44,7 +43,7 @@ public:
     void extractParam(Ogre::Vector3 *v) const;
     void extractParam(Ogre::ColourValue *c) const;
     void extractParam(void**) const;
-    void extractParam(lua_Number* array, int len) const;
+    
 
     virtual void onMouseDown( SDL_Event e );
     virtual void onMouseUp( SDL_Event e);
@@ -62,6 +61,9 @@ private:
 
     friend class App;
     SINGLETON(LuaManager)
+    
+    void addParam(lua_Number* array, int len) const;
+    void extractParam(lua_Number* array, int len) const;
 
     void AddDictionary();
 };
