@@ -5,6 +5,7 @@
 #include <Ogre.h>
 #include "input.h"
 #include "common.h"
+#include "BulletDynamics/btBulletDynamicsCommon.h"
 
 class LuaManager : public InputListener
 {
@@ -34,6 +35,7 @@ public:
     void extractParam(int *value) const;
     void extractParam(double *value) const;
     void extractParam(std::string *str) const;
+    void extractParam(btVector3 *v) const;
     void extractParam(Ogre::Vector3 *v) const;
     void extractParam(Ogre::ColourValue *c) const;
     void extractParam(void**) const;

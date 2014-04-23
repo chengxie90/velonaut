@@ -16,7 +16,7 @@ void Physics::init()
 	world_ = new btDiscreteDynamicsWorld(dispatcher_, overlappingPairCache_, solver_, collisionConfiguration_);
     
     // TODO: 
-    world_->setGravity(btVector3(0, -10, 0));
+    world_->setGravity(btVector3(0, 0, 0));
 }
 
 void Physics::initLua()
@@ -25,6 +25,12 @@ void Physics::initLua()
         luaL_Reg reg[] = {
             {"create", Physics::RigidBody::lcreate},
             {"position", Physics::RigidBody::lposition},
+            {"applyCentralForce", Physics::RigidBody::lapplyCentralForce},
+            {"applyForce", Physics::RigidBody::lapplyForce},
+            {"applyTorque", Physics::RigidBody::lapplyTorque},
+            {"setLinearVelocity", Physics::RigidBody::lsetLinearVelocity},
+            {"setAngularVelocity", Physics::RigidBody::lsetAngularVelocity},
+            {"setDamping", Physics::RigidBody::lsetDamping},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -106,4 +112,80 @@ int Physics::RigidBody::lposition(lua_State *)
     LuaManager::GetInstance()->addParam(pos);
     
     return 1;
+}
+
+int Physics::RigidBody::lapplyCentralForce(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 force;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&force);
+
+    body->applyCentralForce(force);
+
+    return 0;
+}
+
+int Physics::RigidBody::lapplyForce(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 force;
+    btVector3 relativePosition;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&force);
+    LuaManager::GetInstance()->extractParam(&relativePosition);
+
+    body->applyForce(force, relativePosition);
+
+    return 0;
+}
+
+int Physics::RigidBody::lapplyTorque(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 torque;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&torque);
+
+    body->applyTorque(torque);
+
+    return 0;
+}
+
+int Physics::RigidBody::lsetLinearVelocity(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 velocity;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&velocity);
+
+    body->setLinearVelocity(velocity);
+
+    return 0;
+}
+
+int Physics::RigidBody::lsetAngularVelocity(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 velocity;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&velocity);
+
+    body->setAngularVelocity(velocity);
+
+    return 0;
+}
+
+int Physics::RigidBody::lsetDamping(lua_State *)
+{
+    btRigidBody *body;
+    double linearDamping;
+    double angularDamping;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&linearDamping);
+    LuaManager::GetInstance()->extractParam(&angularDamping);
+
+    body->setDamping(linearDamping, angularDamping);
+
+    return 0;
 }

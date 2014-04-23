@@ -29,6 +29,12 @@ private:
         static int lcreate(lua_State *);
         static int lsetShape(lua_State *);
         static int lposition(lua_State *);
+        static int lapplyCentralForce(lua_State *);
+        static int lapplyForce(lua_State *);
+        static int lapplyTorque(lua_State *);
+        static int lsetLinearVelocity(lua_State *);
+        static int lsetAngularVelocity(lua_State *);
+        static int lsetDamping(lua_State *);
     };
 };
 
