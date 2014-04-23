@@ -6,28 +6,134 @@ require "engine.class"
 require "engine.vector"
 require "engine.color"
 require "engine.matrix"
+require "engine.input"
 --
 
 require "engine.utility"
 require "engine.scene"
 
+local Gui = require "engine.gui.c"
+local Network = require "engine.network.c"
+
+
 App = class() -- this is a singleton
 
 function App.start()
+	math.epsilon = 0.00001
+
     local config = dofile("./data/game.config")
-    assert(config.scene)
     App.loadScene(config.scene)
+
+	Gui.loadFont("./data/ui/font/Delicious-Bold.otf")
+	Gui.loadFont("./data/ui/font/Delicious-BoldItalic.otf")
+	Gui.loadFont("./data/ui/font/Delicious-Italic.otf")
+	Gui.loadFont("./data/ui/font/Delicious-Roman.otf")
+
+	Gui.loadDocument("./data/ui/mainmenu.rml")
+
+	local function onGameMessageReceived(event)
+		
+		print("Game Event: " .. event.eventType)
+
+		if event.eventType == "playerlist" then
+			print("received playerlist")			
+			for i, name in ipairs(event.players) do
+				print (name)
+				Gui.setText("txt_status", "Connnect as " .. name);
+			end
+			return
+		end
+
+		if event.eventType == "gameinit" then
+			print("received gameinit")	
+			print("seed: " .. event.seed)
+			Gui.setText("txt_status", "Initializing...");		
+			return
+		end
+
+		if event.eventType == "countdown" then
+			print("received gameinit")	
+			print("Countdown: " .. event.count)
+			Gui.setText("txt_status", event.count);	
+			return		
+		end
+
+		if event.eventType == "gamestart" then
+			print("GOOOOOOOO!!!!!!!!!")
+			Gui.setText("txt_status", "GOOOOOOOO!!!!!!!!!");	
+			return
+		end	
+
+	end
+
+	local function onConnectedToServer()
+		print("Connected to server yo!")
+		Network.RPC("setPlayerName", "Philly")
+	end
+
+	local function onConnectionFailed()
+		print("on connection failed yo!")
+	end
+
+	local function onDisconnect()
+		print("client disconnected yo!")
+	end
+
+	local function onServerResponse(resp)
+		print("Received player list: ")
+		for c = 1, #resp do
+		  print (resp[c])
+		end
+	end
+
+	Network.addEventListener("game_message", onGameMessageReceived)
+	Network.addEventListener("server_response", onServerResponse)
+	Network.addEventListener("connection_failed", onConnectionFailed)
+	Network.addEventListener("connected_to_server", onConnectedToServer)
+	Network.addEventListener("disconnect", onDisconnect)
+
+
+	local function onStartServer()
+		Network.startServer(60001)
+		Network.setMaxIncomingConnections(12)
+		print("starting server")
+	end
+
+	local function onStartClient()
+		Network.connectToServer("127.0.0.1", 60001)	
+		print("starting client")
+	end
+
+	local function onStartGame()
+		Network.RPC("startGame", "")
+	end
+
+	local function onDisconnectClient()
+		Network.shutdownClient()
+	end
+
+	local function onPlayerReady()
+		Network.RPC("setPlayerReady", "")
+	end
+
+	Gui.addEventListener("btn_start_server", "click", onStartServer)
+	Gui.addEventListener("btn_start_client", "click", onStartClient)
+	Gui.addEventListener("btn_start_game", "click", onStartGame)
+	Gui.addEventListener("btn_player_ready", "click", onPlayerReady)
+	Gui.addEventListener("btn_disconnect", "click", onDisconnectClient)
+
 end
 
 function App.update(dt)
     App._scene:update(dt)
+    Input.update()
 end
 
 function App.terminate()
     
 end
 
-function App:activeScene()
+function App.activeScene()
     return App._scene
 end
 

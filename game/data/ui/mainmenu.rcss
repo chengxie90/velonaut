@@ -1,0 +1,60 @@
+body
+{
+	font-family: Delicious;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 15;
+	color: white;
+}
+
+.wrp {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.wrp_main_menu {
+	background-color: #00000088;
+	width: 180px;
+	height: 100%;
+	position: absolute;
+	right: 0;
+}
+
+.btn
+{
+	display: block;
+	background-color: #AC050599;
+	font-size: 18px;
+	font-weight: bold;
+	padding: 10px 10px;
+	margin: 10px 10px;
+}
+
+.btn:hover
+{
+	background-color: #AC0505FF;
+}
+
+.btn:active
+{
+	background-color: red;
+}
+
+.input_text {
+	width: 200px;
+}
+
+.status {
+	position: absolute;
+	top: 35%;
+	width: 100%;
+	text-align: center;
+	display: block;
+	font-size: 45px;
+	font-weight: bold;
+}
+
+
+
+

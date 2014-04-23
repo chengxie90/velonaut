@@ -29,7 +29,7 @@ function MeshRenderer:start()
 end
 
 function MeshRenderer:setMesh(mesh)
-    self._handle = gfxentity.create(mesh._handle)
+    self._handle = gfxentity.createMesh(mesh._handle)
     self._mesh = mesh
     -- TODO: destroy the former one
 end

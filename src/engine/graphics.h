@@ -12,8 +12,16 @@ public:
     void initLua();
     void render();
     void shutdown();
+    Ogre::RenderWindow* renderWindow_ = NULL;
+    Ogre::SceneManager* scene_ = NULL;
     
     static Graphics* GetInstance();
+
+    static int lcreateScene(lua_State *);
+    // TODO: destroy
+
+    static int lsetActiveScene(lua_State *);
+    static int lsetBackgroundColor(lua_State *);
     
 private:
     SINGLETON(Graphics)
@@ -23,20 +31,16 @@ private:
     void initResources();
     
     SDL_Window* window_ = NULL;
+
     Ogre::Root* root_ = NULL;
-    Ogre::RenderWindow* renderWindow_ = NULL;
-    Ogre::SceneManager* scene_ = NULL;
     Ogre::Camera* defaultCamera_ = NULL;
     Ogre::Viewport* viewport_ = NULL;
     
+private:
+
     // we need to keep shared pointers to keep them from being deleted
     std::map<Ogre::Mesh*, Ogre::MeshPtr> meshMap_;
     std::map<Ogre::Material*, Ogre::MaterialPtr> materialMap_;
-    
-    // lua bindings
-private:
-    static int lsetActiveScene(lua_State *);
-    static int lsetBackgroundColor(lua_State *);
     
     struct Scene {
         static int lcreate(lua_State *);
@@ -46,9 +50,13 @@ private:
     
     struct Node {
         static int lcreate(lua_State *);
+        static int lposition(lua_State *);
         static int lsetPosition(lua_State *);
+        static int lorientation(lua_State *);
+        static int lsetOrientation(lua_State *);
         static int llookAt(lua_State *); 
         static int lattachObject(lua_State *);
+        static int lscale(lua_State *);
     };
     
     struct Camera {
@@ -65,7 +73,9 @@ private:
     };
     
     struct Entity {
-        static int lcreate(lua_State *);
+        static int lcreateMesh(lua_State *);
+        static int lcreateSphere(lua_State *);
+        static int lcreateBox(lua_State *);
         static int lsetMaterial(lua_State *);
     };
     

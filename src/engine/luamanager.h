@@ -3,9 +3,11 @@
 
 #include <lua/lua.hpp>
 #include <Ogre.h>
+#include "input.h"
 #include "common.h"
+#include "BulletDynamics/btBulletDynamicsCommon.h"
 
-class LuaManager
+class LuaManager : public InputListener
 {
 public:
     void init();
@@ -26,16 +28,30 @@ public:
     void addParam(int value) const;
     void addParam(double value) const;
     void addParam(std::string str) const;
-
+    void addParam(const btVector3& v) const;
+    void addParam(const btQuaternion& q) const;
+    void addParam(const Ogre::Vector3& v) const;
+    void addParam(const Ogre::Quaternion& q) const;
     void addParam(void *) const;
     
     void extractParam(int *value) const;
     void extractParam(double *value) const;
     void extractParam(std::string *str) const;
+    void extractParam(btVector3 *v) const;
+    void extractParam(btQuaternion *q) const;
+    void extractParam(Ogre::Quaternion *q) const;
     void extractParam(Ogre::Vector3 *v) const;
     void extractParam(Ogre::ColourValue *c) const;
     void extractParam(void**) const;
-    void extractParam(lua_Number* array, int len) const;
+    
+
+    virtual void onMouseDown( SDL_Event e );
+    virtual void onMouseUp( SDL_Event e);
+    virtual void onMouseMove( SDL_Event e );
+
+    virtual void onKeyDown( SDL_Event e );
+    virtual void onKeyUp( SDL_Event e );
+
 
     lua_State *state() const;
     
@@ -46,6 +62,10 @@ private:
     friend class App;
     SINGLETON(LuaManager)
     
+    void addParam(lua_Number* array, int len) const;
+    void extractParam(lua_Number* array, int len) const;
+
+    void AddDictionary();
 };
 
 #endif // LUAMANAGER_H
