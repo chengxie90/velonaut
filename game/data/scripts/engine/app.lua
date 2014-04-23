@@ -22,23 +22,53 @@ function App.start()
 	math.epsilon = 0.00001
 
     local config = dofile("./data/game.config")
-    assert(config.scene)
     App.loadScene(config.scene)
 
-	Gui.loadFont("./data/ui/Delicious-Bold.otf")
-	Gui.loadFont("./data/ui/Delicious-BoldItalic.otf")
-	Gui.loadFont("./data/ui/Delicious-Italic.otf")
-	Gui.loadFont("./data/ui/Delicious-Roman.otf")
+	Gui.loadFont("./data/ui/font/Delicious-Bold.otf")
+	Gui.loadFont("./data/ui/font/Delicious-BoldItalic.otf")
+	Gui.loadFont("./data/ui/font/Delicious-Italic.otf")
+	Gui.loadFont("./data/ui/font/Delicious-Roman.otf")
 
-	Gui.loadDocument("./data/ui/demo.rml")
+	Gui.loadDocument("./data/ui/mainmenu.rml")
 
-	local function onGameMessageReceived(msg)
-		print("Game message received yo!" .. msg.eventType)
+	local function onGameMessageReceived(event)
+		
+		print("Game Event: " .. event.eventType)
+
+		if event.eventType == "playerlist" then
+			print("received playerlist")			
+			for i, name in ipairs(event.players) do
+				print (name)
+				Gui.setText("txt_status", "Connnect as " .. name);
+			end
+			return
+		end
+
+		if event.eventType == "gameinit" then
+			print("received gameinit")	
+			print("seed: " .. event.seed)
+			Gui.setText("txt_status", "Initializing...");		
+			return
+		end
+
+		if event.eventType == "countdown" then
+			print("received gameinit")	
+			print("Countdown: " .. event.count)
+			Gui.setText("txt_status", event.count);	
+			return		
+		end
+
+		if event.eventType == "gamestart" then
+			print("GOOOOOOOO!!!!!!!!!")
+			Gui.setText("txt_status", "GOOOOOOOO!!!!!!!!!");	
+			return
+		end	
+
 	end
 
 	local function onConnectedToServer()
 		print("Connected to server yo!")
-		Network.sendMessage( "{ eventType = 'blu' }" )
+		Network.RPC("setPlayerName", "Philly")
 	end
 
 	local function onConnectionFailed()
@@ -74,18 +104,23 @@ function App.start()
 		print("starting client")
 	end
 
-	local function onBtnDisconnect()
---		Network.sendMessage("{ eventType='BlaBLiBlaBla'} ")
-		Network.sendRequest("getPlayerList")
-		
---		Network.shutdownClient()
+	local function onStartGame()
+		Network.RPC("startGame", "")
 	end
 
+	local function onDisconnectClient()
+		Network.shutdownClient()
+	end
 
-	Gui.addEventListener("btn_start_disconnect", "click", onBtnDisconnect)
+	local function onPlayerReady()
+		Network.RPC("setPlayerReady", "")
+	end
+
 	Gui.addEventListener("btn_start_server", "click", onStartServer)
 	Gui.addEventListener("btn_start_client", "click", onStartClient)
-
+	Gui.addEventListener("btn_start_game", "click", onStartGame)
+	Gui.addEventListener("btn_player_ready", "click", onPlayerReady)
+	Gui.addEventListener("btn_disconnect", "click", onDisconnectClient)
 
 end
 

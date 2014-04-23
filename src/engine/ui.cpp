@@ -5,8 +5,6 @@
 #include "ui.h"
 #include "uirenderinterface.h"
 #include "uisysteminterface.h"
-#include "rocketeventlistener.h"
-#include "luamanager.h"
 #include "app.h"
 
 Ui::Ui()
@@ -20,6 +18,7 @@ void Ui::initLua() {
             {"loadDocument", Ui::lLoadDocument},
             {"loadCursor", Ui::lLoadMouseCursor},
             {"loadFont", Ui::lLoadFont},
+            {"setText", Ui::lSetText},
             {"addEventListener", Ui::lAddEventListener},
             {NULL, NULL}
         };
@@ -60,7 +59,7 @@ void Ui::init() {
 }
 
 void Ui::shutdown() {
-
+context_->UnloadAllDocuments();
 }
 
 int Ui::lLoadDocument(lua_State *state)
@@ -94,6 +93,18 @@ int Ui::lAddEventListener(lua_State *state) {
     int r = luaL_ref(state, LUA_REGISTRYINDEX);
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->AddEventListener(event.c_str(), new RocketEventListener(r), true );
 }
+
+int Ui::lSetText(lua_State *state) {
+    std::string id;
+    std::string text;
+
+    LuaManager::GetInstance()->extractParam(&id);
+    LuaManager::GetInstance()->extractParam(&text);
+
+    Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetInnerRML(text.c_str());
+
+}
+
 
 // TODO: Add RemoveEventListener function
 
@@ -191,7 +202,3 @@ void Ui::configureRenderSystem()
     // Disable depth bias.
     render_system->_setDepthBias(0, 0);
 }
-
-
-
-

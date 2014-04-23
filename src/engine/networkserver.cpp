@@ -3,153 +3,277 @@
 #include <vector>
 #include <functional>
 
-#include "RakNet/StringCompressor.h"
 #include "RakNet/RPC4Plugin.h"
 #include "networkserver.h"
 
 using namespace RakNet;
 using namespace std;
 
-static void* callHandle(void* data) {
-  NetworkServer *h = static_cast<NetworkServer*>(data);
-  h->handle();
-}
 
-NetworkServer::NetworkServer(int port):port_(port)
+static void* callRun(void* data)
 {
+  NetworkServer *server = static_cast<NetworkServer*>(data);
+  server->run();
 }
 
-void NetworkServer::start() {
+NetworkServer *NetworkServer::GetInstance()
+{
+    static NetworkServer instance;
+    return &instance;
+}
+
+NetworkServer::NetworkServer():currentState_(0) {}
+
+void NetworkServer::rpcSetPlayerName(BitStream* bsIn,Packet* p)
+{
+    NetworkServer* server = NetworkServer::GetInstance();
+    RakString rs;
+    server->readString(bsIn, rs, false);
+    NetworkServer::GetInstance()->players_[p->guid].name = string(rs.C_String());
+}
+
+void NetworkServer::rpcStartGame(BitStream* bsIn,Packet* p)
+{
+    NetworkServer* server = NetworkServer::GetInstance();
+
+    server->setServerState(new WaitingForPlayerReadyState);
+
+    server->writeMessage(GAME_MESSAGE, server->createGameInitEvent());
+    server->sendToAll(RELIABLE_ORDERED);
+
+    server->setServerState(new WaitingForPlayerReadyState);
+}
+
+void NetworkServer::rpcSetPlayerReady(BitStream* bsIn,Packet* p)
+{
+    NetworkServer* server = NetworkServer::GetInstance();
+    server->players_[p->guid].ready = true;
+}
+
+void NetworkServer::start(int port)
+{
+    port_ = port;
     server_ = RakPeerInterface::GetInstance();
     server_->AttachPlugin(&rpc_);
 
-    rpc_.RegisterFunction("humbug", [](RakNet::BitStream* s, Packet* p) {
-        std::cout << "RPC CALL humbug" << std::endl;
-    });
-
-    pthread_create(&thread_, NULL, &callHandle, static_cast<void*>(this) );
+    rpc_.RegisterFunction("setPlayerName", &NetworkServer::rpcSetPlayerName);
+    rpc_.RegisterFunction("setPlayerReady", &NetworkServer::rpcSetPlayerReady);
+    rpc_.RegisterFunction("startGame", &NetworkServer::rpcStartGame);
+    pthread_create(&thread_, NULL, &callRun, static_cast<void*>(this) );
 }
 
-void NetworkServer::shutdown() {
+void NetworkServer::shutdown()
+{
     server_->Shutdown(300);
 }
 
-void NetworkServer::setMaxIncomingConnections(int numCon) {
+void NetworkServer::setMaxIncomingConnections(int numCon)
+{
     server_->SetMaximumIncomingConnections(numCon);
 }
 
-void NetworkServer::onClientConnect(Packet* packet) {
+void NetworkServer::onClientConnect(Packet* packet)
+{
     std::cout << "onClientConnect" << std::endl;
     clients_.push_back(packet->guid);
 }
 
-void NetworkServer::onClientAlreadyConnected(Packet *packet) {
+void NetworkServer::onClientAlreadyConnected(Packet *packet)
+{
     cout << "onClientAlreadyConnected" << endl;
 }
 
-void NetworkServer::onClientDisconnect(Packet *packet) {
+void NetworkServer::onClientDisconnect(Packet *packet)
+{
     cout << "onClientDisconnect" << endl;
+    players_.erase(packet->guid);
 }
 
-void NetworkServer::onClientConnectionLost(Packet *packet) {
+void NetworkServer::onClientConnectionLost(Packet *packet)
+{
     cout << "onClientConnectionLost" << endl;
+    players_.erase(packet->guid);
 }
 
-void NetworkServer::onServerRequest(Packet *packet) {
-    std::cout << "Server::onServerRequest" << std::endl;
-    RakNet::RakString rs;
+void NetworkServer::onGameMessageReceived(Packet *packet)
+{
+    RakString rs;
     BitStream bsIn(packet->data,packet->length,false);
-    bsIn.IgnoreBytes(sizeof(MessageID));
-    RakNet::StringCompressor compressor;
-    compressor.DecodeString(&rs, 1000, &bsIn);
+    readString(&bsIn, rs);
+    writeMessage(GAME_MESSAGE, rs);
+    sendToAll(RELIABLE_ORDERED);
 }
 
-void NetworkServer::onGameMessageReceived(Packet *packet) {
-    RakNet::RakString rs;
-    BitStream bsIn(packet->data,packet->length,false);
-    bsIn.IgnoreBytes(sizeof(MessageID));
-    RakNet::StringCompressor compressor;
-    compressor.DecodeString(&rs, 1000, &bsIn);
+void NetworkServer::readString(BitStream *bsIn, RakString &str, bool ignoreMsgType)
+{
+    static StringCompressor compressor;
+    if (ignoreMsgType)
+        bsIn->IgnoreBytes(sizeof(MessageID));
 
-    bsOut.Reset();
-    bsOut.Write((MessageID)GAME_MESSAGE);
-    compressor.EncodeString(&rs, rs.GetLength()+1, &bsOut );
-    // TODO: directly forward encoded message instead of decoding and encoding
-    sendToAllExcept(&bsOut, packet->guid);
+    compressor.DecodeString(&str, 1000, bsIn);
 }
 
-void NetworkServer::sendToAllExcept(BitStream *stream, RakNetGUID except) {
+void NetworkServer::writeMessage(GameMessages msgType, RakString msg)
+{
+    bitSteamOut_.Reset();
+    bitSteamOut_.Write((MessageID)msgType);
+    writeString(msg);
+}
+
+void NetworkServer::writeString(RakString msg)
+{
+    static StringCompressor compressor;
+    compressor.EncodeString(&msg, msg.GetLength()+1, &bitSteamOut_ );
+}
+
+void NetworkServer::sendToAllExcept(BitStream *stream, RakNetGUID except)
+{
     for(int i = 0; i < clients_.size(); i++) {
-        server_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
+        server_->Send(&bitSteamOut_,HIGH_PRIORITY,RELIABLE_ORDERED,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
     }
 }
 
-void NetworkServer::sendToAll(BitStream *stream) {
+void NetworkServer::sendToAll(PacketReliability reliability)
+{
     for(int i = 0; i < clients_.size(); i++) {
-        server_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
+        server_->Send(&bitSteamOut_,HIGH_PRIORITY,reliability,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
     }
 }
 
-void NetworkServer::handle() {
+RakString NetworkServer::createPlayerListEvent() {
+    string s;
+    s.append("{ eventType = 'playerlist', players = {");
 
-    Packet *packet;
-    static RakNet::SocketDescriptor desc(port_,0);
-    server_->Startup(MAX_CLIENTS, &desc, 1);
-    cout << "Starting the server" << endl;
+    for(auto it = players_.begin(); it != players_.end(); ++it) {
+        s.append("'");
+        s.append(it->second.name);
+        s.append("',");
+    }
+    s.append("} }");
+    return RakString(s.c_str());
+}
+
+RakString NetworkServer::createGameInitEvent() {
+    string s;
+    s.append("{eventType='gameinit',seed=123}");
+    return RakString(s.c_str());
+}
+
+RakString NetworkServer::createCountDownEvent(int count) {
+    string s;
+    s.append("{eventType='countdown',count=");
+    s.append(to_string(count));
+    s.append("}");
+    return RakString(s.c_str());
+}
+
+RakString NetworkServer::createGameStartEvent() {
+    string s;
+    s.append("{eventType='gamestart'}");
+    return RakString(s.c_str());
+}
+
+void NetworkServer::setServerState(AbstractServerState *state) {
+    if (currentState_)
+        delete currentState_;
+    currentState_ = state;
+}
+
+void NetworkServer::run() {
+
+    static SocketDescriptor desc(port_,0);
+    server_->Startup(12, &desc, 1);
+    setServerState(new WaitingForPlayersState);
 
     timer t;
     t.restart();
 
     while (1)
     {
-        /*
-        if (t.isTimeout(2.0)) {
-
-            RakNet::StringCompressor compressor;
-            bsOut.Reset();
-            bsOut.Write((MessageID)SERVER_RESPONSE);
-            string resp = "{ 'Player 1', 'Player 2', 'Player 3' }";
-            compressor.EncodeString( resp.c_str(), resp.size()+1, &bsOut );
-            // TODO: directly forward encoded message instead of decoding and encoding
-            sendToAll(&bsOut);
-
-            t.restart();
-        }
-        */
-
-        for (packet=server_->Receive(); packet; server_->DeallocatePacket(packet), packet=server_->Receive())
-        {
-            switch (packet->data[0])
-            {
-                case ID_NEW_INCOMING_CONNECTION:
-                    onClientConnect(packet);
-                    break;
-                case ID_ALREADY_CONNECTED:
-                    onClientAlreadyConnected(packet);
-                    break;
-                case ID_DISCONNECTION_NOTIFICATION:
-                    onClientDisconnect(packet);
-                    break;
-                case ID_CONNECTION_LOST:
-                    onClientConnectionLost(packet);
-                    break;
-                case GAME_MESSAGE:
-                    onGameMessageReceived(packet);
-                    break;                    
-                case SERVER_REQUEST:
-                    onServerRequest(packet);
-                    break;
-
-                default:
-                    cout << "Message with identifier " << packet->data[0] << " has arrived." << endl;
-                    break;
-            }
-
-
-            bsOut.Reset();
-        }
+        if (currentState_)
+            currentState_->update(this, t);
+        pollPackets();
     }
 
-    RakPeerInterface::DestroyInstance(server_);
+    shutdown();
 
+    RakPeerInterface::DestroyInstance(server_);
+}
+
+
+void NetworkServer::pollPackets() {
+    Packet *packet;
+
+    for (packet=server_->Receive(); packet; server_->DeallocatePacket(packet), packet=server_->Receive())
+    {
+        switch (packet->data[0])
+        {
+            case ID_NEW_INCOMING_CONNECTION:
+                onClientConnect(packet);
+                break;
+            case ID_ALREADY_CONNECTED:
+                onClientAlreadyConnected(packet);
+                break;
+            case ID_DISCONNECTION_NOTIFICATION:
+                onClientDisconnect(packet);
+                break;
+            case ID_CONNECTION_LOST:
+                onClientConnectionLost(packet);
+                break;
+            case GAME_MESSAGE:
+                onGameMessageReceived(packet);
+                break;
+
+            default:
+                cout << "Message with identifier " << packet->data[0] << " has arrived." << endl;
+                break;
+        }
+
+        bitSteamOut_.Reset();
+    }
+}
+
+void NetworkServer::WaitingForPlayersState::update(NetworkServer* server, timer& t) {
+    if (!t.isTimeout(1.0))
+        return;
+
+    server->writeMessage(GAME_MESSAGE, server->createPlayerListEvent());
+    server->sendToAll(RELIABLE_ORDERED);
+
+    t.restart();
+}
+
+void NetworkServer::WaitingForPlayerReadyState::update(NetworkServer* server, timer& t) {
+    if (!t.isTimeout(2.0))
+        return;
+
+    for(auto it = server->players_.begin(); it != server->players_.end(); ++it) {
+        if (!it->second.ready) {
+            t.restart();
+            return;
+        }
+    }
+    server->countdown_.restart();
+    server->setServerState(new CountDownState);
+}
+
+void NetworkServer::CountDownState::update(NetworkServer* server, timer& t) {
+    if (!t.isTimeout(1))
+        return;
+
+        int count = 5-server->countdown_.elapsedTime();
+
+        if (count == 0) {
+
+            server->writeMessage(GAME_MESSAGE, server->createGameStartEvent() );
+            server->sendToAll(RELIABLE_ORDERED);
+            server->setServerState(0);
+            return;
+
+        }
+        server->writeMessage(GAME_MESSAGE, server->createCountDownEvent(count));
+        server->sendToAll(RELIABLE_ORDERED);
+
+
+    t.restart();
 }
