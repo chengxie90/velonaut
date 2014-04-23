@@ -68,7 +68,7 @@ function App.start()
 
 	local function onConnectedToServer()
 		print("Connected to server yo!")
-		Network.RPC("setPlayerName", "Philly")
+		Network.RPC("setPlayerName", "Nate")
 	end
 
 	local function onConnectionFailed()
@@ -100,7 +100,7 @@ function App.start()
 	end
 
 	local function onStartClient()
-		Network.connectToServer("127.0.0.1", 60001)	
+		Network.connectToServer("10.116.74.71", 60001)	
 		print("starting client")
 	end
 

@@ -5,13 +5,12 @@ require "engine.meshbuilder"
 require "engine.meshrenderer"
 
 local function getRandomPoint(min, max)
-	local x = math.random()-1
-	local y = math.random()-1
-	local z = math.random()-1
+	local x = math.random()-0.5
+	local y = math.random()-0.5
+	local z = math.random()-0.5
 	local dir = Vector(x, y, z)	
 	dir = dir:getNormalized()
 	local radius = min + (math.random() * (max- min))
-	print("random dir: " .. dir.x .. " " .. dir.y .. " " .. dir.z)
 	return dir * radius	
 end
 
@@ -28,13 +27,15 @@ function Tunnel:_init(object)
 	local tunnelRadius = 100
 	local ringsPerCurve = 80
 	local samplesPerRing = 30
-	local minControlRadius = 400
-	local maxControlRadius = 450
-	local minAnchorRadius = 400
-	local maxAnchorRadius = 450
+	local minStartRadius = 100
+	local maxStartRadius = 150
+	local minControlRadius = 4000
+	local maxControlRadius = 4050
+	local minAnchorRadius = 1000
+	local maxAnchorRadius = 1050
 
 	--TODO: set seed globally somewhere else
-	local tunnelSeed = 1
+	local tunnelSeed = 252111
 
 	-- Set seed and create table of curves
 	math.randomseed(tunnelSeed)
@@ -44,9 +45,9 @@ function Tunnel:_init(object)
 
 	-- First curve
 	local p0 = Vector(0, 0, 0)
-	local p1 = Vector(0, 0, -1) * getRandomRadius(minAnchorRadius, maxAnchorRadius)
-	local p2 = p1 + (Vector(0, 0, -1) * getRandomRadius(minControlRadius, maxControlRadius))
-	local p3 = p2 + Vector(0, 0, -1) * getRandomRadius(minAnchorRadius, maxAnchorRadius)
+	local p1 = Vector(0, 0, -1) * getRandomRadius(minStartRadius, maxStartRadius)
+	local p2 = p1 + (Vector(0, 0, -1) * getRandomRadius(minStartRadius, maxStartRadius))
+	local p3 = p2 + Vector(0, 0, -1) * getRandomRadius(minStartRadius, maxStartRadius)
 	curves[1] = Bezier(p0, p1, p2, p3)
 	--[[
 	print(1 .. " p0: [" .. p0.x .. " " .. p0.y .. " " .. p0.z .. "]"
@@ -57,9 +58,9 @@ function Tunnel:_init(object)
 	-- Middle of spline
 	for i = 2, numCurves-1 do
 		p0 = curves[i-1].p3
-		p1 = p0 + (((p0 - curves[i-1].p2):getNormalized()) * getRandomRadius(minAnchorRadius, maxAnchorRadius))
-		p2 = p1 + getRandomPoint(minControlRadius, maxControlRadius)
-		p3 = p2 + getRandomPoint(minAnchorRadius, maxAnchorRadius)
+		p1 = p0 + (((p0 - curves[i-1].p2):getNormalized()) * getRandomRadius(minControlRadius, maxControlRadius))
+		p3 = p0 + getRandomPoint(minAnchorRadius, maxAnchorRadius)
+		p2 = p3 + getRandomPoint(minControlRadius, maxControlRadius)
 		--[[
 		print(i .. " p0: [" .. p0.x .. " " .. p0.y .. " " .. p0.z .. "]"
 			  	.. " p1: [" .. p1.x .. " " .. p1.y .. " " .. p1.z .. "]"
