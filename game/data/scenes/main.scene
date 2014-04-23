@@ -5,10 +5,10 @@ return
     mainCamera = "player",
     objects = 
     {
-        -- {
-        --     name = "cube",
-        --     prefab = "cube"
-        -- },
+        {
+            name = "cube",
+            prefab = "cube"
+        },
         {
             name = "sphere",
             prefab = "sphere"

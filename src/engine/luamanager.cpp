@@ -110,6 +110,15 @@ void LuaManager::extractParam(Ogre::ColourValue *c) const
     c->a = numbers[3];
 }
 
+void LuaManager::extractParam(btVector3 *v) const
+{
+    lua_Number numbers[3] = {0, 0, 0};
+    extractParam(numbers, 3);
+    v->setX(numbers[0]);
+    v->setY(numbers[1]);
+    v->setZ(numbers[2]);
+}
+
 void LuaManager::dumpStack() const {
 
     int i;

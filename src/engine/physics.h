@@ -27,8 +27,10 @@ private:
     
     struct RigidBody {
         static int lcreate(lua_State *);
-        static int lsetShape(lua_State *);
+        static int ldestroy(lua_State *);
+        
         static int lposition(lua_State *);
+        static int lsetPosition(lua_State *);
     };
 };
 

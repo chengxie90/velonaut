@@ -3,7 +3,7 @@ return
     components = {
         {
             type = "Transform",
-            position = Vector(2, 0, 0)
+            position = Vector(-10, 0, 0)
         },
         {
             type = "MeshRenderer",
@@ -12,8 +12,8 @@ return
         },
         {
             type = "RigidBody",
-            shape = "Sphere",
-            radius = 1,
+            shape = "box",
+            boxHalfExtents = Vector(1, 1, 1),
             mass = 1,
         }
     }
