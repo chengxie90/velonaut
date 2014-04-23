@@ -19,6 +19,7 @@ function RigidBody:update()
     local trans = self:transform()
     assert(trans)
     trans:setPosition(self:position())
+    trans:setOrientation(self:orientation())
 end
 
 function RigidBody:position()
@@ -26,7 +27,7 @@ function RigidBody:position()
 end
 
 function RigidBody:orientation()
-
+	return phyrigidbody.orientation(self._handle)
 end
 
 function RigidBody:applyCentralForce(force)

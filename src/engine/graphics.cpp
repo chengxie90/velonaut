@@ -79,7 +79,10 @@ void Graphics::initLua()
     LuaManager::GetInstance()->requiref("engine.graphics.node.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Graphics::Node::lcreate},
+            {"position", Graphics::Node::lposition},
             {"setPosition", Graphics::Node::lsetPosition},
+            {"orientation", Graphics::Node::lorientation},
+            {"setOrientation", Graphics::Node::lsetOrientation},
             {"attachObject", Graphics::Node::lattachObject},
             {"lookAt", Graphics::Node::llookAt},
             {NULL, NULL}
@@ -350,6 +353,18 @@ int Graphics::Node::lcreate(lua_State *)
     return 1;
 }
 
+int Graphics::Node::lposition(lua_State *)
+{
+    SceneNode *node;
+    LuaManager::GetInstance()->extractParam((void **)&node);
+
+    Vector3 pos = node->getPosition();
+
+    LuaManager::GetInstance()->addParam(pos);
+
+    return 1;
+}
+
 int Graphics::Node::lsetPosition(lua_State *)
 {
     SceneNode *node;
@@ -359,6 +374,34 @@ int Graphics::Node::lsetPosition(lua_State *)
     LuaManager::GetInstance()->extractParam(&pos);
 
     node->setPosition(pos);
+    return 0;
+}
+
+
+int Graphics::Node::lorientation(lua_State *)
+{
+    SceneNode *node;
+    LuaManager::GetInstance()->extractParam((void **)&node);
+
+    Quaternion ori = node->getOrientation();
+
+    LuaManager::GetInstance()->addParam(ori);
+
+    return 1;
+}
+
+
+int Graphics::Node::lsetOrientation(lua_State *)
+{
+    SceneNode *node;
+    LuaManager::GetInstance()->extractParam((void **)&node);
+
+    Quaternion ori;
+    LuaManager::GetInstance()->extractParam(&ori);
+
+    std::cout << "ORIENTATION: " << ori << std::endl;
+
+    node->setOrientation(ori);
     return 0;
 }
 

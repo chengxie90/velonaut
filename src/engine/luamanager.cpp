@@ -70,6 +70,24 @@ void LuaManager::addParam(const btVector3 &v) const
     addParam(array, 3);
 }
 
+void LuaManager::addParam(const btQuaternion &q) const
+{
+    lua_Number array[4] = {q.x(), q.y(), q.z(), q.w()};
+    addParam(array, 4);
+}
+
+void LuaManager::addParam(const Ogre::Vector3& v) const
+{
+    lua_Number array[3] = {v.x, v.y, v.z};
+    addParam(array, 3);
+}
+
+void LuaManager::addParam(const Ogre::Quaternion& q) const
+{
+    lua_Number array[4] = {q.x, q.y, q.z, q.w};
+    addParam(array, 4);
+}
+
 void LuaManager::extractParam(string *str) const {
     *str = luaL_checkstring(state_, 1);
     lua_remove(state_, 1);
@@ -83,12 +101,30 @@ void LuaManager::extractParam(btVector3 *v) const {
     v->setZ(numbers[2]);
 }
 
+void LuaManager::extractParam(btQuaternion *q) const {
+    lua_Number numbers[4];
+    extractParam(numbers, 4);
+    q->setW(numbers[3]);
+    q->setX(numbers[0]);
+    q->setY(numbers[1]);
+    q->setZ(numbers[2]);
+}
+
 void LuaManager::extractParam(Ogre::Vector3 *v) const {
     lua_Number numbers[3];
     extractParam(numbers, 3);
     v->x = numbers[0];
     v->y = numbers[1];
     v->z = numbers[2];
+}
+
+void LuaManager::extractParam(Ogre::Quaternion *q) const {
+    lua_Number numbers[4];
+    extractParam(numbers, 4);
+    q->w = numbers[3];
+    q->x = numbers[0];
+    q->y = numbers[1];
+    q->z = numbers[2];
 }
 
 void LuaManager::addParam(void *p) const

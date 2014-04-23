@@ -9,6 +9,6 @@ return
             type = "MeshRenderer",
             mesh = "cube",
             material = "lambert1"
-        },
+        }
     }
 }

@@ -25,6 +25,11 @@ void Physics::initLua()
         luaL_Reg reg[] = {
             {"create", Physics::RigidBody::lcreate},
             {"position", Physics::RigidBody::lposition},
+            {"position", Physics::RigidBody::lposition},
+            {"setPosition", Physics::RigidBody::lsetPosition},
+            {"orientation", Physics::RigidBody::lorientation},
+            {"setOrientation", Physics::RigidBody::lsetOrientation},
+            {"orientation", Physics::RigidBody::lorientation},
             {"applyCentralForce", Physics::RigidBody::lapplyCentralForce},
             {"applyForce", Physics::RigidBody::lapplyForce},
             {"applyTorque", Physics::RigidBody::lapplyTorque},
@@ -112,6 +117,51 @@ int Physics::RigidBody::lposition(lua_State *)
     LuaManager::GetInstance()->addParam(pos);
     
     return 1;
+}
+
+int Physics::RigidBody::lsetPosition(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 position;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&position);
+
+    btTransform trans;
+    body->getMotionState()->getWorldTransform(trans);
+    trans.setOrigin(position);
+    body->getMotionState()->setWorldTransform(trans);
+
+    return 0;
+}
+
+int Physics::RigidBody::lorientation(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    btTransform trans;
+    body->getMotionState()->getWorldTransform(trans);
+
+    btQuaternion ori = trans.getRotation();
+
+    LuaManager::GetInstance()->addParam(ori);
+
+    return 1;
+}
+
+int Physics::RigidBody::lsetOrientation(lua_State *)
+{
+    btRigidBody *body;
+    btQuaternion orientation;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&orientation);
+
+    btTransform trans;
+    body->getMotionState()->getWorldTransform(trans);
+    trans.setRotation(orientation);
+    body->getMotionState()->setWorldTransform(trans);
+
+    return 0;
 }
 
 int Physics::RigidBody::lapplyCentralForce(lua_State *)

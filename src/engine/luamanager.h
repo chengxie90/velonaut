@@ -29,6 +29,9 @@ public:
     void addParam(double value) const;
     void addParam(std::string str) const;
     void addParam(const btVector3& v) const;
+    void addParam(const btQuaternion& q) const;
+    void addParam(const Ogre::Vector3& v) const;
+    void addParam(const Ogre::Quaternion& q) const;
     void addParam(void *) const;
     void addParam(lua_Number* array, int len) const;
     
@@ -36,6 +39,8 @@ public:
     void extractParam(double *value) const;
     void extractParam(std::string *str) const;
     void extractParam(btVector3 *v) const;
+    void extractParam(btQuaternion *q) const;
+    void extractParam(Ogre::Quaternion *q) const;
     void extractParam(Ogre::Vector3 *v) const;
     void extractParam(Ogre::ColourValue *c) const;
     void extractParam(void**) const;

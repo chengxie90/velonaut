@@ -58,9 +58,9 @@ function Input.getKeyDown(key)
 end
 
 function Input.getKey(key)
-	return inputState[k] == 1 or inputState[k] == 2
+	return inputState[key] == 1 or inputState[key] == 2
 end
 
 function Input.getKeyUp(key)
-	return inputState[k] == 3
+	return inputState[key] == 3
 end

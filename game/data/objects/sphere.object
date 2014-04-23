@@ -15,6 +15,9 @@ return
             shape = "Sphere",
             radius = 1,
             mass = 1,
+        },
+        {
+            type = "Ship"
         }
     }
 }

@@ -26,6 +26,6 @@ function Transform:setPosition(pos)
     gfxnode.setPosition(self._handle, pos)
 end
 
-function Transform:setOrientation(quaternion)
-
+function Transform:setOrientation(ori)
+	gfxnode.setOrientation(self._handle, ori)
 end
