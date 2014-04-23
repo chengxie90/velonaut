@@ -92,6 +92,7 @@ void Graphics::initLua()
             {"localX", Graphics::Node::lgetLocalX},
             {"localY", Graphics::Node::lgetLocalY},
             {"localZ", Graphics::Node::lgetLocalZ},
+            {"setScale", Graphics::Node::lsetScale},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -433,7 +434,7 @@ int Graphics::Node::lattachObject(lua_State *)
     return 0;
 }
 
-int Graphics::Node::lscale(lua_State *)
+int Graphics::Node::lsetScale(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);

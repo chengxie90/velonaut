@@ -23,7 +23,7 @@ Tunnel = class(Behavior)
 function Tunnel:_init(object)
 
 	-- Params
-	local numCurves = 8
+	local numCurves = 4
 	local tunnelRadius = 100
 	local ringsPerCurve = 80
 	local samplesPerRing = 30

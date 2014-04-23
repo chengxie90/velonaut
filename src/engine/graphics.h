@@ -56,7 +56,7 @@ private:
         static int lsetOrientation(lua_State *);
         static int llookAt(lua_State *); 
         static int lattachObject(lua_State *);
-        static int lscale(lua_State *);
+        static int lsetScale(lua_State *);
         static int lgetLocalX(lua_State *);
         static int lgetLocalY(lua_State *);
         static int lgetLocalZ(lua_State *);

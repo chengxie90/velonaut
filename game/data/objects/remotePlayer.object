@@ -1,11 +1,17 @@
 return 
 {
-    components = {
+    components = 
+    {
         {
             type = "Transform",
-            position = Vector(-10, -10, 0)
+            position = Vector(30, 30, 30),
             orientation = Vector(0, 0, 0, 1),
             scale = Vector(1, 1, 1)
+        },
+        {
+            type = "Light",
+            lightType = "pointlight",
+            diffuse = Color(1.0, 1.0, 1.0)
         },
         {
             type = "MeshRenderer",
@@ -15,8 +21,8 @@ return
         {
             type = "RigidBody",
             shape = "box",
-            mass = 0,
+            mass = 1,
             boxHalfExtents = Vector(1, 1, 1)
-        }
+        },
     }
 }

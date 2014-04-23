@@ -3,7 +3,8 @@ return
     components = {
         {
             type = "Transform",
-            position = Vector(-10, 0, 0)
+            position = Vector(-10, 0, 0),
+            scale = Vector(100, 100, 100)
         },
         {
             type = "MeshRenderer",
@@ -13,22 +14,8 @@ return
         {
             type = "RigidBody",
             shape = "box",
-            boxHalfExtents = Vector(1, 1, 1),
+            boxHalfExtents = Vector(100, 100, 100),
             mass = 1,
-        },
-        {
-            type = "Light",
-            lightType = "pointlight",
-            diffuse = Color(1.0, 1.0, 1.0)
-        },
-        {
-            type = "Camera",
-            near = 0.1,
-            far = 10000,
-            fov = 45,
-        },
-        {
-            type = "Ship"
         }
     }
 }
