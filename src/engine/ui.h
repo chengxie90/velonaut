@@ -6,7 +6,7 @@
 #include <lua/lua.hpp>
 #include "common.h"
 #include "inputlistener.h"
-#include "rocketeventlistener.h"
+#include "luamanager.h"
 
 class Ui : public Ogre::RenderQueueListener, InputListener
 {
@@ -34,11 +34,28 @@ private:
     static int lLoadDocument(lua_State* state);
     static int lLoadMouseCursor(lua_State* state);
     static int lLoadFont(lua_State* state);
+    static int lSetText(lua_State* state);
     static int lAddEventListener(lua_State* state);
 
 private:
     Rocket::Core::Context* context_;
     Ogre::Matrix4 projection_matrix;
+
+
+class RocketEventListener : public Rocket::Core::EventListener
+{
+public:
+    int r;
+    RocketEventListener(int r):r(r) {}
+
+
+protected:
+    virtual void ProcessEvent(Rocket::Core::Event& event) {
+        lua_rawgeti(LuaManager::GetInstance()->state(), LUA_REGISTRYINDEX, r);
+        LuaManager::GetInstance()->pCall();
+    }
+};
+
 };
 
 #endif // UI_H

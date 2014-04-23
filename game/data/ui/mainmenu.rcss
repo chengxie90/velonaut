@@ -41,6 +41,20 @@ body
 	background-color: red;
 }
 
+.input_text {
+	width: 200px;
+}
+
+.status {
+	position: absolute;
+	top: 35%;
+	width: 100%;
+	text-align: center;
+	display: block;
+	font-size: 45px;
+	font-weight: bold;
+}
+
 
 
 

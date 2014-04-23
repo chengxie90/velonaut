@@ -21,7 +21,7 @@ public:
     void shutdownClient();
     void connectToServer( const char* serverAdress, int port);
     void sendMessage(std::string msg);
-    void sendRequest(std::string req);
+    void rpc(std::string req, std::string params);
     void poll();
 
     static Network* GetInstance();
@@ -33,7 +33,6 @@ private:
     void onConnectionFailed(RakNet::Packet* packet);
     void onDisconnect(RakNet::Packet* packet);
     void onGameMessageReceived(RakNet::Packet* packet);
-    void onServerResponse( RakNet::Packet* packet );
     void fireEvent(std::string event);
     void fireEvent(std::string event, std::string eventargs);
 
@@ -42,7 +41,7 @@ private:
     static int lShutdownServer(lua_State* state);
     static int lShutdownClient(lua_State* state);
     static int lSendMessage(lua_State* state);
-    static int lSendRequest(lua_State* state);
+    static int lRpc(lua_State* state);
     static int lAddEventListener(lua_State* state);
     static int lSetMaxIncomingConnections(lua_State* state);
 

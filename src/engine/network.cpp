@@ -2,7 +2,7 @@
 
 #include "RakNet/MessageIdentifiers.h"
 #include "RakNet/BitStream.h"
-#include "RakNet/RakNetTypes.h"  // MessageID
+#include "RakNet/RakNetTypes.h"
 #include "RakNet/StringCompressor.h"
 #include "luamanager.h"
 #include "app.h"
@@ -23,7 +23,7 @@ void Network::initLua() {
             {"shutdownClient", Network::lShutdownClient},
             {"connectToServer", Network::lConnectToServer},
             {"sendMessage", Network::lSendMessage},
-            {"sendRequest", Network::lSendRequest},
+            {"RPC", Network::lRpc},
             {"addEventListener", Network::lAddEventListener},
             {"setMaxIncomingConnections", Network::lSetMaxIncomingConnections},
             {NULL, NULL}
@@ -62,10 +62,12 @@ int Network::lShutdownClient(lua_State* state) {
     return 0;
 }
 
-int Network::lSendRequest(lua_State* state) {
-    string request;
-    LuaManager::GetInstance()->extractParam(&request);
-    Network::GetInstance()->sendRequest(request);
+int Network::lRpc(lua_State* state) {
+    string func;
+    string params;
+    LuaManager::GetInstance()->extractParam(&func);
+    LuaManager::GetInstance()->extractParam(&params);
+    Network::GetInstance()->rpc(func, params);
     return 0;
 }
 
@@ -106,8 +108,8 @@ void Network::shutdown() {
 }
 
 void Network::startServer( int port) {
-    server_ = new NetworkServer(port);
-    server_->start();
+    server_ = NetworkServer::GetInstance();
+    server_->start(port);
 }
 
 void Network::shutdownServer() {
@@ -121,31 +123,23 @@ void Network::shutdownClient() {
 void Network::sendMessage(string msg) {
     bsOut.Reset();
     bsOut.Write((MessageID)GAME_MESSAGE);
-    RakNet::StringCompressor compressor;
+    StringCompressor compressor;
     compressor.EncodeString(msg.c_str(), msg.size()+1, &bsOut);
     client_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, serverAddress_,false);
 }
 
-void Network::sendRequest(string req) {
+void Network::rpc(string req, string params) {
     bsOut.Reset();
-    bsOut.Write((MessageID)SERVER_REQUEST);
-    // RakNet::StringCompressor compressor;
-    // compressor.EncodeString(req.c_str(), req.size()+1, &bsOut);
-
-    RakNet::BitStream bsIn;
-
-    std::cout << "sending request" << std::endl;
-    rpc_.Call("humbug", &bsOut, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
-
-    // client_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, serverAddress_,false);
+    StringCompressor compressor;
+    compressor.EncodeString(params.c_str(), params.size()+1, &bsOut);
+    std::cout << "sending rpc" << std::endl;
+    rpc_.Call(req.c_str(), &bsOut, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
 }
 
 void Network::connectToServer(const char *serverAdress, int port) {
 
     static SocketDescriptor desc;
     client_->Startup(1, &desc, 1);
-
-    std::cout<< "Starting the client" << std::endl;
     client_->Connect(serverAdress, port, 0,0);
 }
 
@@ -162,20 +156,11 @@ void Network::onDisconnect(Packet *packet) {
     fireEvent("disconnect");
 }
 
-void Network::onServerResponse(Packet *packet) {
-    RakNet::RakString rs;
-    BitStream bsIn(packet->data,packet->length,false);
-    bsIn.IgnoreBytes(sizeof(MessageID));
-    RakNet::StringCompressor compressor;
-    compressor.DecodeString(&rs, 1000, &bsIn);
-    fireEvent("server_response", string(rs.C_String()));
-}
-
 void Network::onGameMessageReceived(Packet *packet) {
-    RakNet::RakString rs;
+    RakString rs;
     BitStream bsIn(packet->data,packet->length,false);
     bsIn.IgnoreBytes(sizeof(MessageID));
-    RakNet::StringCompressor compressor;
+    StringCompressor compressor;
     compressor.DecodeString(&rs, 1000, &bsIn);
     fireEvent("game_message", string(rs.C_String()));
 }
@@ -218,9 +203,6 @@ void Network::poll() {
               break;
             case GAME_MESSAGE:
               onGameMessageReceived(packet);
-              break;
-            case SERVER_RESPONSE:
-              onServerResponse(packet);
               break;
             default:
                 std::cout << "Message with identifier " << packet->data[0] << " has arrived." << std::endl;
