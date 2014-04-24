@@ -80,8 +80,9 @@ private:
     void onClientAlreadyConnected(RakNet::Packet* packet);
     void onClientConnectionLost(RakNet::Packet* packet);
     void onGameMessageReceived(RakNet::Packet* packet);
-    void sendToAllExcept(RakNet::BitStream* stream, RakNet::RakNetGUID except );
+    void sendToAllExcept(RakNet::BitStream* stream, RakNet::RakNetGUID except, PacketReliability reliability);
     void sendToAll(PacketReliability);
+    void sendToOne(RakNet::RakNetGUID &guid, PacketReliability reliability);
     void pollPackets();
     void setServerState( AbstractServerState* state );
 
@@ -90,7 +91,8 @@ private:
     void readString(RakNet::BitStream *bsIn,RakNet::RakString& str, bool ignoreMsgType = true );
 
     RakNet::RakString createPlayerListEvent();
-    RakNet::RakString createGameInitEvent();
+    RakNet::RakString createWelcomeEvent(RakNet::RakNetGUID);
+    RakNet::RakString createGameInitEvent(uint64_t guid, int seed);
     RakNet::RakString createCountDownEvent( int count);
     RakNet::RakString createGameStartEvent();
 

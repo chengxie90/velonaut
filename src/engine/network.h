@@ -29,6 +29,7 @@ private:
     SINGLETON(Network)
     friend class App;
 
+    void onServerPong(RakNet::Packet* packet);
     void onConnectionAccepted(RakNet::Packet* packet);
     void onConnectionFailed(RakNet::Packet* packet);
     void onDisconnect(RakNet::Packet* packet);

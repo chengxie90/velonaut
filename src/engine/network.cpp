@@ -125,7 +125,7 @@ void Network::sendMessage(string msg) {
     bsOut.Write((MessageID)GAME_MESSAGE);
     StringCompressor compressor;
     compressor.EncodeString(msg.c_str(), msg.size()+1, &bsOut);
-    client_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, serverAddress_,false);
+    client_->Send(&bsOut,HIGH_PRIORITY,UNRELIABLE_SEQUENCED,0, serverAddress_,false);
 }
 
 void Network::rpc(string req, string params) {
@@ -134,6 +134,15 @@ void Network::rpc(string req, string params) {
     compressor.EncodeString(params.c_str(), params.size()+1, &bsOut);
     std::cout << "sending rpc" << std::endl;
     rpc_.Call(req.c_str(), &bsOut, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
+}
+
+void Network::onServerPong(Packet *packet) {
+    std::cout << "onServerPong" << std::endl;
+    RakNet::TimeMS time;
+    RakNet::BitStream bsIn(packet->data,packet->length,false);
+    bsIn.IgnoreBytes(1);
+    bsIn.Read(time);
+    cout << "Got pong from " << packet->systemAddress.ToString() << std::endl;
 }
 
 void Network::connectToServer(const char *serverAdress, int port) {
@@ -191,6 +200,9 @@ void Network::poll() {
     {
         switch (packet->data[0])
         {
+            case ID_UNCONNECTED_PONG:
+                onServerPong(packet);
+                break;
             case ID_CONNECTION_REQUEST_ACCEPTED:
               onConnectionAccepted(packet);
               break;

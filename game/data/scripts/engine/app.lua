@@ -21,6 +21,12 @@ App = class() -- this is a singleton
 function App.start()
 	math.epsilon = 0.00001
 
+	App.gamestarted = false
+
+	for i = 1, 3 do
+		print(i)
+	end
+
     local config = dofile("./data/game.config")
     App.loadScene(config.scene)
 
@@ -33,13 +39,22 @@ function App.start()
 
 	local function onGameMessageReceived(event)
 		
-		print("Game Event: " .. event.eventType)
+		if event.eventType == "playerUpdate" then
+			print( event.position.x .. ", " .. event.position.y .. ", " .. event.position.z )
+			return
+		end
+
+		if event.eventType == "welcome" then
+			print( "Welcome, you been assigned ID " .. event.id )
+			return
+		end	
 
 		if event.eventType == "playerlist" then
 			print("received playerlist")			
-			for i, name in ipairs(event.players) do
-				print (name)
-				Gui.setText("txt_status", "Connnect as " .. name);
+			for i, player in ipairs(event.players) do
+				print (player.name )
+				print (player.id )
+				Gui.setText("txt_status", "Connnect as " .. player.name);
 			end
 			return
 		end
@@ -47,6 +62,7 @@ function App.start()
 		if event.eventType == "gameinit" then
 			print("received gameinit")	
 			print("seed: " .. event.seed)
+			
 			Gui.setText("txt_status", "Initializing...");		
 			return
 		end
@@ -60,15 +76,16 @@ function App.start()
 
 		if event.eventType == "gamestart" then
 			print("GOOOOOOOO!!!!!!!!!")
-			Gui.setText("txt_status", "GOOOOOOOO!!!!!!!!!");	
+			Gui.setText("txt_status", "GOOOOOOOO!!!!!!!!!");
+			App.gamestarted = true	
 			return
 		end	
 
 	end
 
 	local function onConnectedToServer()
-		print("Connected to server yo!")
-		Network.RPC("setPlayerName", "Philly")
+		print("Connected to server yo! ")
+		Network.RPC("setPlayerName", "Phil")
 	end
 
 	local function onConnectionFailed()
@@ -100,7 +117,8 @@ function App.start()
 	end
 
 	local function onStartClient()
-		Network.connectToServer("127.0.0.1", 60001)	
+--		Network.findServer( 60000 )
+		Network.connectToServer("10.116.74.71", 60001)	
 		print("starting client")
 	end
 
@@ -127,6 +145,10 @@ end
 function App.update(dt)
     App._scene:update(dt)
     Input.update()
+	if App.gamestarted then
+		Network.sendMessage( "{ eventType='playerUpdate', position = { x=1, y=2, z=3 } }" )
+	end
+	
 end
 
 function App.terminate()

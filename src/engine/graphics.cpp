@@ -399,8 +399,6 @@ int Graphics::Node::lsetOrientation(lua_State *)
     Quaternion ori;
     LuaManager::GetInstance()->extractParam(&ori);
 
-    std::cout << "ORIENTATION: " << ori << std::endl;
-
     node->setOrientation(ori);
     return 0;
 }
