@@ -29,13 +29,13 @@ function Tunnel:_init(object)
 	local samplesPerRing = 30
 	local minStartRadius = 100
 	local maxStartRadius = 150
-	local minControlRadius = 4000
-	local maxControlRadius = 4050
+	local minControlRadius = 6000
+	local maxControlRadius = 8000
 	local minAnchorRadius = 1000
 	local maxAnchorRadius = 1050
 
 	--TODO: set seed globally somewhere else
-	local tunnelSeed = 252111
+	local tunnelSeed = 666
 
 	-- Set seed and create table of curves
 	math.randomseed(tunnelSeed)

@@ -8,8 +8,6 @@ Player = class(Behavior)
 
 function Player:start()
 	self.RigidBody = self:getComponent("RigidBody")
-	self.RigidBody:setDamping(0.8, 0.9)
-
 	self.Transform = self:getComponent("Transform")
 end
 

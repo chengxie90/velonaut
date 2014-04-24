@@ -24,5 +24,8 @@ return
             mass = 1,
             boxHalfExtents = Vector(10, 10, 10)
         },
+        {
+            type = "Ship"
+        }
     }
 }
