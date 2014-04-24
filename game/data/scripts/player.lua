@@ -19,7 +19,7 @@ function Player:update(dt)
 	local right = -self.Transform:localX() * -1
 
 
-	local rotScale = 3
+	local rotScale = 300
 	local linScale = 800
 
 	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * rotScale) end
