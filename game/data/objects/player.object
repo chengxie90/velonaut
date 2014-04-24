@@ -27,6 +27,9 @@ return
         },
         {
             type = "Player"
+        },
+        {
+            type = "Ship"
         }
     }
 }
