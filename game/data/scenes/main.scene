@@ -6,20 +6,16 @@ return
     objects = 
     {
         {
-            name = "cube",
-            prefab = "cube"
-        },
-        {
-            name = "sphere",
-            prefab = "sphere"
-        },
-        {
             name = "player",
             prefab = "player"
         },
         {
             name = "tunnel",
             prefab = "tunnel"
+        },
+        {
+            name = "remotePlayer1",
+            prefab = "remotePlayer"
         }
     }
 }

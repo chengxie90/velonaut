@@ -37,7 +37,7 @@ void LuaManager::pCall(int nargs, int nresults) const {
     if (lua_pcall(state_, nargs, nresults, 0) != 0) {
         std::string str = lua_tostring(state_, lua_gettop(state_));
         lua_pop(state_, 1);
-        std::cout << str << std::endl;
+        //std::cout << str << std::endl;
         assert(false);
     }
 }
@@ -135,11 +135,13 @@ void LuaManager::addParam(void *p) const
 void LuaManager::addParam(lua_Number *array, int len) const
 {
     lua_getglobal(state_, "Vector");
+    lua_getfield(state_, 1, "__call");
+    lua_pushvalue(state_, 1);
+    lua_remove(state_, 1);
+
     for (int i = 0; i < len; i++) {
         lua_pushnumber(state_, array[i]);
     }
-    
-    lua_getfield(state_, 1, "__call");
 
     lua_call(state_, len + 1, 1);
 }

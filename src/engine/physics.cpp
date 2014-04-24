@@ -24,17 +24,24 @@ void Physics::initLua()
     LuaManager::GetInstance()->requiref("engine.physics.rigidbody.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Physics::RigidBody::lcreate},
+
             {"position", Physics::RigidBody::lposition},
+            {"orientation", Physics::RigidBody::lorientation},
+            {"linearVelocity", Physics::RigidBody::llinearVelocity},
+            {"angularVelocity", Physics::RigidBody::langularVelocity},
+            {"force", Physics::RigidBody::lforce},
+            {"torque", Physics::RigidBody::ltorque},
+
             {"setPosition", Physics::RigidBody::lsetPosition},
-            {"orientation", Physics::RigidBody::lorientation},
             {"setOrientation", Physics::RigidBody::lsetOrientation},
-            {"orientation", Physics::RigidBody::lorientation},
-            {"applyCentralForce", Physics::RigidBody::lapplyCentralForce},
-            {"applyForce", Physics::RigidBody::lapplyForce},
-            {"applyTorque", Physics::RigidBody::lapplyTorque},
             {"setLinearVelocity", Physics::RigidBody::lsetLinearVelocity},
             {"setAngularVelocity", Physics::RigidBody::lsetAngularVelocity},
             {"setDamping", Physics::RigidBody::lsetDamping},
+
+            {"applyCentralForce", Physics::RigidBody::lapplyCentralForce},
+            {"applyForce", Physics::RigidBody::lapplyForce},
+            {"applyTorque", Physics::RigidBody::lapplyTorque},
+            {"clearForces", Physics::RigidBody::lclearForces},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -47,7 +54,11 @@ void Physics::update(float dt)
     world_->stepSimulation(dt);
     
     int numManifolds = world_->getDispatcher()->getNumManifolds();
-    
+
+
+
+    btCollisionObject* obj = world_->getCollisionObjectArray()[0];
+    btRigidBody* rObj = (btRigidBody*) obj;
 }
 
 void Physics::shutdown()
@@ -119,6 +130,69 @@ int Physics::RigidBody::lposition(lua_State *)
     return 1;
 }
 
+int Physics::RigidBody::lorientation(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    btTransform trans;
+    body->getMotionState()->getWorldTransform(trans);
+
+    btQuaternion ori = trans.getRotation();
+
+    LuaManager::GetInstance()->addParam(ori);
+
+    return 1;
+}
+
+int Physics::RigidBody::llinearVelocity(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    btVector3 vel = body->getLinearVelocity();
+
+    LuaManager::GetInstance()->addParam(vel);
+
+    return 1;
+}
+
+int Physics::RigidBody::langularVelocity(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    btVector3 vel = body->getAngularVelocity();
+
+    LuaManager::GetInstance()->addParam(vel);
+
+    return 1;
+}
+
+int Physics::RigidBody::lforce(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    btVector3 force = body->getTotalForce();
+
+    LuaManager::GetInstance()->addParam(force);
+
+    return 1;
+}
+
+int Physics::RigidBody::ltorque(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    btVector3 torque = body->getTotalTorque();
+
+    LuaManager::GetInstance()->addParam(torque);
+
+    return 1;
+}
+
 int Physics::RigidBody::lsetPosition(lua_State *)
 {
     btRigidBody *body;
@@ -140,20 +214,6 @@ int Physics::RigidBody::lsetPosition(lua_State *)
     return 0;
 }
 
-int Physics::RigidBody::lorientation(lua_State *)
-{
-    btRigidBody *body;
-    LuaManager::GetInstance()->extractParam((void **)&body);
-
-    btTransform trans;
-    body->getMotionState()->getWorldTransform(trans);
-
-    btQuaternion ori = trans.getRotation();
-
-    LuaManager::GetInstance()->addParam(ori);
-
-    return 1;
-}
 
 int Physics::RigidBody::lsetOrientation(lua_State *)
 {
@@ -172,44 +232,6 @@ int Physics::RigidBody::lsetOrientation(lua_State *)
 
     btMotionState* ms = body->getMotionState();
     ms->setWorldTransform(trans);
-
-    return 0;
-}
-
-int Physics::RigidBody::lapplyCentralForce(lua_State *)
-{
-    btRigidBody *body;
-    btVector3 force;
-    LuaManager::GetInstance()->extractParam((void **)&body);
-    LuaManager::GetInstance()->extractParam(&force);
-
-    body->applyCentralForce(force);
-
-    return 0;
-}
-
-int Physics::RigidBody::lapplyForce(lua_State *)
-{
-    btRigidBody *body;
-    btVector3 force;
-    btVector3 relativePosition;
-    LuaManager::GetInstance()->extractParam((void **)&body);
-    LuaManager::GetInstance()->extractParam(&force);
-    LuaManager::GetInstance()->extractParam(&relativePosition);
-
-    body->applyForce(force, relativePosition);
-
-    return 0;
-}
-
-int Physics::RigidBody::lapplyTorque(lua_State *)
-{
-    btRigidBody *body;
-    btVector3 torque;
-    LuaManager::GetInstance()->extractParam((void **)&body);
-    LuaManager::GetInstance()->extractParam(&torque);
-
-    body->applyTorque(torque);
 
     return 0;
 }
@@ -251,3 +273,55 @@ int Physics::RigidBody::lsetDamping(lua_State *)
 
     return 0;
 }
+
+int Physics::RigidBody::lapplyCentralForce(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 force;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&force);
+
+    body->activate(true);
+    body->applyCentralForce(force);
+
+    return 0;
+}
+
+int Physics::RigidBody::lapplyForce(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 force;
+    btVector3 relativePosition;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&force);
+    LuaManager::GetInstance()->extractParam(&relativePosition);
+
+    body->activate(true);
+    body->applyForce(force, relativePosition);
+
+    return 0;
+}
+
+int Physics::RigidBody::lapplyTorque(lua_State *)
+{
+    btRigidBody *body;
+    btVector3 torque;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    LuaManager::GetInstance()->extractParam(&torque);
+
+    body->activate(true);
+    body->applyTorque(torque);
+
+    return 0;
+}
+
+int Physics::RigidBody::lclearForces(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    body->clearForces();
+
+    return 0;
+}
+

@@ -41,6 +41,7 @@ end
 function Vector.__unm(v)
     local ret = Vector()
     for i = 1, #v do
+
         ret[i] = -v[i]
     end
     return ret

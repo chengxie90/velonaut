@@ -4,7 +4,7 @@ return
     {
         {
             type = "Transform",
-            position = Vector(0, 0, 30),
+            position = Vector(30, 30, 30),
             orientation = Vector(0, 0, 0, 1),
             scale = Vector(10, 10, 10)
         },
@@ -14,19 +14,15 @@ return
             diffuse = Color(1.0, 1.0, 1.0)
         },
         {
+            type = "MeshRenderer",
+            mesh = "cube",
+            material = "lambert1"
+        },
+        {
             type = "RigidBody",
             shape = "box",
             mass = 1,
             boxHalfExtents = Vector(10, 10, 10)
         },
-        {
-            type = "Camera",
-            near = 0.1,
-            far = 10000,
-            fov = 45,
-        },
-        {
-            type = "Player"
-        }
     }
 }
