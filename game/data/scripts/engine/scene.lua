@@ -107,6 +107,9 @@ function Scene:findObject(name)
     return self._objects[name]
 end
 
-function Scene:removeObject(name)
+function Scene:destroyObject(name)
+    local obj = self:findObject(name)
+    assert(obj)
+    obj:onDestroy()
     self._objects[name] = nil
 end

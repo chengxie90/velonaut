@@ -9,6 +9,10 @@ function Camera:_init(object)
     self._handle = gfxcam.create(object:name())
 end
 
+function Camera:onDestroy()
+    
+end
+
 function Camera:load(data)
     if data.near then self:setNear(data.near) end
     if data.far then self:setFar(data.far) end

@@ -88,10 +88,11 @@ void Graphics::initLua()
             {"orientation", Graphics::Node::lorientation},
             {"setOrientation", Graphics::Node::lsetOrientation},
             {"attachObject", Graphics::Node::lattachObject},
+            {"detachObject", Graphics::Node::ldetachObject},
             {"lookAt", Graphics::Node::llookAt},
-            {"localX", Graphics::Node::lgetLocalX},
-            {"localY", Graphics::Node::lgetLocalY},
-            {"localZ", Graphics::Node::lgetLocalZ},
+            {"localX", Graphics::Node::llocalX},
+            {"localY", Graphics::Node::llocalY},
+            {"localZ", Graphics::Node::llocalZ},
             {"setScale", Graphics::Node::lsetScale},
             {NULL, NULL}
         };
@@ -445,6 +446,18 @@ int Graphics::Node::lattachObject(lua_State *)
     return 0;
 }
 
+int Graphics::Node::ldetachObject(lua_State *)
+{
+    SceneNode* node;
+    Ogre::Camera* obj;
+    LuaManager::GetInstance()->extractParam((void**)&node);
+    LuaManager::GetInstance()->extractParam((void**)&obj);
+    assert(node);
+    assert(obj);
+    node->detachObject(obj);
+    return 0;
+}
+
 int Graphics::Node::lsetScale(lua_State *)
 {
     SceneNode* node;
@@ -456,7 +469,7 @@ int Graphics::Node::lsetScale(lua_State *)
     return 0;
 }
 
-int Graphics::Node::lgetLocalX(lua_State *)
+int Graphics::Node::llocalX(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);
@@ -470,7 +483,7 @@ int Graphics::Node::lgetLocalX(lua_State *)
     return 1;
 }
 
-int Graphics::Node::lgetLocalY(lua_State *)
+int Graphics::Node::llocalY(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);
@@ -484,7 +497,7 @@ int Graphics::Node::lgetLocalY(lua_State *)
     return 1;
 }
 
-int Graphics::Node::lgetLocalZ(lua_State *)
+int Graphics::Node::llocalZ(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);

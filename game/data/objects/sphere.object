@@ -17,7 +17,7 @@ return
             shape = "box",
             boxHalfExtents = Vector(1, 1, 1),
             mass = 0,
-            trigger = true,
+            trigger = false,
         }
     }
 }

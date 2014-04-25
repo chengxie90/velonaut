@@ -17,12 +17,32 @@ function RigidBody:_init()
 end
 
 function RigidBody:load(data)
-    if data.shape == "box" then
-        self._handle = phyrigidbody.create(data.mass, data.shape, data.boxHalfExtents)
+    print(table.unpack(data))
+    self:rebuild(data.mass, data.shape, data)
+
+    assert(self._handle)
+    if data.trigger then self:setTrigger(data.trigger) end
+end
+
+function RigidBody:rebuild(mass, shape, params)
+    self:_destroy()
+    if shape == "box" then
+        local boxHalfExtents = params.boxHalfExtents
+        self._handle = phyrigidbody.create(mass, shape, boxHalfExtents)
         handlemap[self._handle] = self
     end
-    assert(self._handle)
-    if data.trigger then phyrigidbody.setTrigger(self._handle, data.trigger) end
+end
+
+function RigidBody:_destroy()
+    if self._handle then
+        handlemap[self._handle] = nil
+        phyrigidbody.destroy(self._handle)
+        self._handle = nil
+    end
+end
+
+function RigidBody:onDestroy()
+    self:_destroy()
 end
 
 function RigidBody:start()
@@ -44,7 +64,7 @@ function RigidBody:onCollision(collision)
 end
 
 function RigidBody:setTrigger(trigger)
-    
+    phyrigidbody.setTrigger(self._handle, trigger)
 end
 
 function RigidBody:position()

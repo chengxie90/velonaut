@@ -24,16 +24,22 @@ void Physics::initLua()
     LuaManager::GetInstance()->requiref("engine.physics.rigidbody.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Physics::RigidBody::lcreate},
+            {"destroy", Physics::RigidBody::ldestroy},
+            
             {"setTrigger", Physics::RigidBody::lsetTrigger},
+            
             {"position", Physics::RigidBody::lposition},
             {"orientation", Physics::RigidBody::lorientation},
+            
             {"linearVelocity", Physics::RigidBody::llinearVelocity},
             {"angularVelocity", Physics::RigidBody::langularVelocity},
+            
             {"force", Physics::RigidBody::lforce},
             {"torque", Physics::RigidBody::ltorque},
 
             {"setPosition", Physics::RigidBody::lsetPosition},
             {"setOrientation", Physics::RigidBody::lsetOrientation},
+            
             {"setLinearVelocity", Physics::RigidBody::lsetLinearVelocity},
             {"setAngularVelocity", Physics::RigidBody::lsetAngularVelocity},
             {"setDamping", Physics::RigidBody::lsetDamping},
@@ -137,6 +143,13 @@ int Physics::RigidBody::lcreate(lua_State *)
 
 int Physics::RigidBody::ldestroy(lua_State *)
 {
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    Physics::GetInstance()->world_->removeRigidBody(body);
+    delete body->getCollisionShape();
+    delete body;
+    
     return 0;
 }
 

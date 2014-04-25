@@ -3,7 +3,6 @@ require "engine.component"
 require "engine.transform"
 require "engine.camera"
 require "engine.light"
-require "engine.renderer"
 require "engine.meshrenderer"
 require "engine.behavior"
 require "engine.rigidbody"
@@ -14,6 +13,16 @@ function Object:_init(name)
     self._components = {}
     self._started = false
     self._name = name
+end
+
+function Object:onDestroy()
+    for k, v in pairs(self._components) do
+        v:onDestroy()
+    end
+end
+
+function Object:destroy()
+    App.scene():destroyObject(self:name())
 end
 
 function Object:name()
@@ -72,8 +81,11 @@ function Object:getComponent(typename)
     return self._components[typename];
 end
 
-function Object:removeComponent(typename)
-    self._components[typename]._object = nil
+function Object:removeComponent()
+    local comp = self:getComponent(typename)
+    assert(comp)
+    comp:onDestroy()
+    comp._object = nil
     self._components[typename] = nil
 end
 
