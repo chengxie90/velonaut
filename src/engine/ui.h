@@ -58,7 +58,7 @@ public:
 protected:
     virtual void ProcessEvent(Rocket::Core::Event& event) {
         lua_rawgeti(LuaManager::GetInstance()->state(), LUA_REGISTRYINDEX, r);
-        LuaManager::GetInstance()->pCall();
+        LuaManager::GetInstance()->pcall();
     }
 };
 

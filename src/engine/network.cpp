@@ -194,7 +194,7 @@ void Network::onGameMessageReceived(Packet *packet) {
 void Network::fireEvent(string event) {
     for (int i = 0; i < listenerMap_[event].size(); ++i) {
         lua_rawgeti(LuaManager::GetInstance()->state(), LUA_REGISTRYINDEX, listenerMap_[event][i]);
-        LuaManager::GetInstance()->pCall();
+        LuaManager::GetInstance()->pcall();
     }
 }
 
@@ -203,7 +203,7 @@ void Network::fireEvent(string event, string params) {
     for (int i = 0; i < listenerMap_[event].size(); ++i) {
         lua_rawgeti(LuaManager::GetInstance()->state(), LUA_REGISTRYINDEX, listenerMap_[event][i]);
         luaL_dostring(LuaManager::GetInstance()->state(), params.c_str());
-        LuaManager::GetInstance()->pCall(1);
+        LuaManager::GetInstance()->pcall(1);
     }
 }
 

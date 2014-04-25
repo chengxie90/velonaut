@@ -57,6 +57,16 @@ function Object:addComponent(typename)
     return comp
 end
 
+function Object:behaviors()
+    local ret = {}
+    for _, comp in pairs(self._components) do
+        if comp:is_a(Behavior) then
+            table.insert(ret, comp)
+        end
+    end
+    return ret
+end
+
 function Object:getComponent(typename)
     return self._components[typename];
 end

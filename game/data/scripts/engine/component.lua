@@ -27,3 +27,8 @@ end
 function Component:transform()
     return self:owner():transform()
 end
+
+function Component:behaviors()
+    return self:owner():behaviors()
+end
+

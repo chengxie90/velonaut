@@ -27,7 +27,6 @@ function Player:update(dt)
 	local up = self.Transform:localY()
 	local right = -self.Transform:localX() * -1
 
-
 	local rotScale = 300
 	local linScale = 800
 

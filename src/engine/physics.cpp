@@ -16,7 +16,7 @@ void Physics::init()
 	world_ = new btDiscreteDynamicsWorld(dispatcher_, overlappingPairCache_, solver_, collisionConfiguration_);
     
     // TODO: 
-    world_->setGravity(btVector3(0, 0, 0));
+    world_->setGravity(btVector3(0, -10, 0));
 }
 
 void Physics::initLua()
@@ -55,10 +55,16 @@ void Physics::update(float dt)
     
     int numManifolds = world_->getDispatcher()->getNumManifolds();
 
-
-
-    btCollisionObject* obj = world_->getCollisionObjectArray()[0];
-    btRigidBody* rObj = (btRigidBody*) obj;
+    for (int i = 0; i < numManifolds; i++) {
+        btPersistentManifold* contactManifold =  world_->getDispatcher()->getManifoldByIndexInternal(i);
+        const btRigidBody* obA = static_cast<const btRigidBody*>(contactManifold->getBody0());
+        const btRigidBody* obB = static_cast<const btRigidBody*>(contactManifold->getBody1());
+        
+        LuaManager::GetInstance()->addFunction("RigidBody._onGlobalCollision");
+        LuaManager::GetInstance()->addParamReg((void *)obA);
+        LuaManager::GetInstance()->addParamReg((void *)obB);
+        LuaManager::GetInstance()->pcall(2);
+    }
 }
 
 void Physics::shutdown()
@@ -106,6 +112,8 @@ int Physics::RigidBody::lcreate(lua_State *)
     Physics::GetInstance()->world_->addRigidBody(body);
     
     LuaManager::GetInstance()->addParam((void *)body);
+    
+    LuaManager::GetInstance()->setReg((void *)body);
     
     return 1;
 }

@@ -18,7 +18,8 @@ public:
     void doFile(std::string file) const;
     void addlib(luaL_Reg *reg);
     void requiref(std::string name, lua_CFunction func);
-    void pCall(int nargs = 0, int nresults = 0) const;
+    void pcall(int nargs = 0, int nresults = 0) const;
+    void call(int nargs = 0, int nres = 0) const;
     void registerFunction(const char* name, lua_CFunction func) const;
     
     void dumpStack() const;
@@ -44,14 +45,14 @@ public:
     void extractParam(Ogre::ColourValue *c) const;
     void extractParam(void**) const;
     
-
+    void addParamReg(const void *p) const;
+    void setReg(const void *p) const;
+    
     virtual void onMouseDown( SDL_Event e );
     virtual void onMouseUp( SDL_Event e);
     virtual void onMouseMove( SDL_Event e );
-
     virtual void onKeyDown( SDL_Event e );
     virtual void onKeyUp( SDL_Event e );
-
 
     lua_State *state() const;
     
