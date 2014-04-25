@@ -159,7 +159,7 @@ function App.terminate()
     
 end
 
-function App.activeScene()
+function App.scene()
     return App._scene
 end
 

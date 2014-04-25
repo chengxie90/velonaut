@@ -1,5 +1,9 @@
 Component = class()
 
+function Component:onDestroy()
+
+end
+
 function Component:start()
 
 end

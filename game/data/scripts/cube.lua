@@ -11,5 +11,7 @@ function Cube:update(dt)
 end
 
 function Cube:onCollision(collision)
-    print("cube : onCollision with" .. " " .. collision.rigidbody:owner():name() .. " at " .. tostring(collision.position))
+    print(111)
+    local obj = collision.rigidbody:owner()
+    obj:destroy()
 end

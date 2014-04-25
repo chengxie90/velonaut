@@ -22,16 +22,36 @@ function MeshRenderer:load(data)
     end
 end
 
+function MeshRenderer:onDestroy()
+    self:_detach()
+end
+
+function MeshRenderer:_attach()
+    if self._handle then
+        local trans = self:transform()
+        assert(trans)
+        assert(trans._handle)
+        gfxnode.attachObject(trans._handle, self._handle)
+    end
+end
+
+function MeshRenderer:_detach()
+    if self._handle then
+        local trans = self:transform()
+        gfxnode.detachObject(trans._handle, self._handle)
+        self._handle = nil
+    end
+end
+
 function MeshRenderer:start()
-    local trans = self:transform()
-    assert(trans)
-    gfxnode.attachObject(trans._handle, self._handle)
+
 end
 
 function MeshRenderer:setMesh(mesh)
+    self:_detach()
     self._handle = gfxentity.createMesh(mesh._handle)
     self._mesh = mesh
-    -- TODO: destroy the former one
+    self:_attach()
 end
 
 function MeshRenderer:mesh()
