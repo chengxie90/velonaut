@@ -97,6 +97,12 @@ private:
     struct Material {
         static int lcreate(lua_State *);
     };
+
+    struct VQHelper {
+        static int lgetQuaternionFromAxes(lua_State *);
+        static int lgetQuaternionFromAngleAxis(lua_State *);
+        static int langleBetween(lua_State *);
+    };
 };
 
 #endif // GRAPHICS_H

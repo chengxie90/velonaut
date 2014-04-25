@@ -1,0 +1,18 @@
+return 
+{
+    components = {
+        {
+            type = "Transform",
+            position = Vector(0, 0, 0),
+			scale = Vector(80, 80, 1)
+        },
+		{
+            type = "MeshRenderer",
+            mesh = "sphere",
+            material = "checkpoint"
+        },
+        {
+            type = "Checkpoint"
+        }
+    }
+}

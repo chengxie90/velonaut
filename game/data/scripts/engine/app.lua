@@ -54,6 +54,7 @@ function App.start()
 				print (player.id )
 				Gui.setText("txt_status", "Connnect as " .. player.name);
 			end
+
 			return
 		end
 
@@ -62,7 +63,7 @@ function App.start()
 			print("seed: " .. event.seed)			
 			Gui.setText("txt_status", "Initializing...");
 
-			App._scene:loadPlayers(App.players, App.playerId)		
+			App.activeScene():loadPlayers(App.players, App.playerId)		
 			return
 		end
 
@@ -126,6 +127,7 @@ function App.start()
 
 		print("Finding server...") 
 		Network.findServer( 60001 )
+		--Network.connectToServer("10.116.74.71",60001)
 
 	end
 

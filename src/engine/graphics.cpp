@@ -164,6 +164,17 @@ void Graphics::initLua()
         LuaManager::GetInstance()->addlib(reg);
         return 1;
     });
+
+    LuaManager::GetInstance()->requiref("engine.graphics.vqhelper.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"getQuaternionFromAxes", Graphics::VQHelper::lgetQuaternionFromAxes},
+            {"getQuaternionFromAngleAxis", Graphics::VQHelper::lgetQuaternionFromAngleAxis},
+            {"angleBetween", Graphics::VQHelper::langleBetween},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
 }
 
 void Graphics::render()
@@ -672,5 +683,57 @@ int Graphics::MeshBuilder::lgetMesh(lua_State *)
     
     LuaManager::GetInstance()->addParam((void *)p);
     
+    return 1;
+}
+
+int Graphics::VQHelper::lgetQuaternionFromAxes(lua_State *)
+{
+    Ogre::Vector3 x;
+    LuaManager::GetInstance()->extractParam(&x);
+
+    Ogre::Vector3 y;
+    LuaManager::GetInstance()->extractParam(&y);
+
+    Ogre::Vector3 z;
+    LuaManager::GetInstance()->extractParam(&z);
+
+    Ogre::Quaternion q = Ogre::Quaternion(x, y, z);
+
+    LuaManager::GetInstance()->addParam(q);
+
+    return 1;
+}
+
+int Graphics::VQHelper::lgetQuaternionFromAngleAxis(lua_State *)
+{
+    double angle;
+    LuaManager::GetInstance()->extractParam(&angle);
+
+    Ogre::Vector3 axis;
+    LuaManager::GetInstance()->extractParam(&axis);
+
+    Ogre::Quaternion q = Ogre::Quaternion(Ogre::Radian(angle), axis);
+
+    LuaManager::GetInstance()->addParam(q);
+
+    return 1;
+}
+
+int Graphics::VQHelper::langleBetween(lua_State *)
+{
+    LuaManager::GetInstance()->dumpStack();
+    Ogre::Vector3 v1;
+    LuaManager::GetInstance()->extractParam(&v1);
+    std::cout << "v1: " << v1 << std::endl;
+    LuaManager::GetInstance()->dumpStack();
+    Ogre::Vector3 v2;
+    LuaManager::GetInstance()->extractParam(&v2);
+    LuaManager::GetInstance()->dumpStack();
+
+    double angle = (v1.angleBetween(v2)).valueRadians();
+    std::cout << "v1: " << v1 << " v2: " << v2 << " angle: " << angle << std::endl;
+
+    LuaManager::GetInstance()->addParam(angle);
+
     return 1;
 }

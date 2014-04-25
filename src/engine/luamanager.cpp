@@ -272,7 +272,7 @@ void LuaManager::extractParam(lua_Number *array, int len) const
         array[i-1] = num;
         lua_pop(state_, 1);
     }
-    lua_pop(state_, 1);
+    lua_remove(state_, 1);
 }
 
 void LuaManager::onMouseDown( SDL_Event e )
