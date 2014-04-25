@@ -9,8 +9,7 @@ end
 
 function RigidBody:load(data)
     if data.shape == "box" then
-        print(data.shape)
-        self._handle = phyrigidbody.create(data.mass, data.shape, data.boxHalfExtents)
+        self._handle = phyrigidbody.create(data.mass, data.shape, data.boxHalfExtents)		
     end
 end
 
@@ -29,13 +28,26 @@ function RigidBody:position()
     return phyrigidbody.position(self._handle)
 end
 
-function RigidBody:setPosition(pos)
-    phyrigidbody.setPosition(self._handle, pos)
-end
-
 function RigidBody:orientation()
 	return phyrigidbody.orientation(self._handle)
 end
+
+function RigidBody:linearVelocity()
+	return phyrigidbody.linearVelocity(self._handle)
+end
+
+function RigidBody:angularVelocity()
+	return phyrigidbody.angularVelocity(self._handle)
+end
+
+function RigidBody:force()
+	return phyrigidbody.force(self._handle)
+end
+
+function RigidBody:torque()
+	return phyrigidbody.torque(self._handle)
+end
+
 
 function RigidBody:applyCentralForce(force)
 	assert(force)
@@ -54,11 +66,29 @@ function RigidBody:applyForce(force, relativePosition)
 	phyrigidbody.applyCentralForce(self._handle, force, relativePosition)
 end
 
+function RigidBody:clearForces()
+	phyrigidbody.clearForces(self._handle)
+end
+
 function RigidBody:applyTorque(torque)
 	assert(torque)
 	assert(type(torque) == "table")
 	assert(torque._class == Vector)
 	phyrigidbody.applyTorque(self._handle, torque)
+end
+
+function RigidBody:setPosition(pos)
+	local trans = self:transform()
+    assert(trans)
+    trans:setPosition(self:position())
+    phyrigidbody.setPosition(self._handle, pos)	
+end
+
+function RigidBody:setOrientation(ori)
+	local trans = self:transform()
+    assert(trans)
+    trans:setOrientation(self:orientation())
+    phyrigidbody.setOrientation(self._handle, ori)	
 end
 
 function RigidBody:setLinearVelocity(velocity)
@@ -82,3 +112,5 @@ function RigidBody:setDamping(linearDamping, angularDamping)
 	assert(type(angularDamping) == "number")
 	phyrigidbody.setDamping(self._handle, linearDamping, angularDamping)
 end
+
+

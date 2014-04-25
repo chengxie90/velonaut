@@ -4,6 +4,8 @@ return
         {
             type = "Transform",
             position = Vector(-10, -10, 0)
+            orientation = Vector(0, 0, 0, 1),
+            scale = Vector(1, 1, 1)
         },
         {
             type = "MeshRenderer",

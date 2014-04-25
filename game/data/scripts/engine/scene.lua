@@ -9,6 +9,53 @@ function Scene:_init(data)
     gfx.setActiveScene(self._handle)
     self._objects = {}
     self._started = false
+	
+end
+
+function Scene:loadPlayers(players, playerId)
+
+	local ringSampleIndex = 0
+	local initRadius = 65
+	local tangent = Vector(0,0,-1)
+	local startingPoint = Vector(0,0,0)
+	local normal = Vector(0,1,0)
+
+    for _, player in ipairs(players) do
+        local name = "player" .. ringSampleIndex
+
+		local prefab
+		if player.id == playerId then
+			prefab = "player"
+			self.playerName = name
+		else
+			prefab = "remoteplayer"
+		end
+
+		
+
+		local obj = self:createObject(name)
+        local data = loadDataFile(prefab, "object")
+		
+		obj:load(data)
+		obj:start()
+		
+		local theta = ringSampleIndex * 2 * math.pi / #players
+		local ringSample = startingPoint + (normal * (math.cos(theta) * initRadius)) + 
+				((tangent:cross(normal):getNormalized()) * (math.sin(theta) * initRadius))
+		ringSampleIndex = ringSampleIndex+1	       
+
+		obj:transform():setPosition(ringSample)	 
+		print("done transform")       
+
+		if player.id == playerId then
+			obj:getComponent("Player"):setId(playerId)
+		else
+			obj:getComponent("RemotePlayer"):setId(player.id)   
+		end
+    end	
+
+	self:setMainCamera(self:findObject(self.playerName):getComponent("Camera"))	
+
 end
 
 function Scene:load(data)
@@ -44,7 +91,9 @@ function Scene:start()
 end
 
 function Scene:update(dt)
+
     for k, v in pairs(self._objects) do
+		
         v:update(dt)
     end
 end

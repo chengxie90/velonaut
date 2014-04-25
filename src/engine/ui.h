@@ -32,7 +32,7 @@ private:
     SINGLETON(Ui)
     friend class App;
     void configureRenderSystem();
-
+    void buildKeyMaps();
     static int lLoadDocument(lua_State* state);
     static int lLoadMouseCursor(lua_State* state);
     static int lLoadFont(lua_State* state);
@@ -40,8 +40,12 @@ private:
     static int lAddEventListener(lua_State* state);
 
 private:
+
+    typedef std::map< SDL_Keycode, Rocket::Core::Input::KeyIdentifier > KeyIdentifierMap;
+
     Rocket::Core::Context* context_;
     Ogre::Matrix4 projection_matrix;
+    KeyIdentifierMap key_identifiers;
 
 
 class RocketEventListener : public Rocket::Core::EventListener

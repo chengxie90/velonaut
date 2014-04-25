@@ -27,7 +27,11 @@ void Graphics::init()
     root_->loadPlugin("RenderSystem_GL");
 #elif __LINUX__
     // TODO: fix Linux path problem
-    root_->loadPlugin("./Linux/Debug/RenderSystem_GL.so");   
+    char* buffer = new char[1024];
+    getcwd(buffer, 1024);
+    std::cout << buffer << std::endl;
+    delete buffer;
+    root_->loadPlugin("./Linux/Debug/RenderSystem_GL.so");
 #endif
     
     RenderSystem* renderer = root_->getAvailableRenderers()[0];
@@ -85,6 +89,10 @@ void Graphics::initLua()
             {"setOrientation", Graphics::Node::lsetOrientation},
             {"attachObject", Graphics::Node::lattachObject},
             {"lookAt", Graphics::Node::llookAt},
+            {"localX", Graphics::Node::lgetLocalX},
+            {"localY", Graphics::Node::lgetLocalY},
+            {"localZ", Graphics::Node::lgetLocalZ},
+            {"setScale", Graphics::Node::lsetScale},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -239,7 +247,7 @@ void Graphics::initResources()
 int Graphics::Scene::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->root_->createSceneManager(Ogre::ST_GENERIC);
-    scene->setSkyDome(true, "skybox", 5, 1, 500, true);
+    scene->setSkyDome(true, "skybox", 1, 1, 5000, true);
     LuaManager::GetInstance()->addParam((void *)scene);
     return 1;
 }
@@ -399,8 +407,6 @@ int Graphics::Node::lsetOrientation(lua_State *)
     Quaternion ori;
     LuaManager::GetInstance()->extractParam(&ori);
 
-    std::cout << "ORIENTATION: " << ori << std::endl;
-
     node->setOrientation(ori);
     return 0;
 }
@@ -428,7 +434,7 @@ int Graphics::Node::lattachObject(lua_State *)
     return 0;
 }
 
-int Graphics::Node::lscale(lua_State *)
+int Graphics::Node::lsetScale(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);
@@ -437,6 +443,48 @@ int Graphics::Node::lscale(lua_State *)
     LuaManager::GetInstance()->extractParam(&scale);
     node->scale(scale);
     return 0;
+}
+
+int Graphics::Node::lgetLocalX(lua_State *)
+{
+    SceneNode* node;
+    LuaManager::GetInstance()->extractParam((void **)&node);
+    assert(node);
+
+    Matrix3 axes = node->getLocalAxes();
+    Vector3 look = axes.GetColumn(0); // assume look starts as -z
+
+    LuaManager::GetInstance()->addParam(look);
+
+    return 1;
+}
+
+int Graphics::Node::lgetLocalY(lua_State *)
+{
+    SceneNode* node;
+    LuaManager::GetInstance()->extractParam((void **)&node);
+    assert(node);
+
+    Matrix3 axes = node->getLocalAxes();
+    Vector3 look = axes.GetColumn(1); // assume look starts as -z
+
+    LuaManager::GetInstance()->addParam(look);
+
+    return 1;
+}
+
+int Graphics::Node::lgetLocalZ(lua_State *)
+{
+    SceneNode* node;
+    LuaManager::GetInstance()->extractParam((void **)&node);
+    assert(node);
+
+    Matrix3 axes = node->getLocalAxes();
+    Vector3 look = axes.GetColumn(2); // assume look starts as -z
+
+    LuaManager::GetInstance()->addParam(look);
+
+    return 1;
 }
 
 int Graphics::Camera::lsetNear(lua_State *)

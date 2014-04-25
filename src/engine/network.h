@@ -17,6 +17,7 @@ public:
     void initLua();
     void shutdown();
     void startServer(int port);
+    void findServer(int port);
     void shutdownServer();
     void shutdownClient();
     void connectToServer( const char* serverAdress, int port);
@@ -29,6 +30,7 @@ private:
     SINGLETON(Network)
     friend class App;
 
+    void onServerPong(RakNet::Packet* packet);
     void onConnectionAccepted(RakNet::Packet* packet);
     void onConnectionFailed(RakNet::Packet* packet);
     void onDisconnect(RakNet::Packet* packet);
@@ -44,6 +46,7 @@ private:
     static int lRpc(lua_State* state);
     static int lAddEventListener(lua_State* state);
     static int lSetMaxIncomingConnections(lua_State* state);
+    static int lFindServer(lua_State* state);
 
 private:
 

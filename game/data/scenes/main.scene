@@ -2,24 +2,32 @@ return
 {
     ambient = Color(0.3, 0.3, 0.3),
     --backgroundColor = Vector(0, 0, 0.1),
-    mainCamera = "player",
+    mainCamera = "initcam",
     objects = 
     {
-        {
-            name = "cube",
-            prefab = "cube"
-        },
-        {
-            name = "sphere",
-            prefab = "sphere"
-        },
-        {
-            name = "player",
-            prefab = "player"
-        },
+		{
+			name = "initcam",
+			prefab = "initcam"
+		},
+
         {
             name = "tunnel",
             prefab = "tunnel"
         }
+
+--[[
+		,
+        {
+            name = "player",
+            prefab = "player"
+        },
+
+        {
+            name = "remoteplayer1",
+            prefab = "remoteplayer"
+        }
+
+--]]
+
     }
 }

@@ -30,6 +30,7 @@ void NetworkServer::rpcSetPlayerName(BitStream* bsIn,Packet* p)
     RakString rs;
     server->readString(bsIn, rs, false);
     NetworkServer::GetInstance()->players_[p->guid].name = string(rs.C_String());
+    NetworkServer::GetInstance()->players_[p->guid].guid = p->guid;
 }
 
 void NetworkServer::rpcStartGame(BitStream* bsIn,Packet* p)
@@ -38,7 +39,7 @@ void NetworkServer::rpcStartGame(BitStream* bsIn,Packet* p)
 
     server->setServerState(new WaitingForPlayerReadyState);
 
-    server->writeMessage(GAME_MESSAGE, server->createGameInitEvent());
+    server->writeMessage(GAME_MESSAGE, server->createGameInitEvent(123, 0));
     server->sendToAll(RELIABLE_ORDERED);
 
     server->setServerState(new WaitingForPlayerReadyState);
@@ -76,6 +77,10 @@ void NetworkServer::onClientConnect(Packet* packet)
 {
     std::cout << "onClientConnect" << std::endl;
     clients_.push_back(packet->guid);
+    std::cout << packet->guid.g << std::endl;
+
+    writeMessage(GAME_MESSAGE, createWelcomeEvent(packet->guid));
+    sendToOne(packet->guid, RELIABLE_ORDERED);
 }
 
 void NetworkServer::onClientAlreadyConnected(Packet *packet)
@@ -101,7 +106,7 @@ void NetworkServer::onGameMessageReceived(Packet *packet)
     BitStream bsIn(packet->data,packet->length,false);
     readString(&bsIn, rs);
     writeMessage(GAME_MESSAGE, rs);
-    sendToAll(RELIABLE_ORDERED);
+    sendToAll(UNRELIABLE_SEQUENCED);
 }
 
 void NetworkServer::readString(BitStream *bsIn, RakString &str, bool ignoreMsgType)
@@ -126,10 +131,11 @@ void NetworkServer::writeString(RakString msg)
     compressor.EncodeString(&msg, msg.GetLength()+1, &bitSteamOut_ );
 }
 
-void NetworkServer::sendToAllExcept(BitStream *stream, RakNetGUID except)
+void NetworkServer::sendToAllExcept(BitStream *stream, RakNetGUID except, PacketReliability reliability)
 {
     for(int i = 0; i < clients_.size(); i++) {
-        server_->Send(&bitSteamOut_,HIGH_PRIORITY,RELIABLE_ORDERED,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
+        if (clients_[i] != except)
+            server_->Send(&bitSteamOut_,HIGH_PRIORITY,reliability,0, server_->GetSystemAddressFromGuid(clients_[i]), false);
     }
 }
 
@@ -140,22 +146,42 @@ void NetworkServer::sendToAll(PacketReliability reliability)
     }
 }
 
+void NetworkServer::sendToOne(RakNet::RakNetGUID &guid, PacketReliability reliability)
+{
+    server_->Send(&bitSteamOut_,HIGH_PRIORITY,reliability,0, server_->GetSystemAddressFromGuid(guid), false);
+}
+
 RakString NetworkServer::createPlayerListEvent() {
     string s;
     s.append("{ eventType = 'playerlist', players = {");
 
+
     for(auto it = players_.begin(); it != players_.end(); ++it) {
-        s.append("'");
+        s.append("{name='");
         s.append(it->second.name);
-        s.append("',");
+        s.append("', id='");
+        s.append(to_string(it->second.guid.g));
+        s.append("'},");
     }
     s.append("} }");
+
+    cout << s << endl;
     return RakString(s.c_str());
 }
 
-RakString NetworkServer::createGameInitEvent() {
+RakString NetworkServer::createWelcomeEvent(RakNet::RakNetGUID guid) {
     string s;
-    s.append("{eventType='gameinit',seed=123}");
+    s.append("{eventType='welcome',id='");
+    s.append(to_string(guid.g));
+    s.append("'}");
+    return RakString(s.c_str());
+}
+
+RakString NetworkServer::createGameInitEvent(uint64_t guid, int seed) {
+    string s;
+    s.append("{eventType='gameinit',seed=");
+    s.append(to_string(123));
+    s.append("}");
     return RakString(s.c_str());
 }
 

@@ -30,15 +30,22 @@ private:
         static int ldestroy(lua_State *);
         
         static int lposition(lua_State *);
-        static int lsetPosition(lua_State *);
         static int lorientation(lua_State *);
+        static int llinearVelocity(lua_State *);
+        static int langularVelocity(lua_State *);
+        static int lforce(lua_State *);
+        static int ltorque(lua_State *);
+
+        static int lsetPosition(lua_State *);
         static int lsetOrientation(lua_State *);
-        static int lapplyCentralForce(lua_State *);
-        static int lapplyForce(lua_State *);
-        static int lapplyTorque(lua_State *);
         static int lsetLinearVelocity(lua_State *);
         static int lsetAngularVelocity(lua_State *);
         static int lsetDamping(lua_State *);
+
+        static int lapplyCentralForce(lua_State *);
+        static int lapplyForce(lua_State *);
+        static int lapplyTorque(lua_State *);
+        static int lclearForces(lua_State *);
     };
 };
 

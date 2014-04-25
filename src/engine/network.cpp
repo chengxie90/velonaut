@@ -23,6 +23,7 @@ void Network::initLua() {
             {"shutdownClient", Network::lShutdownClient},
             {"connectToServer", Network::lConnectToServer},
             {"sendMessage", Network::lSendMessage},
+            {"findServer", Network::lFindServer},
             {"RPC", Network::lRpc},
             {"addEventListener", Network::lAddEventListener},
             {"setMaxIncomingConnections", Network::lSetMaxIncomingConnections},
@@ -92,6 +93,12 @@ int Network::lSetMaxIncomingConnections(lua_State *state) {
     Network::GetInstance()->server_->setMaxIncomingConnections(numConnections);
 }
 
+int Network::lFindServer(lua_State *state) {
+    int port;
+    LuaManager::GetInstance()->extractParam(&port);
+    Network::GetInstance()->findServer(port);
+}
+
 Network *Network::GetInstance()
 {
     return App::GetApp()->GetNetwork();
@@ -100,6 +107,8 @@ Network *Network::GetInstance()
 void Network::init() {
     client_ = RakPeerInterface::GetInstance();
     client_->AttachPlugin(&rpc_);
+    static SocketDescriptor desc;
+    client_->Startup(1, &desc, 1);
 }
 
 void Network::shutdown() {
@@ -120,12 +129,16 @@ void Network::shutdownClient() {
     client_->Shutdown(300);
 }
 
+void Network::findServer(int port) {
+    client_->Ping("255.255.255.255", port, false);
+}
+
 void Network::sendMessage(string msg) {
     bsOut.Reset();
     bsOut.Write((MessageID)GAME_MESSAGE);
     StringCompressor compressor;
     compressor.EncodeString(msg.c_str(), msg.size()+1, &bsOut);
-    client_->Send(&bsOut,HIGH_PRIORITY,RELIABLE_ORDERED,0, serverAddress_,false);
+    client_->Send(&bsOut,HIGH_PRIORITY,UNRELIABLE_SEQUENCED,0, serverAddress_,false);
 }
 
 void Network::rpc(string req, string params) {
@@ -136,10 +149,23 @@ void Network::rpc(string req, string params) {
     rpc_.Call(req.c_str(), &bsOut, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
 }
 
+void Network::onServerPong(Packet *packet) {
+    std::cout << "onServerPong" << std::endl;
+    RakNet::TimeMS time;
+    RakNet::BitStream bsIn(packet->data,packet->length,false);
+    bsIn.IgnoreBytes(1);
+    bsIn.Read(time);
+    cout << "Got pong from " << packet->systemAddress.ToString() << std::endl;
+
+    string ipaddress = string(packet->systemAddress.ToString());
+    ipaddress = ipaddress.substr(0, ipaddress.find("|"));
+    ipaddress.insert(0, "'");
+    ipaddress.append("'");
+    fireEvent("server_found", ipaddress);
+}
+
 void Network::connectToServer(const char *serverAdress, int port) {
 
-    static SocketDescriptor desc;
-    client_->Startup(1, &desc, 1);
     client_->Connect(serverAdress, port, 0,0);
 }
 
@@ -191,6 +217,9 @@ void Network::poll() {
     {
         switch (packet->data[0])
         {
+            case ID_UNCONNECTED_PONG:
+                onServerPong(packet);
+                break;
             case ID_CONNECTION_REQUEST_ACCEPTED:
               onConnectionAccepted(packet);
               break;

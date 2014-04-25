@@ -21,6 +21,12 @@ App = class() -- this is a singleton
 function App.start()
 	math.epsilon = 0.00001
 
+	App.gamestarted = false
+
+	for i = 1, 3 do
+		print(i)
+	end
+
     local config = dofile("./data/game.config")
     App.loadScene(config.scene)
 
@@ -33,21 +39,30 @@ function App.start()
 
 	local function onGameMessageReceived(event)
 		
-		print("Game Event: " .. event.eventType)
+		if event.eventType == "welcome" then
+			print( "Welcome, you been assigned ID " .. event.id )
+			App.playerId = event.id
+			return
+		end	
 
 		if event.eventType == "playerlist" then
-			print("received playerlist")			
-			for i, name in ipairs(event.players) do
-				print (name)
-				Gui.setText("txt_status", "Connnect as " .. name);
+			print("received playerlist")
+			App.players = event.players
+			
+			for i, player in ipairs(App.players) do
+				print (player.name )
+				print (player.id )
+				Gui.setText("txt_status", "Connnect as " .. player.name);
 			end
 			return
 		end
 
 		if event.eventType == "gameinit" then
 			print("received gameinit")	
-			print("seed: " .. event.seed)
-			Gui.setText("txt_status", "Initializing...");		
+			print("seed: " .. event.seed)			
+			Gui.setText("txt_status", "Initializing...");
+
+			App._scene:loadPlayers(App.players, App.playerId)		
 			return
 		end
 
@@ -60,15 +75,18 @@ function App.start()
 
 		if event.eventType == "gamestart" then
 			print("GOOOOOOOO!!!!!!!!!")
-			Gui.setText("txt_status", "GOOOOOOOO!!!!!!!!!");	
+			Gui.setText("txt_status", "GOOOOOOOO!!!!!!!!!");
+			App.gamestarted = true	
 			return
 		end	
 
 	end
 
 	local function onConnectedToServer()
-		print("Connected to server yo!")
-		Network.RPC("setPlayerName", "Philly")
+
+		print("Connected to server yo! ")
+		Network.RPC("setPlayerName", "Nate")
+
 	end
 
 	local function onConnectionFailed()
@@ -86,12 +104,17 @@ function App.start()
 		end
 	end
 
+	local function onServerFound( serverip )
+		print("Found server at " .. serverip)
+		Network.connectToServer(serverip, 60001)	
+	end
+	
+	Network.addEventListener("server_found", onServerFound)
 	Network.addEventListener("game_message", onGameMessageReceived)
 	Network.addEventListener("server_response", onServerResponse)
 	Network.addEventListener("connection_failed", onConnectionFailed)
 	Network.addEventListener("connected_to_server", onConnectedToServer)
 	Network.addEventListener("disconnect", onDisconnect)
-
 
 	local function onStartServer()
 		Network.startServer(60001)
@@ -100,8 +123,10 @@ function App.start()
 	end
 
 	local function onStartClient()
-		Network.connectToServer("127.0.0.1", 60001)	
-		print("starting client")
+
+		print("Finding server...") 
+		Network.findServer( 60001 )
+
 	end
 
 	local function onStartGame()
@@ -127,6 +152,7 @@ end
 function App.update(dt)
     App._scene:update(dt)
     Input.update()
+
 end
 
 function App.terminate()
