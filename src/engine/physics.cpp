@@ -60,10 +60,29 @@ void Physics::update(float dt)
         const btRigidBody* obA = static_cast<const btRigidBody*>(contactManifold->getBody0());
         const btRigidBody* obB = static_cast<const btRigidBody*>(contactManifold->getBody1());
         
+        btVector3 p = {0, 0, 0};
+        int numContacts = contactManifold->getNumContacts();
+        int count = 0;
+        for (int j = 0; j < numContacts; j++)
+        {
+            btManifoldPoint& pt = contactManifold->getContactPoint(j);
+            if (pt.getDistance() < 0.f)
+            {
+                const btVector3& ptA = pt.getPositionWorldOnA();
+                p += ptA;
+                count += 1;
+//                const btVector3& ptB = pt.getPositionWorldOnB();
+//                const btVector3& normalOnB = pt.m_normalWorldOnB;
+            }
+        }
+
+        p /= count;
+        
         LuaManager::GetInstance()->addFunction("RigidBody._onGlobalCollision");
         LuaManager::GetInstance()->addParamReg((void *)obA);
         LuaManager::GetInstance()->addParamReg((void *)obB);
-        LuaManager::GetInstance()->pcall(2);
+        LuaManager::GetInstance()->addParam(p);
+        LuaManager::GetInstance()->pCall(3);
     }
 }
 

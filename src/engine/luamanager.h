@@ -18,7 +18,7 @@ public:
     void doFile(std::string file) const;
     void addlib(luaL_Reg *reg);
     void requiref(std::string name, lua_CFunction func);
-    void pcall(int nargs = 0, int nresults = 0) const;
+    void pCall(int nargs = 0, int nresults = 0) const;
     void call(int nargs = 0, int nres = 0) const;
     void registerFunction(const char* name, lua_CFunction func) const;
     

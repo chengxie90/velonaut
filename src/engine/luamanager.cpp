@@ -32,7 +32,7 @@ void LuaManager::addFunction(string func) const {
     }
 }
 
-void LuaManager::pcall(int nargs, int nresults) const {
+void LuaManager::pCall(int nargs, int nresults) const {
 
     if (lua_pcall(state_, nargs, nresults, 0) != 0) {
         std::string str = lua_tostring(state_, lua_gettop(state_));
@@ -140,14 +140,13 @@ void LuaManager::addParam(void *p) const
 void LuaManager::addParam(lua_Number *array, int len) const
 {
     lua_getglobal(state_, "Vector");
-    lua_getfield(state_, 1, "__call");
-    lua_pushvalue(state_, 1);
-    lua_remove(state_, 1);
+    lua_getfield(state_, -1, "__call");
+    lua_pushvalue(state_, -2);
+    lua_remove(state_, -3);
 
     for (int i = 0; i < len; i++) {
         lua_pushnumber(state_, array[i]);
     }
-
     lua_call(state_, len + 1, 1);
 }
 
@@ -230,7 +229,7 @@ void LuaManager::update(float dt)
 {
     addFunction("App.update");
     addParam((double)dt);
-    pcall(1);
+    pCall(1);
 }
 
 void LuaManager::shutdown()
@@ -299,7 +298,7 @@ void LuaManager::onMouseDown( SDL_Event e )
     addParam( Input::GetInstance()->dictionary_[e.button.button] );
     addParam(modifierState);
 
-    pcall(2);
+    pCall(2);
 }
 
 void LuaManager::onMouseUp( SDL_Event e)
@@ -310,7 +309,7 @@ void LuaManager::onMouseUp( SDL_Event e)
     addParam( Input::GetInstance()->dictionary_[e.button.button] );
     addParam(modifierState);
 
-    pcall(2);
+    pCall(2);
 }
 
 void LuaManager::onMouseMove( SDL_Event e )
@@ -323,21 +322,21 @@ void LuaManager::onMouseMove( SDL_Event e )
     addParam( e.motion.y );
     addParam(modifierState);
 
-    pcall(3);
+    pCall(3);
 }
 
 void LuaManager::onKeyDown( SDL_Event e )
 {
     addFunction("Input.onKeyDown");
     addParam( Input::GetInstance()->dictionary_[e.key.keysym.sym] );
-    pcall(1);
+    pCall(1);
 }
 
 void LuaManager::onKeyUp( SDL_Event e )
 {
     addFunction("Input.onKeyUp");
     addParam( Input::GetInstance()->dictionary_[e.key.keysym.sym] );
-    pcall(1);
+    pCall(1);
 }
 
 void LuaManager::AddDictionary()
@@ -351,5 +350,5 @@ void LuaManager::AddDictionary()
         addParam( it->second );
         count++;
     }
-    pcall(count);
+    pCall(count);
 }

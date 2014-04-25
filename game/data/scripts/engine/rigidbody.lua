@@ -5,11 +5,11 @@ RigidBody = class(Component)
 
 local handlemap = {}
 
-function RigidBody._onGlobalCollision(handle1, handle2)
+function RigidBody._onGlobalCollision(handle1, handle2, pos)
     local obj1 = handlemap[handle1]
     local obj2 = handlemap[handle2]
-    obj1:onCollision({rigidbody = obj2})
-    obj2:onCollision({rigidbody = obj1})
+    obj1:onCollision({rigidbody = obj2, position = pos})
+    obj2:onCollision({rigidbody = obj1, position = pos})
 end
 
 function RigidBody:_init()
