@@ -1,0 +1,34 @@
+return 
+{
+    components = 
+    {
+        {
+            type = "Transform",
+            position = Vector(0, 0, 0),
+            orientation = Vector(0, 0, 0, 1),
+            scale = Vector(10, 10, 10)
+        },
+        {
+            type = "Light",
+            lightType = "pointlight",
+            diffuse = Color(1.0, 1.0, 1.0)
+        },
+        {
+            type = "MeshRenderer",
+            mesh = "cube",
+            material = "lambert1"
+        },
+        {
+            type = "RigidBody",
+            shape = "box",
+            mass = 1,
+            boxHalfExtents = Vector(10, 10, 10)
+        },
+        {
+            type = "Ship"
+        },
+		{
+            type = "AutoPlayer"
+        }
+    }
+}

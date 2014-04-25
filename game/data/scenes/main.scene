@@ -13,7 +13,8 @@ return
         {
             name = "tunnel",
             prefab = "tunnel"
-        },
+        }
+--[[
         {
             name = "box1",
             prefab = "cube"
@@ -21,11 +22,7 @@ return
         {
             name = "box2",
             prefab = "sphere"
-        }
-
-
---[[
-		,
+        },
         {
             name = "player",
             prefab = "player"

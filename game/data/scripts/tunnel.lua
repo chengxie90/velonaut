@@ -124,7 +124,8 @@ function Tunnel:_init(object)
 	end
 
 	local m = mb:getMesh()
-	local mr = object:addComponent("MeshRenderer", nil, 
+	local mr = object:addComponent("MeshRenderer", nil, false)
+	
 	mr:setMesh(m)
 	--local mat = Material("tunnel")
 	--mr:setMaterial(mat)
@@ -144,6 +145,19 @@ end
 
 function Tunnel:update(dt)
 
+end
+
+function Tunnel:getClosestSamplePosition(position)
+	local minDist = math.huge
+	local minInd = 0	
+	for i = 1, #self._tunnel do
+		local newDist = (self._tunnel[i][1] - position).length()
+		if (newDist < minDist) then 
+			minDist = newDist
+			minInd = i
+		end
+	end
+	return {"position" = self._tunnel[minInd][1], "distance" = minDist}
 end
 
 function Tunnel:getSamplePosition(sampleIndex)

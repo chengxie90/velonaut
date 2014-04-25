@@ -11,6 +11,13 @@ return
             mesh = "sphere",
             material = "checkpoint"
         },
+		{
+            type = "RigidBody",
+            shape = "box",
+            mass = 1,
+            boxHalfExtents = Vector(80, 80, 1),
+			trigger = true
+        },
         {
             type = "Checkpoint"
         }

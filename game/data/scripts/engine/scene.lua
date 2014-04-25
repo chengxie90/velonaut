@@ -41,8 +41,7 @@ function Scene:loadPlayers(players, playerId)
 				((tangent:cross(normal):getNormalized()) * (math.sin(theta) * initRadius))
 		ringSampleIndex = ringSampleIndex+1	       
 
-		obj:transform():setPosition(ringSample)	 
-		print("done transform")       
+		obj:transform():setPosition(ringSample)	  
 
 		if player.id == playerId then
 			obj:getComponent("Player"):setId(playerId)

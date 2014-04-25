@@ -13,14 +13,17 @@ function Player:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
 
-	local tun = App.activeScene():findObject("tunnel"):getComponent("Tunnel")	
-
 	-- Create first checkpoint 
 	self._nextCheckpoint = 1
-	for i = 1, tun:getNumCheckpoints() do
+	self:createNextCheckpoint();
+end
+
+function Player:createNextCheckpoint()
+	local tun = App.activeScene():findObject("tunnel"):getComponent("Tunnel")	
+	if self._nextCheckpoint <= tun:getNumCheckpoints() then
 		local name = "checkpoint" .. self._nextCheckpoint
 		local prefab = "checkpoint"
-	
+
 		local obj = App.activeScene():createObject(name)
 		local data = loadDataFile(prefab, "object")	
 		obj:load(data)
@@ -36,9 +39,11 @@ function Player:start()
 
 		obj:transform():setPosition(startPos)
 		obj:transform():setOrientation(startOri)
-	self._nextCheckpoint = self._nextCheckpoint + 1
-	end
+		obj:getComponent("RigidBody"):setPosition(startPos)		
+		obj:getComponent("RigidBody"):setOrientation(startOri)
 
+		self._nextCheckpoint = self._nextCheckpoint + 1
+	end
 end
 
 function Player:setId( id )
@@ -68,6 +73,15 @@ function Player:update(dt)
 
 	self:sendPhysics()
 
+end
+
+function Player:onCollision(collision)
+    if collision.rigidbody:owner():getComponent("Checkpoint") ~= nil then
+		local checkpoint = collision.rigidbody:owner()
+		checkpoint:removeComponent("Checkpoint")
+		checkpoint:removeComponent("MeshRenderer")
+		self:createNextCheckpoint()
+	end
 end
 
 function Player:sendPhysics()

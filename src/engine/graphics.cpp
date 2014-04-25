@@ -721,17 +721,13 @@ int Graphics::VQHelper::lgetQuaternionFromAngleAxis(lua_State *)
 
 int Graphics::VQHelper::langleBetween(lua_State *)
 {
-    LuaManager::GetInstance()->dumpStack();
     Ogre::Vector3 v1;
     LuaManager::GetInstance()->extractParam(&v1);
-    std::cout << "v1: " << v1 << std::endl;
-    LuaManager::GetInstance()->dumpStack();
+
     Ogre::Vector3 v2;
     LuaManager::GetInstance()->extractParam(&v2);
-    LuaManager::GetInstance()->dumpStack();
 
     double angle = (v1.angleBetween(v2)).valueRadians();
-    std::cout << "v1: " << v1 << " v2: " << v2 << " angle: " << angle << std::endl;
 
     LuaManager::GetInstance()->addParam(angle);
 

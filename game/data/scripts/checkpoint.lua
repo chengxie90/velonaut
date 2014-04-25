@@ -13,3 +13,7 @@ end
 function Checkpoint:update()
 
 end
+
+function Checkpoint:onCollision(collision)
+    --print("cube : onCollision with" .. " " .. collision.rigidbody:owner():name() .. " at " .. tostring(collision.position))
+end
