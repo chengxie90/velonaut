@@ -132,8 +132,12 @@ function Tunnel:_init(object)
 
 	-- Add specific samples to checkpoints member for convenience
 	local checkpointIndex = 1
+	local countIndex = 1
 	while checkpointIndex*self._samplesPerCheckpoint < #self._tunnel do
-		self._checkpoints[checkpointIndex] = self._tunnel[checkpointIndex*self._samplesPerCheckpoint]
+		if checkpointIndex ~= 2 and checkpointIndex ~= 3 then
+			self._checkpoints[countIndex] = self._tunnel[checkpointIndex*self._samplesPerCheckpoint]
+			countIndex = countIndex + 1
+		end
 		checkpointIndex = checkpointIndex + 1
 	end
 
@@ -157,7 +161,7 @@ function Tunnel:getClosestSamplePosition(position)
 			minInd = i
 		end
 	end
-	return {"position" = self._tunnel[minInd][1], "distance" = minDist}
+	return {["position"] = self._tunnel[minInd][1], ["distance"] = minDist}
 end
 
 function Tunnel:getSamplePosition(sampleIndex)
@@ -177,15 +181,15 @@ function Tunnel:getNumSamples()
 end
 
 function Tunnel:getCheckpointPosition(checkpointIndex)
-	return self._tunnel[checkpointIndex*self._samplesPerCheckpoint][1]
+	return self._checkpoints[checkpointIndex][1]
 end
 
 function Tunnel:getCheckpointTangent(checkpointIndex)
-	return self._tunnel[checkpointIndex*self._samplesPerCheckpoint][2]
+	return self._checkpoints[checkpointIndex][2]
 end
 
 function Tunnel:getCheckpointNormal(checkpointIndex)
-	return self._tunnel[checkpointIndex*self._samplesPerCheckpoint][3]
+	return self._checkpoints[checkpointIndex][3]
 end
 
 function Tunnel:getNumCheckpoints()

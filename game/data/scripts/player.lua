@@ -19,12 +19,12 @@ function Player:start()
 end
 
 function Player:createNextCheckpoint()
-	local tun = App.activeScene():findObject("tunnel"):getComponent("Tunnel")	
+	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")	
 	if self._nextCheckpoint <= tun:getNumCheckpoints() then
 		local name = "checkpoint" .. self._nextCheckpoint
 		local prefab = "checkpoint"
 
-		local obj = App.activeScene():createObject(name)
+		local obj = App.scene():createObject(name)
 		local data = loadDataFile(prefab, "object")	
 		obj:load(data)
 		obj:start()
@@ -78,9 +78,8 @@ end
 function Player:onCollision(collision)
     if collision.rigidbody:owner():getComponent("Checkpoint") ~= nil then
 		local checkpoint = collision.rigidbody:owner()
-		checkpoint:removeComponent("Checkpoint")
-		checkpoint:removeComponent("MeshRenderer")
-		self:createNextCheckpoint()
+    	checkpoint:destroy()
+		self:createNextCheckpoint();
 	end
 end
 

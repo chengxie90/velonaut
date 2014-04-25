@@ -63,7 +63,7 @@ function App.start()
 			print("seed: " .. event.seed)			
 			Gui.setText("txt_status", "Initializing...");
 
-			App.activeScene():loadPlayers(App.players, App.playerId)		
+			App.scene():loadPlayers(App.players, App.playerId)		
 			return
 		end
 
