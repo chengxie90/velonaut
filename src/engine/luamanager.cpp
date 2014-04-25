@@ -37,7 +37,7 @@ void LuaManager::pCall(int nargs, int nresults) const {
     if (lua_pcall(state_, nargs, nresults, 0) != 0) {
         std::string str = lua_tostring(state_, lua_gettop(state_));
         lua_pop(state_, 1);
-        //std::cout << str << std::endl;
+        std::cout << str << std::endl;
         assert(false);
     }
 }

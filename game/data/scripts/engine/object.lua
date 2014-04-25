@@ -17,15 +17,17 @@ function Object:_init(name)
 end
 
 function Object:load(data)
+
     for _, componentData in ipairs(data.components) do
+
         local typename = componentData.type
         local comp = self:addComponent(typename)
         comp:load(componentData)
     end
+
 end
 
 function Object:start()
-    assert(self._started == false)
     for k, v in pairs(self._components) do
         v:start()
     end
@@ -40,16 +42,18 @@ end
 
 function Object:addComponent(typename)
     assert(self._components[typename] == nil, "Duplicated components")
+	
     local classobject = rawget(_G, typename)
     if classobject == nil then
         require(typename:lower())
         classobject = _G[typename]
         assert(classobject)
+
     end
     local comp = classobject(self)
+	
     comp:setOwner(self)
     self._components[typename] = comp
-    if self._started then comp:start() end
     return comp
 end
 

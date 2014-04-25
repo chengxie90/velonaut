@@ -81,7 +81,6 @@ void NetworkServer::onClientConnect(Packet* packet)
 
     writeMessage(GAME_MESSAGE, createWelcomeEvent(packet->guid));
     sendToOne(packet->guid, RELIABLE_ORDERED);
-
 }
 
 void NetworkServer::onClientAlreadyConnected(Packet *packet)
@@ -171,11 +170,10 @@ RakString NetworkServer::createPlayerListEvent() {
 }
 
 RakString NetworkServer::createWelcomeEvent(RakNet::RakNetGUID guid) {
-    std::cout << "creating welcome " << guid.g << std::endl;
     string s;
-    s.append("{eventType='welcome',id=");
-    s.append("");
-    s.append("}");
+    s.append("{eventType='welcome',id='");
+    s.append(to_string(guid.g));
+    s.append("'}");
     return RakString(s.c_str());
 }
 

@@ -4,7 +4,7 @@ return
     {
         {
             type = "Transform",
-            position = Vector(0, 0, 30),
+            position = Vector(0, 0, 0),
             orientation = Vector(0, 0, 0, 1),
             scale = Vector(10, 10, 10)
         },

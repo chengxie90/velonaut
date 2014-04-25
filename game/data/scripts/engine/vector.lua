@@ -4,6 +4,14 @@ Vector = class()
 
 function Vector:_init(...)
     local args = {...}
+	if type(args[1]) == "table" then
+		for i = 1, #args[1] do
+		    self[i] = args[1][i]
+		end
+		return
+	end
+
+	
     for i = 1, #args do
         self[i] = args[i]
     end
@@ -121,6 +129,14 @@ function Vector:getNormalized()
 	end
 	ret:normalize()
 	return ret
+end
+
+function Vector:serialize3d()
+	return "{" .. self[1] .. "," .. self[2] .. "," .. self[3] .. "}";
+end
+
+function Vector:serialize4d()
+	return "{" .. self[1] .. "," .. self[2] .. "," .. self[3] .. "," .. self[4] .."}";
 end
 
 local function test()

@@ -23,6 +23,7 @@ void Network::initLua() {
             {"shutdownClient", Network::lShutdownClient},
             {"connectToServer", Network::lConnectToServer},
             {"sendMessage", Network::lSendMessage},
+            {"findServer", Network::lFindServer},
             {"RPC", Network::lRpc},
             {"addEventListener", Network::lAddEventListener},
             {"setMaxIncomingConnections", Network::lSetMaxIncomingConnections},
@@ -92,6 +93,12 @@ int Network::lSetMaxIncomingConnections(lua_State *state) {
     Network::GetInstance()->server_->setMaxIncomingConnections(numConnections);
 }
 
+int Network::lFindServer(lua_State *state) {
+    int port;
+    LuaManager::GetInstance()->extractParam(&port);
+    Network::GetInstance()->findServer(port);
+}
+
 Network *Network::GetInstance()
 {
     return App::GetApp()->GetNetwork();
@@ -100,6 +107,8 @@ Network *Network::GetInstance()
 void Network::init() {
     client_ = RakPeerInterface::GetInstance();
     client_->AttachPlugin(&rpc_);
+    static SocketDescriptor desc;
+    client_->Startup(1, &desc, 1);
 }
 
 void Network::shutdown() {
@@ -118,6 +127,10 @@ void Network::shutdownServer() {
 
 void Network::shutdownClient() {
     client_->Shutdown(300);
+}
+
+void Network::findServer(int port) {
+    client_->Ping("255.255.255.255", port, false);
 }
 
 void Network::sendMessage(string msg) {
@@ -143,12 +156,16 @@ void Network::onServerPong(Packet *packet) {
     bsIn.IgnoreBytes(1);
     bsIn.Read(time);
     cout << "Got pong from " << packet->systemAddress.ToString() << std::endl;
+
+    string ipaddress = string(packet->systemAddress.ToString());
+    ipaddress = ipaddress.substr(0, ipaddress.find("|"));
+    ipaddress.insert(0, "'");
+    ipaddress.append("'");
+    fireEvent("server_found", ipaddress);
 }
 
 void Network::connectToServer(const char *serverAdress, int port) {
 
-    static SocketDescriptor desc;
-    client_->Startup(1, &desc, 1);
     client_->Connect(serverAdress, port, 0,0);
 }
 
