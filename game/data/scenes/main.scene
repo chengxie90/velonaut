@@ -13,7 +13,16 @@ return
         {
             name = "tunnel",
             prefab = "tunnel"
+        },
+        {
+            name = "box1",
+            prefab = "cube"
+        },
+        {
+            name = "box2",
+            prefab = "sphere"
         }
+
 
 --[[
 		,
@@ -21,12 +30,10 @@ return
             name = "player",
             prefab = "player"
         },
-
         {
             name = "remoteplayer1",
             prefab = "remoteplayer"
         }
-
 --]]
 
     }

@@ -3,14 +3,26 @@ local phyrigidbody = require "engine.physics.rigidbody.c"
 
 RigidBody = class(Component)
 
+local handlemap = {}
+
+function RigidBody._onGlobalCollision(handle1, handle2, pos)
+    local obj1 = handlemap[handle1]
+    local obj2 = handlemap[handle2]
+    obj1:onCollision({rigidbody = obj2, position = pos})
+    obj2:onCollision({rigidbody = obj1, position = pos})
+end
+
 function RigidBody:_init()
 
 end
 
 function RigidBody:load(data)
     if data.shape == "box" then
-        self._handle = phyrigidbody.create(data.mass, data.shape, data.boxHalfExtents)		
+        self._handle = phyrigidbody.create(data.mass, data.shape, data.boxHalfExtents)
+        handlemap[self._handle] = self
     end
+    assert(self._handle)
+    if data.trigger then phyrigidbody.setTrigger(self._handle, data.trigger) end
 end
 
 function RigidBody:start()
@@ -22,6 +34,17 @@ function RigidBody:update()
     assert(trans)
     trans:setPosition(self:position())
     trans:setOrientation(self:orientation())
+end
+
+function RigidBody:onCollision(collision)
+    local behaviors = self:behaviors()
+    for _, c in ipairs(behaviors) do
+        c:onCollision(collision)
+    end
+end
+
+function RigidBody:setTrigger(trigger)
+    
 end
 
 function RigidBody:position()

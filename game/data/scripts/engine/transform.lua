@@ -5,9 +5,7 @@ Transform = class(Component)
 
 function Transform:_init()
     self._position = Vector(0, 0, 0)
-    self._orientation = Vector(0, 0, 0, 1)
     self._scale = Vector(1, 1, 1)
-    self._delegates = {}
     self._handle = gfxnode.create()
 end
 

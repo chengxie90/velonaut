@@ -9,3 +9,7 @@ end
 function Behavior:update(dt)
 
 end
+
+function Behavior:onCollision(...)
+
+end

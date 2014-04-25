@@ -13,18 +13,19 @@ Object = class()
 function Object:_init(name)
     self._components = {}
     self._started = false
-    self.name = name
+    self._name = name
+end
+
+function Object:name()
+    return self._name
 end
 
 function Object:load(data)
-
     for _, componentData in ipairs(data.components) do
-
         local typename = componentData.type
         local comp = self:addComponent(typename)
         comp:load(componentData)
     end
-
 end
 
 function Object:start()
@@ -55,6 +56,16 @@ function Object:addComponent(typename)
     comp:setOwner(self)
     self._components[typename] = comp
     return comp
+end
+
+function Object:behaviors()
+    local ret = {}
+    for _, comp in pairs(self._components) do
+        if comp:is_a(Behavior) then
+            table.insert(ret, comp)
+        end
+    end
+    return ret
 end
 
 function Object:getComponent(typename)
