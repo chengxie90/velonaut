@@ -137,6 +137,13 @@ void LuaManager::addParam(void *p) const
     lua_pushlightuserdata(state_, p);
 }
 
+void LuaManager::extractParam(bool *b) const
+{
+    luaL_checktype(state_, 1, LUA_TBOOLEAN);
+    *b = lua_toboolean(state_, 1);
+    lua_remove(state_, 1);
+}
+
 void LuaManager::addParam(lua_Number *array, int len) const
 {
     lua_getglobal(state_, "Vector");

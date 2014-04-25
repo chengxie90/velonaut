@@ -24,7 +24,7 @@ void Physics::initLua()
     LuaManager::GetInstance()->requiref("engine.physics.rigidbody.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Physics::RigidBody::lcreate},
-
+            {"setTrigger", Physics::RigidBody::lsetTrigger},
             {"position", Physics::RigidBody::lposition},
             {"orientation", Physics::RigidBody::lorientation},
             {"linearVelocity", Physics::RigidBody::llinearVelocity},
@@ -125,9 +125,7 @@ int Physics::RigidBody::lcreate(lua_State *)
     shape->calculateLocalInertia(mass, inertia);
     
     btRigidBody *body = new btRigidBody(mass, motionState, shape, inertia);
-    
-    //body->setCollisionFlags(body->getCollisionFlags() | btRigidBody::CF_NO_CONTACT_RESPONSE);
-    
+        
     Physics::GetInstance()->world_->addRigidBody(body);
     
     LuaManager::GetInstance()->addParam((void *)body);
@@ -139,6 +137,24 @@ int Physics::RigidBody::lcreate(lua_State *)
 
 int Physics::RigidBody::ldestroy(lua_State *)
 {
+    return 0;
+}
+
+int Physics::RigidBody::lsetTrigger(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    
+    bool trigger;
+    LuaManager::GetInstance()->extractParam(&trigger);
+    
+    if (trigger) {
+        body->setCollisionFlags(body->getCollisionFlags() | btRigidBody::CF_NO_CONTACT_RESPONSE);
+    }
+    else {
+        body->setCollisionFlags(body->getCollisionFlags() & ~btRigidBody::CF_NO_CONTACT_RESPONSE);
+    }
+    
     return 0;
 }
 

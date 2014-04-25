@@ -29,6 +29,8 @@ private:
         static int lcreate(lua_State *);
         static int ldestroy(lua_State *);
         
+        static int lsetTrigger(lua_State *);
+        
         static int lposition(lua_State *);
         static int lorientation(lua_State *);
         static int llinearVelocity(lua_State *);

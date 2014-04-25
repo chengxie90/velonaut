@@ -13,18 +13,19 @@ Object = class()
 function Object:_init(name)
     self._components = {}
     self._started = false
-    self.name = name
+    self._name = name
+end
+
+function Object:name()
+    return self._name
 end
 
 function Object:load(data)
-
     for _, componentData in ipairs(data.components) do
-
         local typename = componentData.type
         local comp = self:addComponent(typename)
         comp:load(componentData)
     end
-
 end
 
 function Object:start()

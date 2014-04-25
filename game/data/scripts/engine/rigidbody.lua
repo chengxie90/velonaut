@@ -19,8 +19,10 @@ end
 function RigidBody:load(data)
     if data.shape == "box" then
         self._handle = phyrigidbody.create(data.mass, data.shape, data.boxHalfExtents)
-        handlemap[self._handle] = self	
+        handlemap[self._handle] = self
     end
+    assert(self._handle)
+    if data.trigger then phyrigidbody.setTrigger(self._handle, data.trigger) end
 end
 
 function RigidBody:start()
@@ -39,6 +41,10 @@ function RigidBody:onCollision(collision)
     for _, c in ipairs(behaviors) do
         c:onCollision(collision)
     end
+end
+
+function RigidBody:setTrigger(trigger)
+    
 end
 
 function RigidBody:position()

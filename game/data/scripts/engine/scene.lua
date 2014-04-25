@@ -13,7 +13,6 @@ function Scene:_init(data)
 end
 
 function Scene:loadPlayers(players, playerId)
-
 	local ringSampleIndex = 0
 	local initRadius = 65
 	local tangent = Vector(0,0,-1)
@@ -30,8 +29,6 @@ function Scene:loadPlayers(players, playerId)
 		else
 			prefab = "remoteplayer"
 		end
-
-		
 
 		local obj = self:createObject(name)
         local data = loadDataFile(prefab, "object")
@@ -55,7 +52,6 @@ function Scene:loadPlayers(players, playerId)
     end	
 
 	self:setMainCamera(self:findObject(self.playerName):getComponent("Camera"))	
-
 end
 
 function Scene:load(data)
@@ -91,9 +87,7 @@ function Scene:start()
 end
 
 function Scene:update(dt)
-
     for k, v in pairs(self._objects) do
-		
         v:update(dt)
     end
 end
