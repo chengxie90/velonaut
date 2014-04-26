@@ -83,6 +83,7 @@ void Graphics::initLua()
     LuaManager::GetInstance()->requiref("engine.graphics.node.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Graphics::Node::lcreate},
+            {"setParent", Graphics::Node::lsetParent},
             {"position", Graphics::Node::lposition},
             {"setPosition", Graphics::Node::lsetPosition},
             {"orientation", Graphics::Node::lorientation},
@@ -252,6 +253,7 @@ void Graphics::initResources()
     ResourceGroupManager& resGroupManager = ResourceGroupManager::getSingleton();
     resGroupManager.addResourceLocation("data/meshes", "FileSystem");
     resGroupManager.addResourceLocation("data/materials", "FileSystem");
+    resGroupManager.addResourceLocation("data/textures", "FileSystem");
     resGroupManager.initialiseAllResourceGroups();
     resGroupManager.loadResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
@@ -371,6 +373,20 @@ int Graphics::Node::lcreate(lua_State *)
     SceneNode* node = Graphics::GetInstance()->scene_->getRootSceneNode()->createChildSceneNode();
     LuaManager::GetInstance()->addParam((void *)node);
     return 1;
+}
+
+int Graphics::Node::lsetParent(lua_State *)
+{
+    SceneNode* parent;
+    LuaManager::GetInstance()->extractParam((void**)&parent);
+    
+    SceneNode* node;
+    LuaManager::GetInstance()->extractParam((void**)&node);
+    
+    node->getParentSceneNode()->removeChild(node);
+    parent->addChild(node);
+    
+    return 0;
 }
 
 int Graphics::Node::lposition(lua_State *)

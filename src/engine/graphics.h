@@ -50,6 +50,8 @@ private:
     
     struct Node {
         static int lcreate(lua_State *);
+        static int lsetParent(lua_State *);
+        
         static int lposition(lua_State *);
         static int lsetPosition(lua_State *);
         static int lorientation(lua_State *);

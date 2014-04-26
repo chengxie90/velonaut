@@ -15,8 +15,7 @@ void Physics::init()
 	solver_ = new btSequentialImpulseConstraintSolver;
 	world_ = new btDiscreteDynamicsWorld(dispatcher_, overlappingPairCache_, solver_, collisionConfiguration_);
     
-    // TODO: 
-    world_->setGravity(btVector3(0, 0, 0));
+    world_->setGravity(btVector3(0, -10, 0));
 }
 
 void Physics::initLua()

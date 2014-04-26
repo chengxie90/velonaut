@@ -53,14 +53,26 @@ function Scene:loadPlayers(players, playerId)
 	self:setMainCamera(self:findObject(self.playerName):getComponent("Camera"))	
 end
 
+function Scene:_loadObjectData(data)
+    local name = data.name
+    local prefab = data.prefab
+    assert(name and name ~= "")
+    local obj = self:createObject(name)
+    local prefabData = loadDataFile(data.prefab, "object")
+    obj:load(prefabData)
+    if data.children then
+        for _, objData in ipairs(data.children) do
+            local child = self:_loadObjectData(objData)
+            child:transform():setParent(obj:transform())
+        end
+    end
+    return obj
+end
+
 function Scene:load(data)
+    assert(data.objects)
     for _, objectData in ipairs(data.objects) do
-        local name = objectData.name
-        local prefab = objectData.prefab
-        assert(name and name ~= "")
-        local obj = self:createObject(name)
-        local data = loadDataFile(objectData.prefab, "object")
-        obj:load(data)
+        self:_loadObjectData(objectData)
     end
 
     local obj = self:findObject(data.mainCamera)
@@ -99,7 +111,6 @@ function Scene:createObject(name)
     assert(self._objects[name] == nil)
     local obj = Object(name)
     self._objects[name] = obj
-    if self._started then obj:start() end
     return obj
 end
 
