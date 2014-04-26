@@ -9,20 +9,21 @@ return
 			name = "initcam",
 			prefab = "initcam"
 		},
-
         {
             name = "tunnel",
             prefab = "tunnel"
-        }
---[[
+        },
         {
             name = "box1",
-            prefab = "cube"
+            prefab = "cube",
+            children = {
+                {
+                    name = "box2",
+                    prefab = "sphere"
+                },
+            }
         },
-        {
-            name = "box2",
-            prefab = "sphere"
-        },
+--[[
         {
             name = "player",
             prefab = "player"

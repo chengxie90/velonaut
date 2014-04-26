@@ -9,8 +9,7 @@ Input::Input()
 
 void Input::init()
 {
-    dictionary_ = std::map<uint, std::string>();
-    FillDictionary();
+    fillDictionary();
 }
 
 void Input::update()
@@ -49,7 +48,6 @@ void Input::update()
         if (e.type == SDL_MOUSEMOTION) {
             for (int i = 0; i < listeners_.size(); ++i) {
                 listeners_[i]->onMouseMove(e);
-
             }
         }
     }
@@ -64,16 +62,12 @@ void Input::addListener(InputListener *listener) {
     listeners_.push_back(listener);
 }
 
-void Input::callListeners() {
-
-}
-
 Input *Input::GetInstance()
 {
     return App::GetApp()->GetInput();
 }
 
-void Input::FillDictionary()
+void Input::fillDictionary()
 {
     dictionary_[SDL_BUTTON_LEFT]    = "mouse_left";
     dictionary_[SDL_BUTTON_RIGHT]   = "mouse_right";

@@ -23,10 +23,6 @@ function App.start()
 
 	App.gamestarted = false
 
-	for i = 1, 3 do
-		print(i)
-	end
-
     local config = dofile("./data/game.config")
     App.loadScene(config.scene)
 

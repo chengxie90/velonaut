@@ -15,17 +15,17 @@ public:
     void addListener( InputListener* listener );
 
     static Input* GetInstance();
-
+    
     std::map<uint, std::string> dictionary_;
     
 private:
     friend class App;
     SINGLETON(Input)
 
-    void FillDictionary();
-
-    void callListeners();
+    void fillDictionary();
+    
     std::vector<InputListener*> listeners_;
+    
 };
 
 #endif // INPUT_H

@@ -11,7 +11,6 @@ function Cube:update(dt)
 end
 
 function Cube:onCollision(collision)
-    print(111)
     local obj = collision.rigidbody:owner()
     obj:destroy()
 end

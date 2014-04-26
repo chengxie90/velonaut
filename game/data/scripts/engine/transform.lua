@@ -30,6 +30,10 @@ function Transform:update()
 
 end
 
+function Transform:setParent(parent)
+    gfxnode.setParent(parent._handle, self._handle)
+end
+
 function Transform:position()
     return self._position
 end
