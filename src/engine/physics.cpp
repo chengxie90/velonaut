@@ -262,6 +262,7 @@ int Physics::RigidBody::lsetPosition(lua_State *)
 
     trans.setOrigin(pos);
 
+    body->activate(true);
     body->setCenterOfMassTransform(trans);
 
     btMotionState* ms = body->getMotionState();
@@ -282,6 +283,7 @@ int Physics::RigidBody::lsetOrientation(lua_State *)
     btTransform trans;
     trans = body->getCenterOfMassTransform();
 
+    body->activate(true);
     trans.setRotation(orientation);
 
     body->setCenterOfMassTransform(trans);
@@ -299,6 +301,7 @@ int Physics::RigidBody::lsetLinearVelocity(lua_State *)
     LuaManager::GetInstance()->extractParam((void **)&body);
     LuaManager::GetInstance()->extractParam(&velocity);
 
+    body->activate(true);
     body->setLinearVelocity(velocity);
 
     return 0;
@@ -311,6 +314,7 @@ int Physics::RigidBody::lsetAngularVelocity(lua_State *)
     LuaManager::GetInstance()->extractParam((void **)&body);
     LuaManager::GetInstance()->extractParam(&velocity);
 
+    body->activate(true);
     body->setAngularVelocity(velocity);
 
     return 0;
@@ -325,6 +329,7 @@ int Physics::RigidBody::lsetDamping(lua_State *)
     LuaManager::GetInstance()->extractParam(&linearDamping);
     LuaManager::GetInstance()->extractParam(&angularDamping);
 
+    body->activate(true);
     body->setDamping(linearDamping, angularDamping);
 
     return 0;

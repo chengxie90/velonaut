@@ -4,16 +4,16 @@ require "engine.mesh"
 require "engine.meshbuilder"
 require "engine.meshrenderer"
 
-Checkpoint = class(Behavior)
+FinishLine = class(Behavior)
 
-function Checkpoint:start()
-
-end
-
-function Checkpoint:update()
+function FinishLine:start()
 
 end
 
-function Checkpoint:onCollision(collision)
+function FinishLine:update()
+
+end
+
+function FinishLine:onCollision(collision)
 
 end

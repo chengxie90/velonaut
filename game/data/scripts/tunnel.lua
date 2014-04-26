@@ -25,20 +25,20 @@ function Tunnel:_init(object)
 	-- Members
 	self._tunnel = {} -- Each row of table is a table with 3 vectors: position, tangent, normal
 	self._checkpoints = {} -- For convenience. Each row of table is a table with 3 vectors: position, tangent, normal
-	self._numCurves = 4
+	self._numCurves = 3
 	self._tunnelRadius = 100
 	self._ringsPerCurve = 80
 	self._samplesPerRing = 30
-	self._samplesPerCheckpoint = 20
-	self._tunnelSeed = 666 --TODO: set seed globally somewhere else
+	self._samplesPerCheckpoint = 10
+	self._tunnelSeed = 7243897024 --TODO: set seed globally somewhere else
 
 	-- Params
 	local minStartRadius = 500
 	local maxStartRadius = 550
 	local minControlRadius = 6000
 	local maxControlRadius = 8000
-	local minAnchorRadius = 1000
-	local maxAnchorRadius = 1050
+	local minAnchorRadius = 500
+	local maxAnchorRadius = 550
 
 	-- Set seed and create table of curves
 	math.randomseed(self._tunnelSeed)
@@ -134,7 +134,7 @@ function Tunnel:_init(object)
 	local checkpointIndex = 1
 	local countIndex = 1
 	while checkpointIndex*self._samplesPerCheckpoint < #self._tunnel do
-		if checkpointIndex ~= 2 and checkpointIndex ~= 3 then
+		if checkpointIndex == 1 or checkpointIndex > 7 then
 			self._checkpoints[countIndex] = self._tunnel[checkpointIndex*self._samplesPerCheckpoint]
 			countIndex = countIndex + 1
 		end
@@ -155,13 +155,17 @@ function Tunnel:getClosestSamplePosition(position)
 	local minDist = math.huge
 	local minInd = 0	
 	for i = 1, #self._tunnel do
-		local newDist = (self._tunnel[i][1] - position).length()
+		local newDist = (self._tunnel[i][1] - position):length()
 		if (newDist < minDist) then 
 			minDist = newDist
 			minInd = i
 		end
 	end
 	return {["position"] = self._tunnel[minInd][1], ["distance"] = minDist}
+end
+
+function Tunnel:tunnelRadius()
+	return self._tunnelRadius
 end
 
 function Tunnel:getSamplePosition(sampleIndex)

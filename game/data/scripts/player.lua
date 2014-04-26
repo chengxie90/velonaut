@@ -15,7 +15,8 @@ function Player:start()
 
 	-- Create first checkpoint 
 	self._nextCheckpoint = 1
-	self:createNextCheckpoint();
+	self:createNextCheckpoint();self.RigidBody = self:getComponent("RigidBody")
+	self.Transform = self:getComponent("Transform")
 end
 
 function Player:createNextCheckpoint()
@@ -43,6 +44,28 @@ function Player:createNextCheckpoint()
 		obj:getComponent("RigidBody"):setOrientation(startOri)
 
 		self._nextCheckpoint = self._nextCheckpoint + 1
+	elseif self._nextCheckpoint == tun:getNumCheckpoints()+1 then
+		print("making finishline")
+		local name = "finishline"
+		local prefab = "finishline"
+
+		local obj = App.scene():createObject(name)
+		local data = loadDataFile(prefab, "object")	
+		obj:load(data)
+		obj:start()
+
+		local startPos = tun:getCheckpointPosition(1)
+		local startTan = tun:getCheckpointTangent(1):getNormalized()
+
+		local angle = Vector(0,0,-1):angleBetween(startTan)
+		local axis = Vector(0,0,-1):cross(startTan)
+		local startOri = Vector(0, 0, 0, 0)
+		startOri:makeQuaternionFromAngleAxis(angle, axis)
+
+		obj:transform():setPosition(startPos)
+		obj:transform():setOrientation(startOri)
+		obj:getComponent("RigidBody"):setPosition(startPos)		
+		obj:getComponent("RigidBody"):setOrientation(startOri)
 	end
 end
 
@@ -56,12 +79,23 @@ end
 
 function Player:update(dt)
 
-	local look = self.Transform:localZ() * -1
-	local up = self.Transform:localY()
-	local right = -self.Transform:localX() * -1
+	local cammantrans = App.scene():findObject("cameraman"):getComponent("Transform")
+	local thrust = self:transform():localZ() * -1
+	local look = cammantrans:localZ() * -1
+	local up = cammantrans:localY()
+	local right = cammantrans:localX()
 
 	local rotScale = 300
 	local linScale = 800
+	
+	local inTun = true
+	--[[
+	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")
+	local tunnelDist = tun:getClosestSamplePosition(self.Transform:position())
+	if tunnelDist.distance > (tun:tunnelRadius() * 1.1) then 
+		inTun = false
+	end
+	--]]
 
 	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * rotScale) end
 	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * -rotScale) end
@@ -69,9 +103,12 @@ function Player:update(dt)
 	if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
 	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
 	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
-	if Input.getKey("key_space") then self.RigidBody:applyCentralForce(look * linScale) end
+	if Input.getKey("key_space") and inTun then self.RigidBody:applyCentralForce(thrust * linScale) end
 
 	self:sendPhysics()
+
+		
+	
 
 end
 

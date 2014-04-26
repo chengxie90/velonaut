@@ -1,0 +1,26 @@
+return 
+{
+    components = 
+    {
+        {
+            type = "Transform"
+        },        
+        {
+            type = "Camera",
+            near = 0.1,
+            far = 10000,
+            fov = 45,
+        },
+        {
+            type = "RigidBody",
+            shape = "box",
+            mass = 1,
+            boxHalfExtents = Vector(1, 1, 1),
+            trigger = true
+        },
+        {
+            type = "CameraMan"
+        }  
+
+    }
+}

@@ -1,0 +1,18 @@
+material skybox2
+{
+	technique
+	{
+		pass
+		{
+			fog_override true none
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture fronttron.jpg backtron.jpg lefttron.jpg righttron.jpg uptron.jpg downtron.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
