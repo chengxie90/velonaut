@@ -17,13 +17,19 @@ return
         {
             name = "box1",
             prefab = "cube",
-            children = {
-                {
-                    name = "box2",
-                    prefab = "sphere"
-                },
-            }
         },
+<<<<<<< HEAD
+        {
+            name = "box2",
+            prefab = "sphere"
+        },
+        {
+            name = "projectile",
+            prefab = "projectile"
+        }
+--[[
+=======
+>>>>>>> 44acf6191ab5b1aa66809007a6882a24076aff17
         {
             name = "player",
             prefab = "player"

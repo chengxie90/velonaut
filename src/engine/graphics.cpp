@@ -25,13 +25,11 @@ void Graphics::init()
     
 #ifdef __APPLE__
     root_->loadPlugin("RenderSystem_GL");
+    root_->loadPlugin("Plugin_ParticleFX");
 #elif __LINUX__
     // TODO: fix Linux path problem
-    char* buffer = new char[1024];
-    getcwd(buffer, 1024);
-    std::cout << buffer << std::endl;
-    delete buffer;
     root_->loadPlugin("./Linux/Debug/RenderSystem_GL.so");
+    root_->loadPlugin("./Linux/Debug/Plugin_ParticleFX_d.so");
 #endif
     
     RenderSystem* renderer = root_->getAvailableRenderers()[0];
@@ -179,6 +177,15 @@ void Graphics::initLua()
         LuaManager::GetInstance()->addlib(reg);
         return 1;
     });
+    
+    LuaManager::GetInstance()->requiref("engine.graphics.particle.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"create", Graphics::Particle::lcreate},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
 }
 
 void Graphics::render()
@@ -256,6 +263,7 @@ void Graphics::initResources()
     resGroupManager.addResourceLocation("data/meshes", "FileSystem");
     resGroupManager.addResourceLocation("data/materials", "FileSystem");
     resGroupManager.addResourceLocation("data/textures", "FileSystem");
+    resGroupManager.addResourceLocation("data/particles", "FileSystem");
     resGroupManager.initialiseAllResourceGroups();
     resGroupManager.loadResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
@@ -456,7 +464,7 @@ int Graphics::Node::llookAt(lua_State *)
 int Graphics::Node::lattachObject(lua_State *)
 {
     SceneNode* node;
-    Ogre::Camera* obj;
+    Ogre::MovableObject* obj;
     LuaManager::GetInstance()->extractParam((void**)&node);
     LuaManager::GetInstance()->extractParam((void**)&obj);
     assert(node);
@@ -764,6 +772,24 @@ int Graphics::VQHelper::langleBetween(lua_State *)
     LuaManager::GetInstance()->addParam(angle);
 
     return 1;
+}
+
+int Graphics::Particle::lcreate(lua_State *)
+{
+    static string name = "particle";
+    static int count = 0;
+    
+    string prefab;
+    LuaManager::GetInstance()->extractParam(&prefab);
+    
+    ParticleSystem* ps = Graphics::GetInstance()->scene_->createParticleSystem(name + std::to_string(count++), prefab);
+    
+    MovableObject *obj = static_cast<MovableObject*>(ps);
+
+    LuaManager::GetInstance()->addParam((void *)obj);
+    
+    return 1;
+    
 }
 
 int Graphics::VQHelper::lrotationTo(lua_State *)
