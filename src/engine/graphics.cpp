@@ -29,6 +29,7 @@ void Graphics::init()
 #elif __LINUX__
     // TODO: fix Linux path problem
     root_->loadPlugin("./Linux/Debug/RenderSystem_GL.so");
+    root_->loadPlugin("./Linux/Debug/Plugin_ParticleFX_d.so");
 #endif
     
     RenderSystem* renderer = root_->getAvailableRenderers()[0];
