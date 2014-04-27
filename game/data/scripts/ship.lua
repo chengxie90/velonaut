@@ -14,3 +14,11 @@ end
 function Ship:update(dt)
 
 end
+
+function Ship:useItem(item)
+	--[[
+	if (item == "boost") then
+		local vel = self:owner():getComponent("RigidBody"):linearVelocity()
+		--]]
+
+end

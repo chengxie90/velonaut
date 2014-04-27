@@ -22,7 +22,11 @@ return
             type = "Camera",
             near = 0.1,
             far = 10000,
-            fov = 45,
+            fov = 45
+        },
+        {
+            type = "MeshRenderer",
+            mesh = "ship",
         },
         {
             type = "Player"

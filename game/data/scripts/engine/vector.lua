@@ -169,6 +169,19 @@ function Vector:makeQuaternionFromAngleAxis(angle, axis)
 	end
 end
 
+function Vector.rotationTo(v1, v2)
+    assert(#v1 == 3)
+    assert(#v2 == 3)
+    return gfxvqhelper.rotationTo(v1, v2)
+end
+
+function Vector.rotationBy(q, v)
+    assert(#q == 4)
+    assert(#v == 3)
+    return gfxvqhelper.rotationBy(q, v)
+end
+
+
 local function test()
     local v1 = Vector(1, 2, 3)
     local v2 = Vector(2, 3, 4)

@@ -25,20 +25,22 @@ function Tunnel:_init(object)
 	-- Members
 	self._tunnel = {} -- Each row of table is a table with 3 vectors: position, tangent, normal
 	self._checkpoints = {} -- For convenience. Each row of table is a table with 3 vectors: position, tangent, normal
-	self._numCurves = 4
+	self._pickups = {}
+	self._numCurves = 3
 	self._tunnelRadius = 100
 	self._ringsPerCurve = 80
 	self._samplesPerRing = 30
-	self._samplesPerCheckpoint = 20
-	self._tunnelSeed = 666 --TODO: set seed globally somewhere else
+	self._samplesPerCheckpoint = 10
+	self._samplesPerPickup = 65
+	self._tunnelSeed = 7243897024 --TODO: set seed globally somewhere else
 
 	-- Params
 	local minStartRadius = 500
 	local maxStartRadius = 550
 	local minControlRadius = 6000
 	local maxControlRadius = 8000
-	local minAnchorRadius = 1000
-	local maxAnchorRadius = 1050
+	local minAnchorRadius = 500
+	local maxAnchorRadius = 550
 
 	-- Set seed and create table of curves
 	math.randomseed(self._tunnelSeed)
@@ -134,11 +136,18 @@ function Tunnel:_init(object)
 	local checkpointIndex = 1
 	local countIndex = 1
 	while checkpointIndex*self._samplesPerCheckpoint < #self._tunnel do
-		if checkpointIndex ~= 2 and checkpointIndex ~= 3 then
+		if checkpointIndex == 1 or checkpointIndex > 7 then
 			self._checkpoints[countIndex] = self._tunnel[checkpointIndex*self._samplesPerCheckpoint]
 			countIndex = countIndex + 1
 		end
 		checkpointIndex = checkpointIndex + 1
+	end
+
+		-- Add specific samples to pickups member for convenience
+	local pickupIndex = 1
+	while pickupIndex*self._samplesPerPickup < #self._tunnel do
+		self._pickups[pickupIndex] = self._tunnel[pickupIndex*self._samplesPerPickup]
+		pickupIndex = pickupIndex + 1
 	end
 
 end
@@ -155,13 +164,17 @@ function Tunnel:getClosestSamplePosition(position)
 	local minDist = math.huge
 	local minInd = 0	
 	for i = 1, #self._tunnel do
-		local newDist = (self._tunnel[i][1] - position).length()
+		local newDist = (self._tunnel[i][1] - position):length()
 		if (newDist < minDist) then 
 			minDist = newDist
 			minInd = i
 		end
 	end
 	return {["position"] = self._tunnel[minInd][1], ["distance"] = minDist}
+end
+
+function Tunnel:tunnelRadius()
+	return self._tunnelRadius
 end
 
 function Tunnel:getSamplePosition(sampleIndex)
@@ -173,6 +186,7 @@ function Tunnel:getSampleTangent(sampleIndex)
 end
 
 function Tunnel:getSampleNormal(sampleIndex)
+	local rad = math.random(0,0.8*self._tunnelRadius)
 	return self._tunnel[sampleIndex][3]
 end
 
@@ -194,4 +208,28 @@ end
 
 function Tunnel:getNumCheckpoints()
 	return #self._checkpoints
+end
+
+function Tunnel:getPickupPosition(pickupIndex)
+	local center = self._pickups[pickupIndex][1]
+	local tangent = self._pickups[pickupIndex][2]
+	local normal = self._pickups[pickupIndex][3]
+	local rad = math.random(0,0.8*self._tunnelRadius)
+	local ang = math.random(0,2*math.pi)
+
+	return center + (normal * (math.cos(ang) * rad)) + 
+						((tangent:cross(normal):getNormalized()) * (math.sin(ang) * rad))
+
+end
+
+function Tunnel:getPickupTangent(pickupIndex)
+	return self._pickups[pickupIndex][2]
+end
+
+function Tunnel:getPickupNormal(pickupIndex)
+	return self._pickups[pickupIndex][3]
+end
+
+function Tunnel:getNumPickups()
+	return #self._pickups
 end
