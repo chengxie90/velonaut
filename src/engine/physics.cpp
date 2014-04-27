@@ -15,7 +15,6 @@ void Physics::init()
 	solver_ = new btSequentialImpulseConstraintSolver;
 	world_ = new btDiscreteDynamicsWorld(dispatcher_, overlappingPairCache_, solver_, collisionConfiguration_);
     
-    // TODO: 
     world_->setGravity(btVector3(0, 0, 0));
 }
 
@@ -24,16 +23,22 @@ void Physics::initLua()
     LuaManager::GetInstance()->requiref("engine.physics.rigidbody.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Physics::RigidBody::lcreate},
-
+            {"destroy", Physics::RigidBody::ldestroy},
+            
+            {"setTrigger", Physics::RigidBody::lsetTrigger},
+            
             {"position", Physics::RigidBody::lposition},
             {"orientation", Physics::RigidBody::lorientation},
+            
             {"linearVelocity", Physics::RigidBody::llinearVelocity},
             {"angularVelocity", Physics::RigidBody::langularVelocity},
+            
             {"force", Physics::RigidBody::lforce},
             {"torque", Physics::RigidBody::ltorque},
 
             {"setPosition", Physics::RigidBody::lsetPosition},
             {"setOrientation", Physics::RigidBody::lsetOrientation},
+            
             {"setLinearVelocity", Physics::RigidBody::lsetLinearVelocity},
             {"setAngularVelocity", Physics::RigidBody::lsetAngularVelocity},
             {"setDamping", Physics::RigidBody::lsetDamping},
@@ -55,10 +60,35 @@ void Physics::update(float dt)
     
     int numManifolds = world_->getDispatcher()->getNumManifolds();
 
+    for (int i = 0; i < numManifolds; i++) {
+        btPersistentManifold* contactManifold =  world_->getDispatcher()->getManifoldByIndexInternal(i);
+        const btRigidBody* obA = static_cast<const btRigidBody*>(contactManifold->getBody0());
+        const btRigidBody* obB = static_cast<const btRigidBody*>(contactManifold->getBody1());
+        
+        btVector3 p = {0, 0, 0};
+        int numContacts = contactManifold->getNumContacts();
+        int count = 0;
+        for (int j = 0; j < numContacts; j++)
+        {
+            btManifoldPoint& pt = contactManifold->getContactPoint(j);
+            if (pt.getDistance() < 0.f)
+            {
+                const btVector3& ptA = pt.getPositionWorldOnA();
+                p += ptA;
+                count += 1;
+//                const btVector3& ptB = pt.getPositionWorldOnB();
+//                const btVector3& normalOnB = pt.m_normalWorldOnB;
+            }
+        }
 
-
-    btCollisionObject* obj = world_->getCollisionObjectArray()[0];
-    btRigidBody* rObj = (btRigidBody*) obj;
+        p /= count;
+        
+        LuaManager::GetInstance()->addFunction("RigidBody._onGlobalCollision");
+        LuaManager::GetInstance()->addParamReg((void *)obA);
+        LuaManager::GetInstance()->addParamReg((void *)obB);
+        LuaManager::GetInstance()->addParam(p);
+        LuaManager::GetInstance()->pCall(3);
+    }
 }
 
 void Physics::shutdown()
@@ -100,18 +130,43 @@ int Physics::RigidBody::lcreate(lua_State *)
     shape->calculateLocalInertia(mass, inertia);
     
     btRigidBody *body = new btRigidBody(mass, motionState, shape, inertia);
-    
-    //body->setCollisionFlags(body->getCollisionFlags() | btRigidBody::CF_NO_CONTACT_RESPONSE);
-    
+        
     Physics::GetInstance()->world_->addRigidBody(body);
     
     LuaManager::GetInstance()->addParam((void *)body);
+    
+    LuaManager::GetInstance()->setReg((void *)body);
     
     return 1;
 }
 
 int Physics::RigidBody::ldestroy(lua_State *)
 {
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+
+    Physics::GetInstance()->world_->removeRigidBody(body);
+    delete body->getCollisionShape();
+    delete body;
+    
+    return 0;
+}
+
+int Physics::RigidBody::lsetTrigger(lua_State *)
+{
+    btRigidBody *body;
+    LuaManager::GetInstance()->extractParam((void **)&body);
+    
+    bool trigger;
+    LuaManager::GetInstance()->extractParam(&trigger);
+    
+    if (trigger) {
+        body->setCollisionFlags(body->getCollisionFlags() | btRigidBody::CF_NO_CONTACT_RESPONSE);
+    }
+    else {
+        body->setCollisionFlags(body->getCollisionFlags() & ~btRigidBody::CF_NO_CONTACT_RESPONSE);
+    }
+    
     return 0;
 }
 
@@ -206,6 +261,7 @@ int Physics::RigidBody::lsetPosition(lua_State *)
 
     trans.setOrigin(pos);
 
+    body->activate(true);
     body->setCenterOfMassTransform(trans);
 
     btMotionState* ms = body->getMotionState();
@@ -226,6 +282,7 @@ int Physics::RigidBody::lsetOrientation(lua_State *)
     btTransform trans;
     trans = body->getCenterOfMassTransform();
 
+    body->activate(true);
     trans.setRotation(orientation);
 
     body->setCenterOfMassTransform(trans);
@@ -243,6 +300,7 @@ int Physics::RigidBody::lsetLinearVelocity(lua_State *)
     LuaManager::GetInstance()->extractParam((void **)&body);
     LuaManager::GetInstance()->extractParam(&velocity);
 
+    body->activate(true);
     body->setLinearVelocity(velocity);
 
     return 0;
@@ -255,6 +313,7 @@ int Physics::RigidBody::lsetAngularVelocity(lua_State *)
     LuaManager::GetInstance()->extractParam((void **)&body);
     LuaManager::GetInstance()->extractParam(&velocity);
 
+    body->activate(true);
     body->setAngularVelocity(velocity);
 
     return 0;
@@ -269,6 +328,7 @@ int Physics::RigidBody::lsetDamping(lua_State *)
     LuaManager::GetInstance()->extractParam(&linearDamping);
     LuaManager::GetInstance()->extractParam(&angularDamping);
 
+    body->activate(true);
     body->setDamping(linearDamping, angularDamping);
 
     return 0;

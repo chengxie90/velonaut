@@ -25,13 +25,11 @@ void Graphics::init()
     
 #ifdef __APPLE__
     root_->loadPlugin("RenderSystem_GL");
+    root_->loadPlugin("Plugin_ParticleFX");
 #elif __LINUX__
     // TODO: fix Linux path problem
-    char* buffer = new char[1024];
-    getcwd(buffer, 1024);
-    std::cout << buffer << std::endl;
-    delete buffer;
     root_->loadPlugin("./Linux/Debug/RenderSystem_GL.so");
+    root_->loadPlugin("./Linux/Debug/Plugin_ParticleFX_d.so");
 #endif
     
     RenderSystem* renderer = root_->getAvailableRenderers()[0];
@@ -83,15 +81,17 @@ void Graphics::initLua()
     LuaManager::GetInstance()->requiref("engine.graphics.node.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Graphics::Node::lcreate},
+            {"setParent", Graphics::Node::lsetParent},
             {"position", Graphics::Node::lposition},
             {"setPosition", Graphics::Node::lsetPosition},
             {"orientation", Graphics::Node::lorientation},
             {"setOrientation", Graphics::Node::lsetOrientation},
             {"attachObject", Graphics::Node::lattachObject},
+            {"detachObject", Graphics::Node::ldetachObject},
             {"lookAt", Graphics::Node::llookAt},
-            {"localX", Graphics::Node::lgetLocalX},
-            {"localY", Graphics::Node::lgetLocalY},
-            {"localZ", Graphics::Node::lgetLocalZ},
+            {"localX", Graphics::Node::llocalX},
+            {"localY", Graphics::Node::llocalY},
+            {"localZ", Graphics::Node::llocalZ},
             {"setScale", Graphics::Node::lsetScale},
             {NULL, NULL}
         };
@@ -159,6 +159,28 @@ void Graphics::initLua()
             {"normal", Graphics::MeshBuilder::lnormal},
             {"index", Graphics::MeshBuilder::lindex},
             {"getMesh", Graphics::MeshBuilder::lgetMesh},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
+
+    LuaManager::GetInstance()->requiref("engine.graphics.vqhelper.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"getQuaternionFromAxes", Graphics::VQHelper::lgetQuaternionFromAxes},
+            {"getQuaternionFromAngleAxis", Graphics::VQHelper::lgetQuaternionFromAngleAxis},
+            {"angleBetween", Graphics::VQHelper::langleBetween},
+            {"rotationTo", Graphics::VQHelper::lrotationTo},
+            {"applyRotationTo", Graphics::VQHelper::lapplyRotationTo},
+            {NULL, NULL}
+        };
+        LuaManager::GetInstance()->addlib(reg);
+        return 1;
+    });
+    
+    LuaManager::GetInstance()->requiref("engine.graphics.particle.c", [](lua_State* state) {
+        luaL_Reg reg[] = {
+            {"create", Graphics::Particle::lcreate},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -240,6 +262,8 @@ void Graphics::initResources()
     ResourceGroupManager& resGroupManager = ResourceGroupManager::getSingleton();
     resGroupManager.addResourceLocation("data/meshes", "FileSystem");
     resGroupManager.addResourceLocation("data/materials", "FileSystem");
+    resGroupManager.addResourceLocation("data/textures", "FileSystem");
+    resGroupManager.addResourceLocation("data/particles", "FileSystem");
     resGroupManager.initialiseAllResourceGroups();
     resGroupManager.loadResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 }
@@ -247,6 +271,7 @@ void Graphics::initResources()
 int Graphics::Scene::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->root_->createSceneManager(Ogre::ST_GENERIC);
+    //scene->setSkyBox(true, "skybox2");
     scene->setSkyDome(true, "skybox", 1, 1, 5000, true);
     LuaManager::GetInstance()->addParam((void *)scene);
     return 1;
@@ -361,6 +386,20 @@ int Graphics::Node::lcreate(lua_State *)
     return 1;
 }
 
+int Graphics::Node::lsetParent(lua_State *)
+{
+    SceneNode* parent;
+    LuaManager::GetInstance()->extractParam((void**)&parent);
+    
+    SceneNode* node;
+    LuaManager::GetInstance()->extractParam((void**)&node);
+    
+    node->getParentSceneNode()->removeChild(node);
+    parent->addChild(node);
+    
+    return 0;
+}
+
 int Graphics::Node::lposition(lua_State *)
 {
     SceneNode *node;
@@ -425,12 +464,24 @@ int Graphics::Node::llookAt(lua_State *)
 int Graphics::Node::lattachObject(lua_State *)
 {
     SceneNode* node;
-    Ogre::Camera* obj;
+    Ogre::MovableObject* obj;
     LuaManager::GetInstance()->extractParam((void**)&node);
     LuaManager::GetInstance()->extractParam((void**)&obj);
     assert(node);
     assert(obj);
     node->attachObject(obj);
+    return 0;
+}
+
+int Graphics::Node::ldetachObject(lua_State *)
+{
+    SceneNode* node;
+    Ogre::Camera* obj;
+    LuaManager::GetInstance()->extractParam((void**)&node);
+    LuaManager::GetInstance()->extractParam((void**)&obj);
+    assert(node);
+    assert(obj);
+    node->detachObject(obj);
     return 0;
 }
 
@@ -445,7 +496,7 @@ int Graphics::Node::lsetScale(lua_State *)
     return 0;
 }
 
-int Graphics::Node::lgetLocalX(lua_State *)
+int Graphics::Node::llocalX(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);
@@ -459,7 +510,7 @@ int Graphics::Node::lgetLocalX(lua_State *)
     return 1;
 }
 
-int Graphics::Node::lgetLocalY(lua_State *)
+int Graphics::Node::llocalY(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);
@@ -473,7 +524,7 @@ int Graphics::Node::lgetLocalY(lua_State *)
     return 1;
 }
 
-int Graphics::Node::lgetLocalZ(lua_State *)
+int Graphics::Node::llocalZ(lua_State *)
 {
     SceneNode* node;
     LuaManager::GetInstance()->extractParam((void **)&node);
@@ -672,5 +723,101 @@ int Graphics::MeshBuilder::lgetMesh(lua_State *)
     
     LuaManager::GetInstance()->addParam((void *)p);
     
+    return 1;
+}
+
+int Graphics::VQHelper::lgetQuaternionFromAxes(lua_State *)
+{
+    Ogre::Vector3 x;
+    LuaManager::GetInstance()->extractParam(&x);
+
+    Ogre::Vector3 y;
+    LuaManager::GetInstance()->extractParam(&y);
+
+    Ogre::Vector3 z;
+    LuaManager::GetInstance()->extractParam(&z);
+
+    Ogre::Quaternion q = Ogre::Quaternion(x, y, z);
+
+    LuaManager::GetInstance()->addParam(q);
+
+    return 1;
+}
+
+int Graphics::VQHelper::lgetQuaternionFromAngleAxis(lua_State *)
+{
+    double angle;
+    LuaManager::GetInstance()->extractParam(&angle);
+
+    Ogre::Vector3 axis;
+    LuaManager::GetInstance()->extractParam(&axis);
+
+    Ogre::Quaternion q = Ogre::Quaternion(Ogre::Radian(angle), axis);
+
+    LuaManager::GetInstance()->addParam(q);
+
+    return 1;
+}
+
+int Graphics::VQHelper::langleBetween(lua_State *)
+{
+    Ogre::Vector3 v1;
+    LuaManager::GetInstance()->extractParam(&v1);
+
+    Ogre::Vector3 v2;
+    LuaManager::GetInstance()->extractParam(&v2);
+
+    double angle = (v1.angleBetween(v2)).valueRadians();
+
+    LuaManager::GetInstance()->addParam(angle);
+
+    return 1;
+}
+
+int Graphics::Particle::lcreate(lua_State *)
+{
+    static string name = "particle";
+    static int count = 0;
+    
+    string prefab;
+    LuaManager::GetInstance()->extractParam(&prefab);
+    
+    ParticleSystem* ps = Graphics::GetInstance()->scene_->createParticleSystem(name + std::to_string(count++), prefab);
+    
+    MovableObject *obj = static_cast<MovableObject*>(ps);
+
+    LuaManager::GetInstance()->addParam((void *)obj);
+    
+    return 1;
+    
+}
+
+int Graphics::VQHelper::lrotationTo(lua_State *)
+{
+    Ogre::Vector3 v1;
+    LuaManager::GetInstance()->extractParam(&v1);
+
+    Ogre::Vector3 v2;
+    LuaManager::GetInstance()->extractParam(&v2);
+
+    Ogre::Quaternion q = v1.getRotationTo(v2);
+
+    LuaManager::GetInstance()->addParam(q);
+
+    return 1;
+}
+
+int Graphics::VQHelper::lapplyRotationTo(lua_State *)
+{
+    Ogre::Quaternion q;
+    LuaManager::GetInstance()->extractParam(&q);
+
+    Ogre::Vector3 v;
+    LuaManager::GetInstance()->extractParam(&v);
+
+    Ogre::Vector3 ret = q * v;
+
+    LuaManager::GetInstance()->addParam(ret);
+
     return 1;
 }

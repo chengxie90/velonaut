@@ -67,7 +67,7 @@ void Ui::init() {
 }
 
 void Ui::shutdown() {
-context_->UnloadAllDocuments();
+    context_->UnloadAllDocuments();
 }
 
 int Ui::lLoadDocument(lua_State *state)
@@ -196,7 +196,6 @@ void Ui::onMouseMove(SDL_Event e) {
 }
 
 void Ui::onMouseUp(SDL_Event e ) {
-
     context_->ProcessMouseButtonUp(0, 0);
 }
 

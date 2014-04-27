@@ -42,6 +42,11 @@ void LuaManager::pCall(int nargs, int nresults) const {
     }
 }
 
+void LuaManager::call(int nargs, int nres) const
+{
+    lua_call(state_, nargs, nres);
+}
+
 void LuaManager::addParam(int value) const {
     lua_pushnumber(state_, value);
 }
@@ -62,11 +67,6 @@ void LuaManager::extractParam(double *value)const {
 
 void LuaManager::addParam(bool value) const {
     lua_pushboolean(state_, value);
-}
-
-void LuaManager::extractParam(bool *value) const {
-    *value = lua_toboolean(state_, -1);
-    lua_remove(state_, 1);
 }
 
 void LuaManager::addParam(string str) const {
@@ -141,17 +141,23 @@ void LuaManager::addParam(void *p) const
     lua_pushlightuserdata(state_, p);
 }
 
+void LuaManager::extractParam(bool *b) const
+{
+    luaL_checktype(state_, 1, LUA_TBOOLEAN);
+    *b = lua_toboolean(state_, 1);
+    lua_remove(state_, 1);
+}
+
 void LuaManager::addParam(lua_Number *array, int len) const
 {
     lua_getglobal(state_, "Vector");
-    lua_getfield(state_, 1, "__call");
-    lua_pushvalue(state_, 1);
-    lua_remove(state_, 1);
+    lua_getfield(state_, -1, "__call");
+    lua_pushvalue(state_, -2);
+    lua_remove(state_, -3);
 
     for (int i = 0; i < len; i++) {
         lua_pushnumber(state_, array[i]);
     }
-
     lua_call(state_, len + 1, 1);
 }
 
@@ -270,6 +276,17 @@ void LuaManager::extractParam(void **p) const
     lua_remove(state_, 1);
 }
 
+void LuaManager::addParamReg(const void *p) const
+{
+    lua_rawgetp(state_, LUA_REGISTRYINDEX, p);
+}
+
+void LuaManager::setReg(const void *p) const
+{
+    lua_pushvalue(state_, -1);
+    lua_rawsetp(state_, LUA_REGISTRYINDEX, p);
+}
+
 void LuaManager::extractParam(lua_Number *array, int len) const
 {
     luaL_checktype(state_, 1, LUA_TTABLE);
@@ -281,7 +298,7 @@ void LuaManager::extractParam(lua_Number *array, int len) const
         array[i-1] = num;
         lua_pop(state_, 1);
     }
-    lua_pop(state_, 1);
+    lua_remove(state_, 1);
 }
 
 void LuaManager::onMouseDown( SDL_Event e )

@@ -50,16 +50,21 @@ private:
     
     struct Node {
         static int lcreate(lua_State *);
+        static int lsetParent(lua_State *);
+        
         static int lposition(lua_State *);
         static int lsetPosition(lua_State *);
         static int lorientation(lua_State *);
         static int lsetOrientation(lua_State *);
         static int llookAt(lua_State *); 
+        
         static int lattachObject(lua_State *);
+        static int ldetachObject(lua_State *);
+        
         static int lsetScale(lua_State *);
-        static int lgetLocalX(lua_State *);
-        static int lgetLocalY(lua_State *);
-        static int lgetLocalZ(lua_State *);
+        static int llocalX(lua_State *);
+        static int llocalY(lua_State *);
+        static int llocalZ(lua_State *);
     };
     
     struct Camera {
@@ -96,6 +101,18 @@ private:
     
     struct Material {
         static int lcreate(lua_State *);
+    };
+    
+    struct Particle {
+        static int lcreate(lua_State *);
+    };
+
+    struct VQHelper {
+        static int lgetQuaternionFromAxes(lua_State *);
+        static int lgetQuaternionFromAngleAxis(lua_State *);
+        static int langleBetween(lua_State *);
+        static int lrotationTo(lua_State *);
+        static int lapplyRotationTo(lua_State *);
     };
 };
 

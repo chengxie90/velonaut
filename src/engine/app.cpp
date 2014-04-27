@@ -30,8 +30,8 @@ bool App::init(int argc, char *argv[])
     network_->init();
     luaManager_->init();
 
-    input_->addListener( ui_);
-    input_->addListener( luaManager_);
+    input_->addListener(ui_);
+    input_->addListener(luaManager_);
 
     return true;
 }

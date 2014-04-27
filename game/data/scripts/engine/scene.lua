@@ -13,7 +13,6 @@ function Scene:_init(data)
 end
 
 function Scene:loadPlayers(players, playerId)
-
 	local ringSampleIndex = 0
 	local initRadius = 65
 	local tangent = Vector(0,0,-1)
@@ -31,8 +30,6 @@ function Scene:loadPlayers(players, playerId)
 			prefab = "remoteplayer"
 		end
 
-		
-
 		local obj = self:createObject(name)
         local data = loadDataFile(prefab, "object")
 		
@@ -44,28 +41,49 @@ function Scene:loadPlayers(players, playerId)
 				((tangent:cross(normal):getNormalized()) * (math.sin(theta) * initRadius))
 		ringSampleIndex = ringSampleIndex+1	       
 
-		obj:transform():setPosition(ringSample)	 
-		print("done transform")       
+        obj:getComponent("RigidBody"):setPosition(ringSample)   
+        obj:transform():setPosition(ringSample)   
 
 		if player.id == playerId then
 			obj:getComponent("Player"):setId(playerId)
+            self._player = obj
 		else
 			obj:getComponent("RemotePlayer"):setId(player.id)   
 		end
     end	
 
-	self:setMainCamera(self:findObject(self.playerName):getComponent("Camera"))	
+    local name = "cameraman"
+    local prefab = "cameraman"
+    local obj = self:createObject(name)
+    local data = loadDataFile(prefab, "object")
+    obj:load(data)
+    obj:start()
+    obj:transform():setParent(self._player:transform())
+    obj:getComponent("CameraMan"):initializePosition()
 
+	self:setMainCamera(self:findObject("cameraman"):getComponent("Camera"))	
+end
+
+function Scene:_loadObjectData(data)
+    local name = data.name
+    local prefab = data.prefab
+    assert(name and name ~= "")
+    local obj = self:createObject(name)
+    local prefabData = loadDataFile(data.prefab, "object")
+    obj:load(prefabData)
+    if data.children then
+        for _, objData in ipairs(data.children) do
+            local child = self:_loadObjectData(objData)
+            child:transform():setParent(obj:transform())
+        end
+    end
+    return obj
 end
 
 function Scene:load(data)
+    assert(data.objects)
     for _, objectData in ipairs(data.objects) do
-        local name = objectData.name
-        local prefab = objectData.prefab
-        assert(name and name ~= "")
-        local obj = self:createObject(name)
-        local data = loadDataFile(objectData.prefab, "object")
-        obj:load(data)
+        self:_loadObjectData(objectData)
     end
 
     local obj = self:findObject(data.mainCamera)
@@ -91,11 +109,13 @@ function Scene:start()
 end
 
 function Scene:update(dt)
-
     for k, v in pairs(self._objects) do
-		
         v:update(dt)
     end
+end
+
+function Scene:player()
+    return self._player
 end
 
 function Scene:setMainCamera(cam)
@@ -106,7 +126,6 @@ function Scene:createObject(name)
     assert(self._objects[name] == nil)
     local obj = Object(name)
     self._objects[name] = obj
-    if self._started then obj:start() end
     return obj
 end
 
@@ -114,6 +133,9 @@ function Scene:findObject(name)
     return self._objects[name]
 end
 
-function Scene:removeObject(name)
+function Scene:destroyObject(name)
+    local obj = self:findObject(name)
+    assert(obj)
+    obj:onDestroy()
     self._objects[name] = nil
 end

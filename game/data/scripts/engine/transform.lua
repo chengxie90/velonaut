@@ -7,8 +7,12 @@ function Transform:_init()
     self._position = Vector(0, 0, 0)
     self._orientation = Vector(0, 0, 0, 1)
     self._scale = Vector(1, 1, 1)
-    self._delegates = {}
     self._handle = gfxnode.create()
+end
+
+function Transform:onDestroy()
+    -- we don't destroy the node here because it's not recommended by Ogre
+    -- instead we clear the scene at a later time
 end
 
 function Transform:load(data)
@@ -24,6 +28,10 @@ end
 
 function Transform:update()
 
+end
+
+function Transform:setParent(parent)
+    gfxnode.setParent(parent._handle, self._handle)
 end
 
 function Transform:position()
