@@ -15,7 +15,7 @@ return
         },
         {
             type = "MeshRenderer",
-            mesh = "cube",
+            mesh = "ship",
             material = "lambert1"
         },
         {
@@ -26,6 +26,9 @@ return
         },
         {
             type = "Ship"
-        }
+        },
+		{
+			type = "RemotePlayer"
+		}
     }
 }
