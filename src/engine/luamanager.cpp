@@ -65,6 +65,10 @@ void LuaManager::extractParam(double *value)const {
     lua_remove(state_, 1);
 }
 
+void LuaManager::addParam(bool value) const {
+    lua_pushboolean(state_, value);
+}
+
 void LuaManager::addParam(string str) const {
     lua_pushstring(state_, str.c_str());
 }

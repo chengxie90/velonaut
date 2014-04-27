@@ -7,6 +7,8 @@
 #include "uisysteminterface.h"
 #include "app.h"
 
+using namespace std;
+
 Ui::Ui()
 {
     buildKeyMaps();
@@ -20,6 +22,11 @@ void Ui::initLua() {
             {"loadCursor", Ui::lLoadMouseCursor},
             {"loadFont", Ui::lLoadFont},
             {"setText", Ui::lSetText},
+            {"setAttribute", Ui::lSetAttribute},
+            {"getAttribute", Ui::lGetAttribute},
+            {"addClass", Ui::lAddClass},
+            {"hasClass", Ui::lHasClass},
+            {"removeClass", Ui::lRemoveClass},
             {"addEventListener", Ui::lAddEventListener},
             {NULL, NULL}
         };
@@ -65,7 +72,7 @@ void Ui::shutdown() {
 
 int Ui::lLoadDocument(lua_State *state)
 {
-    std::string doc;
+    string doc;
     LuaManager::GetInstance()->extractParam(&doc);
     Ui::GetInstance()->doc_ = Ui::GetInstance()->context_->LoadDocument( doc.c_str() );
     if (Ui::GetInstance()->doc_)
@@ -85,8 +92,8 @@ int Ui::lLoadMouseCursor(lua_State *state)
 
 int Ui::lAddEventListener(lua_State *state) {
 
-    std::string id;
-    std::string event;
+    string id;
+    string event;
 
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&event);
@@ -95,16 +102,75 @@ int Ui::lAddEventListener(lua_State *state) {
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->AddEventListener(event.c_str(), new RocketEventListener(r), true );
 }
 
+int Ui::lAddClass(lua_State *state) {
+    string id;
+    string text;
+
+    LuaManager::GetInstance()->extractParam(&id);
+    LuaManager::GetInstance()->extractParam(&text);
+
+    Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetClass(text.c_str(), true);
+}
+
+int Ui::lRemoveClass(lua_State *state) {
+    string id;
+    string text;
+
+    LuaManager::GetInstance()->extractParam(&id);
+    LuaManager::GetInstance()->extractParam(&text);
+
+    Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetClass(text.c_str(), false);
+}
+
+int Ui::lHasClass(lua_State *state) {
+    string id;
+    string text;
+
+    LuaManager::GetInstance()->extractParam(&id);
+    LuaManager::GetInstance()->extractParam(&text);
+
+    bool hasClass = Ui::GetInstance()->doc_->GetElementById(id.c_str())->IsClassSet(text.c_str());
+    LuaManager::GetInstance()->addParam(hasClass);
+
+    return 1;
+}
+
 int Ui::lSetText(lua_State *state) {
-    std::string id;
-    std::string text;
+    string id;
+    string text;
 
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
 
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetInnerRML(text.c_str());
-
 }
+
+int Ui::lSetAttribute(lua_State *state) {
+    string id;
+    string attr;
+    string val;
+
+    LuaManager::GetInstance()->extractParam(&id);
+    LuaManager::GetInstance()->extractParam(&attr);
+    LuaManager::GetInstance()->extractParam(&val);
+
+    Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetAttribute(attr.c_str(), val.c_str());
+}
+
+int Ui::lGetAttribute(lua_State *state) {
+    string id;
+    string attr;
+
+    LuaManager::GetInstance()->extractParam(&id);
+    LuaManager::GetInstance()->extractParam(&attr);
+
+    Rocket::Core::String s = Ui::GetInstance()->doc_->GetElementById(id.c_str())->GetAttribute<Rocket::Core::String>(attr.c_str(), "none" );
+
+    LuaManager::GetInstance()->addParam(string(s.CString()));
+
+    return 1;
+}
+
 
 
 // TODO: Add RemoveEventListener function
@@ -116,7 +182,7 @@ Ui *Ui::GetInstance()
 
 int Ui::lLoadFont(lua_State *state)
 {
-    std::string s;
+    string s;
     LuaManager::GetInstance()->extractParam(&s);
     Rocket::Core::FontDatabase::LoadFontFace(s.c_str());
 }
@@ -137,7 +203,13 @@ void Ui::onKeyDown( SDL_Event e )
 {
     if (key_identifiers[e.key.keysym.sym] != 0) {
         context_->ProcessKeyDown(key_identifiers[e.key.keysym.sym], 0);
-        //context_->ProcessTextInput(e.key.keysym.sym);
+        if (key_identifiers[e.key.keysym.sym] != Rocket::Core::Input::KI_BACK &&
+            key_identifiers[e.key.keysym.sym] != Rocket::Core::Input::KI_UP &&
+            key_identifiers[e.key.keysym.sym] != Rocket::Core::Input::KI_DOWN &&
+            key_identifiers[e.key.keysym.sym] != Rocket::Core::Input::KI_RIGHT &&
+            key_identifiers[e.key.keysym.sym] != Rocket::Core::Input::KI_LEFT
+           )
+            context_->ProcessTextInput(e.key.keysym.sym);
     }
 }
 
@@ -151,7 +223,6 @@ void Ui::onKeyUp( SDL_Event e )
 // Called from Ogre before a queue group is rendered.
 void Ui::renderQueueStarted(Ogre::uint8 queueGroupId, const Ogre::String& invocation, bool& ROCKET_UNUSED(skipThisInvocation))
 {
-    //std::cout << "rendering" << std::endl;
     if (queueGroupId == Ogre::RENDER_QUEUE_OVERLAY && Ogre::Root::getSingleton().getRenderSystem()->_getViewport()->getOverlaysEnabled())
     {
         context_->Update();
@@ -300,6 +371,12 @@ void Ui::buildKeyMaps()
     key_identifiers[SDLK_F13] = Rocket::Core::Input::KI_F13;
     key_identifiers[SDLK_F14] = Rocket::Core::Input::KI_F14;
     key_identifiers[SDLK_F15] = Rocket::Core::Input::KI_F15;
+
+    key_identifiers[SDLK_UP] = Rocket::Core::Input::KI_UP;
+    key_identifiers[SDLK_LEFT] = Rocket::Core::Input::KI_LEFT;
+    key_identifiers[SDLK_RIGHT] = Rocket::Core::Input::KI_RIGHT;
+    key_identifiers[SDLK_DOWN] = Rocket::Core::Input::KI_DOWN;
+
     /*
     //key_identifiers[OIS::KC_KANA] = Rocket::Core::Input::KI_KANA;
     key_identifiers[OIS::KC_ABNT_C1] = Rocket::Core::Input::KI_UNKNOWN;

@@ -1,0 +1,36 @@
+.menu_host_race .hostedby .label, .hostedby .host {
+}
+
+.menu_host_race .ipaddress .label, .ipaddress .ip {
+}
+
+.menu_host_race .playerlist {
+	margin-top: 30px;
+}
+
+.menu_host_race .playerlist .title {
+	font-family: DinPro;
+	font-size: 21px;
+}
+
+.menu_host_race .playerlist .listitem {
+	display: block;
+}
+
+.menu_host_race .col_right {
+	float: right;
+	width: 30%;
+	margin-right: 10%;
+}
+
+.menu_host_race .status {
+	display: block;
+	font-size: 25px;
+	margin-top: 30px;
+	text-align: center;
+}
+
+.menu_host_race .btnBack {
+	position: relative;
+	margin-top: 80px;
+}

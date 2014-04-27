@@ -18,6 +18,7 @@ void Network::initLua() {
 
     LuaManager::GetInstance()->requiref("engine.network.c",[](lua_State* state) {
         luaL_Reg reg[] = {
+            {"startClient", Network::lStartClient},
             {"startServer", Network::lStartServer},
             {"shutdownServer", Network::lShutdownServer},
             {"shutdownClient", Network::lShutdownClient},
@@ -45,6 +46,12 @@ int Network::lConnectToServer(lua_State* state) {
     return 0;
 
 }
+
+int Network::lStartClient(lua_State* state) {
+    Network::GetInstance()->startClient();
+    return 0;
+}
+
 
 int Network::lStartServer(lua_State* state) {
     int port;
@@ -107,8 +114,7 @@ Network *Network::GetInstance()
 void Network::init() {
     client_ = RakPeerInterface::GetInstance();
     client_->AttachPlugin(&rpc_);
-    static SocketDescriptor desc;
-    client_->Startup(1, &desc, 1);
+    server_ = NetworkServer::GetInstance();
 }
 
 void Network::shutdown() {
@@ -116,17 +122,22 @@ void Network::shutdown() {
     shutdownServer();
 }
 
+void Network::startClient() {
+    static SocketDescriptor desc;
+    client_->Startup(1, &desc, 1);
+}
+
 void Network::startServer( int port) {
-    server_ = NetworkServer::GetInstance();
     server_->start(port);
 }
 
 void Network::shutdownServer() {
-    server_->shutdown();
+    server_->shutdown();    
 }
 
 void Network::shutdownClient() {
-    client_->Shutdown(300);
+    if(client_->IsActive())
+        client_->Shutdown(300);
 }
 
 void Network::findServer(int port) {
@@ -239,6 +250,3 @@ void Network::poll() {
         }
     }
 }
-
-
-

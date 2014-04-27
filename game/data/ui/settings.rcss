@@ -1,0 +1,55 @@
+.menu_settings .subtitle {
+	display: block;
+	font-family: DinPro;
+	font-size: 22px;
+	margin-top: 10px
+	margin-bottom: 0;
+	padding: 0;
+	text-transform: uppercase;
+}
+
+.menu_settings .optionlist {
+	display:block;
+}
+
+.menu_settings .listitem {
+	display:block;
+	margin-bottom: 5px;
+}
+
+.checkbox {
+	background: #000000CC;
+	margin-top: 5px;
+	width: 15px;
+	height: 15px;
+	border-style: solid;
+	border-color: white;
+	border-width: 2px;
+}
+
+.checkbox.checked {
+	background: red;
+}
+
+.col_left {
+	display:block;
+	float: left;
+	with: 300px;
+}
+
+.col_right {
+	display: block;
+	float: left;
+	with: 300px;
+}
+
+.fld_text {
+	background: #000000CC;
+	width: 200px;
+	height: 27px;
+	border-style: solid;
+	border-color: white;
+	border-width: 2px;
+	padding-left: 5px;
+}
+
