@@ -23,10 +23,6 @@ function App.start()
 
 	App.gamestarted = false
 
-	for i = 1, 3 do
-		print(i)
-	end
-
     local config = dofile("./data/game.config")
     App.loadScene(config.scene)
 
@@ -54,6 +50,7 @@ function App.start()
 				print (player.id )
 				Gui.setText("txt_status", "Connnect as " .. player.name);
 			end
+
 			return
 		end
 
@@ -62,7 +59,7 @@ function App.start()
 			print("seed: " .. event.seed)			
 			Gui.setText("txt_status", "Initializing...");
 
-			App._scene:loadPlayers(App.players, App.playerId)		
+			App.scene():loadPlayers(App.players, App.playerId)		
 			return
 		end
 
@@ -126,6 +123,7 @@ function App.start()
 
 		print("Finding server...") 
 		Network.findServer( 60001 )
+		--Network.connectToServer("10.116.74.71",60001)
 
 	end
 
@@ -159,7 +157,7 @@ function App.terminate()
     
 end
 
-function App.activeScene()
+function App.scene()
     return App._scene
 end
 

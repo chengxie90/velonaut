@@ -3,28 +3,39 @@ require "engine.component"
 require "engine.transform"
 require "engine.camera"
 require "engine.light"
-require "engine.renderer"
 require "engine.meshrenderer"
 require "engine.behavior"
 require "engine.rigidbody"
+require "engine.particlerenderer"
 
 Object = class()
 
 function Object:_init(name)
     self._components = {}
     self._started = false
-    self.name = name
+    self._name = name
+end
+
+function Object:onDestroy()
+    for k, v in pairs(self._components) do
+        v:onDestroy()
+    end
+end
+
+function Object:destroy()
+    App.scene():destroyObject(self:name())
+end
+
+function Object:name()
+    return self._name
 end
 
 function Object:load(data)
-
     for _, componentData in ipairs(data.components) do
-
         local typename = componentData.type
         local comp = self:addComponent(typename)
         comp:load(componentData)
     end
-
 end
 
 function Object:start()
@@ -57,12 +68,25 @@ function Object:addComponent(typename)
     return comp
 end
 
+function Object:behaviors()
+    local ret = {}
+    for _, comp in pairs(self._components) do
+        if comp:is_a(Behavior) then
+            table.insert(ret, comp)
+        end
+    end
+    return ret
+end
+
 function Object:getComponent(typename)
     return self._components[typename];
 end
 
-function Object:removeComponent(typename)
-    self._components[typename]._object = nil
+function Object:removeComponent()
+    local comp = self:getComponent(typename)
+    assert(comp)
+    comp:onDestroy()
+    comp._object = nil
     self._components[typename] = nil
 end
 

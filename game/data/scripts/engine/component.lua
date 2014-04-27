@@ -1,5 +1,9 @@
 Component = class()
 
+function Component:onDestroy()
+
+end
+
 function Component:start()
 
 end
@@ -27,3 +31,8 @@ end
 function Component:transform()
     return self:owner():transform()
 end
+
+function Component:behaviors()
+    return self:owner():behaviors()
+end
+

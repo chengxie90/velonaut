@@ -1,0 +1,28 @@
+particle_system projectile
+{
+    material lambert1
+    particle_width 1
+    particle_height 1
+    cull_each false
+    quota 10000
+
+    // Area emitter
+    emitter Point
+    {
+        angle 15
+        emission_rate 5
+        time_to_live 3
+        direction 0 1 0
+        velocity_min 0.1
+        velocity_max 0.5
+        colour_range_start 1 0 0
+        colour_range_end 0 0 1
+    }
+
+    // Gravity
+    affector LinearForce
+    {
+        force_vector 0 -1 0
+        force_application add
+    }
+}

@@ -1,4 +1,4 @@
-material plane
+material checkpoint
 {
 	technique
     	{
@@ -13,8 +13,8 @@ material plane
 
           texture_unit
           {
-            	colour_op_ex source1 src_manual src_current 0.8 0 0.8
-		alpha_op_ex source1 src_manual src_current 0.8
+            	colour_op_ex source1 src_manual src_current 0.2 0.8 0
+				alpha_op_ex source1 src_manual src_current 0.3
           }
        }
 

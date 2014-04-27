@@ -1,3 +1,4 @@
+require "engine.scene"
 require "engine.vector"
 require "engine.behavior"
 require "engine.input"
@@ -11,6 +12,38 @@ Player = class(Behavior)
 function Player:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
+
+	-- Create first checkpoint 
+	self._nextCheckpoint = 1
+	self:createNextCheckpoint();
+end
+
+function Player:createNextCheckpoint()
+	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")	
+	if self._nextCheckpoint <= tun:getNumCheckpoints() then
+		local name = "checkpoint" .. self._nextCheckpoint
+		local prefab = "checkpoint"
+
+		local obj = App.scene():createObject(name)
+		local data = loadDataFile(prefab, "object")	
+		obj:load(data)
+		obj:start()
+
+		local startPos = tun:getCheckpointPosition(self._nextCheckpoint)
+		local startTan = tun:getCheckpointTangent(self._nextCheckpoint):getNormalized()
+
+		local angle = Vector(0,0,-1):angleBetween(startTan)
+		local axis = Vector(0,0,-1):cross(startTan)
+		local startOri = Vector(0, 0, 0, 0)
+		startOri:makeQuaternionFromAngleAxis(angle, axis)
+
+		obj:transform():setPosition(startPos)
+		obj:transform():setOrientation(startOri)
+		obj:getComponent("RigidBody"):setPosition(startPos)		
+		obj:getComponent("RigidBody"):setOrientation(startOri)
+
+		self._nextCheckpoint = self._nextCheckpoint + 1
+	end
 end
 
 function Player:setId( id )
@@ -27,7 +60,6 @@ function Player:update(dt)
 	local up = self.Transform:localY()
 	local right = -self.Transform:localX() * -1
 
-
 	local rotScale = 300
 	local linScale = 800
 
@@ -41,6 +73,14 @@ function Player:update(dt)
 
 	self:sendPhysics()
 
+end
+
+function Player:onCollision(collision)
+    if collision.rigidbody:owner():getComponent("Checkpoint") ~= nil then
+		local checkpoint = collision.rigidbody:owner()
+    	checkpoint:destroy()
+		self:createNextCheckpoint();
+	end
 end
 
 function Player:sendPhysics()

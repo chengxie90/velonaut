@@ -6,7 +6,11 @@ local gfxnode = require "engine.graphics.node.c"
 Camera = class(Component)
 
 function Camera:_init(object)
-    self._handle = gfxcam.create(object.name)
+    self._handle = gfxcam.create(object:name())
+end
+
+function Camera:onDestroy()
+    
 end
 
 function Camera:load(data)

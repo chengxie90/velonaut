@@ -1,0 +1,15 @@
+return 
+{
+    components = {
+        {
+            type = "Transform",
+            position = Vector(0, 0, 0),
+            orientation = Vector(0, 0, 0, 1),
+            scale = Vector(1, 1, 1)
+        },
+        {
+            type = "ParticleRenderer",
+            particleSystem = "projectile"
+        },
+    }
+}

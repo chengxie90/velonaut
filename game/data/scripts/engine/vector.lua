@@ -1,4 +1,5 @@
 require "engine.class"
+local gfxvqhelper = require "engine.graphics.vqhelper.c"
 
 Vector = class()
 
@@ -107,6 +108,21 @@ function Vector.cross(v1, v2)
 	return ret
 end
 
+function Vector.dot(v1, v2)
+	assert(#v1 == #v2)
+	local prod = 0
+	for i = 1, #v1 do
+		prod = prod + (v1[i] + v2[i])
+	end
+	return prod
+end
+
+function Vector.angleBetween(v1, v2)
+	assert(#v1 == #v2)
+	assert(#v1 == 3)
+	return gfxvqhelper.angleBetween(v1, v2) 
+end
+
 function Vector:length()
 	local lenSq = 0
 	for i = 1, #self do
@@ -137,6 +153,20 @@ end
 
 function Vector:serialize4d()
 	return "{" .. self[1] .. "," .. self[2] .. "," .. self[3] .. "," .. self[4] .."}";
+end
+
+function Vector:makeQuaternionFromAxes(x, y, z)
+	local q = gfxvqhelper.getQuaternionFromAxes(x, y, z)
+	for i = 1, #q do
+		self[i] = q[i]
+	end
+end
+
+function Vector:makeQuaternionFromAngleAxis(angle, axis)
+	local q = gfxvqhelper.getQuaternionFromAngleAxis(angle, axis)
+	for i = 1, #q do
+		self[i] = q[i]
+	end
 end
 
 local function test()

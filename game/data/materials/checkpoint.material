@@ -1,0 +1,22 @@
+material checkpoint
+{
+	technique
+    	{
+
+	pass
+       {
+	  lighting on
+	  scene_blend alpha_blend
+	  depth_write off
+	  cull_hardware none
+	  cull_software none
+
+          texture_unit
+          {
+            	colour_op_ex source1 src_manual src_current 0.2 0.8 0
+				alpha_op_ex source1 src_manual src_current 0.3
+          }
+       }
+
+   }
+}
