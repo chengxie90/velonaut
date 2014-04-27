@@ -1,0 +1,16 @@
+
+material Wraith_Raider_Starship3material_2_NoCull
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			specular 1 1 1 1 3.84
+			cull_hardware none
+			cull_software none
+		}
+
+	}
+
+}

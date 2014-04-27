@@ -1,0 +1,25 @@
+return 
+{
+    components = {
+        {
+            type = "Transform",
+            position = Vector(0, 0, 0),
+            scale = Vector(10, 10, 10)
+        },
+		{
+            type = "MeshRenderer",
+            mesh = "cube",
+            material = "orb"
+        },
+		{
+            type = "RigidBody",
+            shape = "box",
+            mass = 1,
+            boxHalfExtents = Vector(10, 10, 10),
+			trigger = true
+        },
+        {
+            type = "Pickup"
+        }
+    }
+}

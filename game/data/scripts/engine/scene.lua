@@ -41,16 +41,27 @@ function Scene:loadPlayers(players, playerId)
 				((tangent:cross(normal):getNormalized()) * (math.sin(theta) * initRadius))
 		ringSampleIndex = ringSampleIndex+1	       
 
-		obj:transform():setPosition(ringSample)	  
+        obj:getComponent("RigidBody"):setPosition(ringSample)   
+        obj:transform():setPosition(ringSample)   
 
 		if player.id == playerId then
 			obj:getComponent("Player"):setId(playerId)
+            self._player = obj
 		else
 			obj:getComponent("RemotePlayer"):setId(player.id)   
 		end
     end	
 
-	self:setMainCamera(self:findObject(self.playerName):getComponent("Camera"))	
+    local name = "cameraman"
+    local prefab = "cameraman"
+    local obj = self:createObject(name)
+    local data = loadDataFile(prefab, "object")
+    obj:load(data)
+    obj:start()
+    obj:transform():setParent(self._player:transform())
+    obj:getComponent("CameraMan"):initializePosition()
+
+	self:setMainCamera(self:findObject("cameraman"):getComponent("Camera"))	
 end
 
 function Scene:_loadObjectData(data)
@@ -101,6 +112,10 @@ function Scene:update(dt)
     for k, v in pairs(self._objects) do
         v:update(dt)
     end
+end
+
+function Scene:player()
+    return self._player
 end
 
 function Scene:setMainCamera(cam)

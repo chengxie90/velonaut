@@ -169,6 +169,8 @@ void Graphics::initLua()
             {"getQuaternionFromAxes", Graphics::VQHelper::lgetQuaternionFromAxes},
             {"getQuaternionFromAngleAxis", Graphics::VQHelper::lgetQuaternionFromAngleAxis},
             {"angleBetween", Graphics::VQHelper::langleBetween},
+            {"rotationTo", Graphics::VQHelper::lrotationTo},
+            {"rotateBy", Graphics::VQHelper::lrotationTo},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -268,6 +270,7 @@ void Graphics::initResources()
 int Graphics::Scene::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->root_->createSceneManager(Ogre::ST_GENERIC);
+    //scene->setSkyBox(true, "skybox2");
     scene->setSkyDome(true, "skybox", 1, 1, 5000, true);
     LuaManager::GetInstance()->addParam((void *)scene);
     return 1;
@@ -770,7 +773,6 @@ int Graphics::VQHelper::langleBetween(lua_State *)
     return 1;
 }
 
-
 int Graphics::Particle::lcreate(lua_State *)
 {
     static string name = "particle";
@@ -785,5 +787,36 @@ int Graphics::Particle::lcreate(lua_State *)
 
     LuaManager::GetInstance()->addParam((void *)obj);
     
+    return 1;
+    
+}
+
+int Graphics::VQHelper::lrotationTo(lua_State *)
+{
+    Ogre::Vector3 v1;
+    LuaManager::GetInstance()->extractParam(&v1);
+
+    Ogre::Vector3 v2;
+    LuaManager::GetInstance()->extractParam(&v2);
+
+    Ogre::Quaternion q = v1.getRotationTo(v2);
+
+    LuaManager::GetInstance()->addParam(q);
+
+    return 1;
+}
+
+int Graphics::VQHelper::lrotationBy(lua_State *)
+{
+    Ogre::Vector3 v;
+    LuaManager::GetInstance()->extractParam(&v);
+
+    Ogre::Quaternion q;
+    LuaManager::GetInstance()->extractParam(&q);
+
+    Ogre::Vector3 ret = q * v;
+
+    LuaManager::GetInstance()->addParam(ret);
+
     return 1;
 }
