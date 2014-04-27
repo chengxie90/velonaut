@@ -1,0 +1,18 @@
+material moonshineskybox
+{
+	technique
+	{
+		pass
+		{
+			fog_override true none
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture ../../../asset/skyboxes/MoonShine/MoonShine_front.tif ../../../asset/skyboxes/MoonShine/MoonShine_back.tif ../../../asset/skyboxes/MoonShine/MoonShine_right.tif ../../../asset/skyboxes/MoonShine/MoonShine_left.tif ../../../asset/skyboxes/MoonShine/MoonShine_up.tif ../../../asset/skyboxes/MoonShine/MoonShine_down.tif separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}

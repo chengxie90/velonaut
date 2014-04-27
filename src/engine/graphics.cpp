@@ -271,8 +271,8 @@ void Graphics::initResources()
 int Graphics::Scene::lcreate(lua_State *)
 {
     SceneManager* scene = Graphics::GetInstance()->root_->createSceneManager(Ogre::ST_GENERIC);
-    //scene->setSkyBox(true, "skybox2");
-    scene->setSkyDome(true, "skybox", 1, 1, 5000, true);
+    scene->setSkyBox(true, "moonshineskybox");
+    //scene->setSkyDome(true, "skybox", 1, 1, 5000, true);
     LuaManager::GetInstance()->addParam((void *)scene);
     return 1;
 }
