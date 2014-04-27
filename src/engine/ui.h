@@ -37,6 +37,11 @@ private:
     static int lLoadMouseCursor(lua_State* state);
     static int lLoadFont(lua_State* state);
     static int lSetText(lua_State* state);
+    static int lSetAttribute(lua_State* state);
+    static int lGetAttribute(lua_State* state);
+    static int lAddClass(lua_State* state);
+    static int lHasClass(lua_State* state);
+    static int lRemoveClass(lua_State* state);
     static int lAddEventListener(lua_State* state);
 
 private:

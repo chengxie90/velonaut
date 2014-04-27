@@ -22,15 +22,29 @@ NetworkServer *NetworkServer::GetInstance()
     return &instance;
 }
 
-NetworkServer::NetworkServer():currentState_(0) {}
+NetworkServer::NetworkServer():currentState_(0), thread_(0), isRunning_(false) {
+    server_ = RakPeerInterface::GetInstance();
+    server_->AttachPlugin(&rpc_);
+}
 
 void NetworkServer::rpcSetPlayerName(BitStream* bsIn,Packet* p)
 {
-    NetworkServer* server = NetworkServer::GetInstance();
+    NetworkServer* srv = NetworkServer::GetInstance();
     RakString rs;
-    server->readString(bsIn, rs, false);
-    NetworkServer::GetInstance()->players_[p->guid].name = string(rs.C_String());
-    NetworkServer::GetInstance()->players_[p->guid].guid = p->guid;
+    srv->readString(bsIn, rs, false);
+
+    string clientIp = srv->server_->GetSystemAddressFromGuid(p->guid).ToString(false);
+
+    auto& player = srv->players_[p->guid];
+    player.name = string(rs.C_String());
+    player.guid = p->guid;
+    player.ipAdress = clientIp;
+
+    if ( clientIp.compare("127.0.0.1") == 0) {
+        player.isServer = true;
+        string serverAddress = srv->server_->GetSystemAddressFromGuid(srv->server_->GetMyGUID()).ToString(false);
+        player.ipAdress = serverAddress;
+    }
 }
 
 void NetworkServer::rpcStartGame(BitStream* bsIn,Packet* p)
@@ -38,7 +52,6 @@ void NetworkServer::rpcStartGame(BitStream* bsIn,Packet* p)
     NetworkServer* server = NetworkServer::GetInstance();
 
     server->setServerState(new WaitingForPlayerReadyState);
-
     server->writeMessage(GAME_MESSAGE, server->createGameInitEvent(123, 0));
     server->sendToAll(RELIABLE_ORDERED);
 
@@ -48,24 +61,40 @@ void NetworkServer::rpcStartGame(BitStream* bsIn,Packet* p)
 void NetworkServer::rpcSetPlayerReady(BitStream* bsIn,Packet* p)
 {
     NetworkServer* server = NetworkServer::GetInstance();
-    server->players_[p->guid].ready = true;
+    server->players_[p->guid].isReady = true;
+}
+
+void NetworkServer::rpcSetNumPlayers(BitStream* bsIn,Packet* p)
+{
+
+    NetworkServer* srv = NetworkServer::GetInstance();
+    RakString rs;
+    srv->readString(bsIn, rs, false);
+    std::cout << "setNumPlayers: " << rs.C_String() << std::endl;
+
+    NetworkServer* server = NetworkServer::GetInstance();
+    server->numPlayers_ = atoi(rs.C_String());
 }
 
 void NetworkServer::start(int port)
 {
     port_ = port;
+    isRunning_ = true;
+
     server_ = RakPeerInterface::GetInstance();
     server_->AttachPlugin(&rpc_);
 
     rpc_.RegisterFunction("setPlayerName", &NetworkServer::rpcSetPlayerName);
     rpc_.RegisterFunction("setPlayerReady", &NetworkServer::rpcSetPlayerReady);
+    rpc_.RegisterFunction("setNumPlayers", &NetworkServer::rpcSetNumPlayers);
     rpc_.RegisterFunction("startGame", &NetworkServer::rpcStartGame);
     pthread_create(&thread_, NULL, &callRun, static_cast<void*>(this) );
 }
 
 void NetworkServer::shutdown()
 {
-    server_->Shutdown(300);
+    if (isRunning_)
+        isRunning_ = false;
 }
 
 void NetworkServer::setMaxIncomingConnections(int numCon)
@@ -77,7 +106,6 @@ void NetworkServer::onClientConnect(Packet* packet)
 {
     std::cout << "onClientConnect" << std::endl;
     clients_.push_back(packet->guid);
-    std::cout << packet->guid.g << std::endl;
 
     writeMessage(GAME_MESSAGE, createWelcomeEvent(packet->guid));
     sendToOne(packet->guid, RELIABLE_ORDERED);
@@ -151,25 +179,45 @@ void NetworkServer::sendToOne(RakNet::RakNetGUID &guid, PacketReliability reliab
     server_->Send(&bitSteamOut_,HIGH_PRIORITY,reliability,0, server_->GetSystemAddressFromGuid(guid), false);
 }
 
-RakString NetworkServer::createPlayerListEvent() {
-    string s;
-    s.append("{ eventType = 'playerlist', players = {");
+RakString NetworkServer::createPlayerListEvent()
+{
+    std::string hostname;
+    std::string hostip;
 
+    for(auto it = players_.begin(); it != players_.end(); ++it) {
+
+        if (it->second.isServer) {
+            hostname = it->second.name;
+            hostip = it->second.ipAdress;
+        }
+    }
+
+    string s;
+    s.append("{ eventType='playerlist', ");
+    s.append("host='");
+    s.append(hostname);
+    s.append("'");
+    s.append(", hostip='");
+    s.append(hostip);
+    s.append("'");
+    s.append(", players={");
 
     for(auto it = players_.begin(); it != players_.end(); ++it) {
         s.append("{name='");
         s.append(it->second.name);
         s.append("', id='");
         s.append(to_string(it->second.guid.g));
+
         s.append("'},");
+
+
     }
     s.append("} }");
-
-    cout << s << endl;
     return RakString(s.c_str());
 }
 
-RakString NetworkServer::createWelcomeEvent(RakNet::RakNetGUID guid) {
+RakString NetworkServer::createWelcomeEvent(RakNet::RakNetGUID guid)
+{
     string s;
     s.append("{eventType='welcome',id='");
     s.append(to_string(guid.g));
@@ -177,7 +225,8 @@ RakString NetworkServer::createWelcomeEvent(RakNet::RakNetGUID guid) {
     return RakString(s.c_str());
 }
 
-RakString NetworkServer::createGameInitEvent(uint64_t guid, int seed) {
+RakString NetworkServer::createGameInitEvent(uint64_t guid, int seed)
+{
     string s;
     s.append("{eventType='gameinit',seed=");
     s.append(to_string(123));
@@ -185,7 +234,8 @@ RakString NetworkServer::createGameInitEvent(uint64_t guid, int seed) {
     return RakString(s.c_str());
 }
 
-RakString NetworkServer::createCountDownEvent(int count) {
+RakString NetworkServer::createCountDownEvent(int count)
+{
     string s;
     s.append("{eventType='countdown',count=");
     s.append(to_string(count));
@@ -193,19 +243,22 @@ RakString NetworkServer::createCountDownEvent(int count) {
     return RakString(s.c_str());
 }
 
-RakString NetworkServer::createGameStartEvent() {
+RakString NetworkServer::createGameStartEvent()
+{
     string s;
     s.append("{eventType='gamestart'}");
     return RakString(s.c_str());
 }
 
-void NetworkServer::setServerState(AbstractServerState *state) {
+void NetworkServer::setServerState(AbstractServerState *state)
+{
     if (currentState_)
         delete currentState_;
     currentState_ = state;
 }
 
-void NetworkServer::run() {
+void NetworkServer::run()
+{
 
     static SocketDescriptor desc(port_,0);
     server_->Startup(12, &desc, 1);
@@ -214,7 +267,7 @@ void NetworkServer::run() {
     timer t;
     t.restart();
 
-    while (1)
+    while (isRunning_)
     {
         if (currentState_)
             currentState_->update(this, t);
@@ -227,7 +280,8 @@ void NetworkServer::run() {
 }
 
 
-void NetworkServer::pollPackets() {
+void NetworkServer::pollPackets()
+{
     Packet *packet;
 
     for (packet=server_->Receive(); packet; server_->DeallocatePacket(packet), packet=server_->Receive())
@@ -259,22 +313,35 @@ void NetworkServer::pollPackets() {
     }
 }
 
-void NetworkServer::WaitingForPlayersState::update(NetworkServer* server, timer& t) {
+void NetworkServer::WaitingForPlayersState::update(NetworkServer* server, timer& t)
+{
     if (!t.isTimeout(1.0))
         return;
 
     server->writeMessage(GAME_MESSAGE, server->createPlayerListEvent());
     server->sendToAll(RELIABLE_ORDERED);
 
+    if (server->players_.size() >= server->numPlayers_) {
+        server->setServerState(new WaitingForPlayerReadyState);
+
+        server->writeMessage(GAME_MESSAGE, server->createGameInitEvent(123, 0));
+        server->sendToAll(RELIABLE_ORDERED);
+
+        server->setServerState(new WaitingForPlayerReadyState);
+        return;
+    }
+
+
     t.restart();
 }
 
-void NetworkServer::WaitingForPlayerReadyState::update(NetworkServer* server, timer& t) {
+void NetworkServer::WaitingForPlayerReadyState::update(NetworkServer* server, timer& t)
+{
     if (!t.isTimeout(2.0))
         return;
 
     for(auto it = server->players_.begin(); it != server->players_.end(); ++it) {
-        if (!it->second.ready) {
+        if (!it->second.isReady) {
             t.restart();
             return;
         }
@@ -283,7 +350,8 @@ void NetworkServer::WaitingForPlayerReadyState::update(NetworkServer* server, ti
     server->setServerState(new CountDownState);
 }
 
-void NetworkServer::CountDownState::update(NetworkServer* server, timer& t) {
+void NetworkServer::CountDownState::update(NetworkServer* server, timer& t)
+{
     if (!t.isTimeout(1))
         return;
 
@@ -297,6 +365,7 @@ void NetworkServer::CountDownState::update(NetworkServer* server, timer& t) {
             return;
 
         }
+
         server->writeMessage(GAME_MESSAGE, server->createCountDownEvent(count));
         server->sendToAll(RELIABLE_ORDERED);
 

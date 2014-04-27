@@ -110,5 +110,3 @@ Physics *App::GetPhysics()
 {
     return g_app.physics_;
 }
-
-

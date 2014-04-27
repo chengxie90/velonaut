@@ -16,6 +16,7 @@ public:
     void init();
     void initLua();
     void shutdown();
+    void startClient();
     void startServer(int port);
     void findServer(int port);
     void shutdownServer();
@@ -39,6 +40,7 @@ private:
     void fireEvent(std::string event, std::string eventargs);
 
     static int lConnectToServer(lua_State* state);
+    static int lStartClient(lua_State* state);
     static int lStartServer(lua_State* state);
     static int lShutdownServer(lua_State* state);
     static int lShutdownClient(lua_State* state);

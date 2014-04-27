@@ -1,0 +1,8 @@
+return 
+{
+    components = {
+        {
+            type = "MainMenu"
+        }
+    }
+}

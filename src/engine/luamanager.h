@@ -25,6 +25,7 @@ public:
 
     void addFunction(std::string str) const;
 
+    void addParam(bool value) const;
     void addParam(int value) const;
     void addParam(double value) const;
     void addParam(std::string str) const;
@@ -34,6 +35,7 @@ public:
     void addParam(const Ogre::Quaternion& q) const;
     void addParam(void *) const;
     
+    void extractParam(bool *value) const;
     void extractParam(int *value) const;
     void extractParam(double *value) const;
     void extractParam(std::string *str) const;

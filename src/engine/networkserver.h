@@ -45,8 +45,13 @@ class NetworkServer
 
     struct Player {
         RakNet::RakNetGUID guid;
-        bool ready;
-        std::string name;        
+        bool isReady;
+        bool isServer;
+        std::string name;
+        std::string ipAdress;
+
+        Player():isReady(false), isServer(false){}
+
     };
 
     struct AbstractServerState {
@@ -100,7 +105,7 @@ private:
     static void rpcSetPlayerName(RakNet::BitStream* s, RakNet::Packet* p);
     static void rpcStartGame(RakNet::BitStream* s, RakNet::Packet* p);
     static void rpcSetPlayerReady(RakNet::BitStream* s, RakNet::Packet* p);
-
+    static void rpcSetNumPlayers(RakNet::BitStream* s, RakNet::Packet* p);
 
 private:
     std::vector<RakNet::RakNetGUID> clients_;
@@ -114,6 +119,8 @@ private:
     RakNet::StringCompressor compressor_;
     int port_;
     timer countdown_;
+    bool isRunning_;
+    int numPlayers_;
 };
 
 

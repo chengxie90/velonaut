@@ -1,25 +1,100 @@
 <rml>
 	<head>
+		<title>Demo</title>
 		<link type="text/rcss" href="rkt.rcss"/>
 		<link type="text/rcss" href="mainmenu.rcss"/>
-		<title>Demo</title>
-		<style>
-
-		</style>
+		<link type="text/rcss" href="hostrace.rcss"/>
+		<link type="text/rcss" href="settings.rcss"/>
 	</head>
 	<body>
 		<div class="wrp">
 			
 			<div id="txt_status" class="status" />
-			<div class="wrp_main_menu">
-				<button id="btn_start_server" class="btn">START SERVER</button>
-				<button id="btn_start_client" class="btn">START CLIENT</button>
-				<button id="btn_start_game" class="btn">START GAME</button>
-				<button id="btn_player_ready" class="btn">PLAYER READY</button>
-				<button id="btn_disconnect" class="btn">DISCONNECT CLIENT</button>
-				<input id="fld_name" class="input_text"></input>
-			</div>
 			
+			<div id="main_menu_wrp">
+				<div id="menu_main" class="wrp_menu menu_main">
+					<div class="inner">
+						<button id="btn_join_race" class="btn"><span class="label">Join Race</span></button>
+						<button id="btn_host_race" class="btn"><span class="label">Host Race</span></button>
+						<button id="btn_settings" class="btn"><span class="label">Settings</span></button>
+						<button id="btn_credits" class="btn"><span class="label">Credits</span></button>
+						<button id="btn_quit" class="btn"><span class="label">Quit</span></button>
+						<input id="fld_text" class="input_text"></input>
+					</div>
+				</div>
+
+				<div id="menu_join_race" class="wrp_menu menu_host_race isHidden">
+					<div class="inner">
+						<h1 class="submenu_title" >GETTING READY</h1>
+						<div>
+							<div class="col_left">
+								<p class="hostedby">
+									<span class="label">Hosted by: </span><span id="lbl_host" class="host">...</span>
+								</p>
+								<p class="ipaddress">
+									<span class="label">IP address: </span><span id="lbl_host_ip" class="ip">...</span>
+								</p>
+								<div class="playerlist">
+									<h2 id="lbl_current_players" class="title" >Current Players</h2>
+									<ul id="lst_players">
+										<li class="listitem">No players yet</li>
+									</ul>
+								</div>
+							</div>
+							<div class="col_right">
+								<span class="status">Waiting for players to join...</span>
+							</div>
+						</div>
+						<button id="hostraceBtnBack" class="btn btnBack">Main Menu</button>
+					</div>
+				</div>
+
+				<div id="menu_settings" class="wrp_menu menu_settings isHidden">
+					<div class="inner">
+						<h1 class="submenu_title" >Settings</h1>
+						<div>
+							<h2 class="subtitle">Gameplay</h2>
+							<ul class="optionlist">
+								<li class="listitem"><span class="col_left">Player Name</span><input id="fld_player_name" class="fld_text col_right"/></li>
+								<li class="listitem"><span class="col_left">Inverted Controls</span><span id="chb_invert_controls" class="checkbox col_right" /></li>
+							</ul>
+							<h2 class="subtitle">Client / Server</h2>
+							<ul class="optionlist">
+								<li class="listitem"><span class="col_left">Players per game</span><input id="fld_min_num_players" class="fld_text col_right" value="1"/></li>
+								<li class="listitem"><span class="col_left">Automatically find server</span><span id="chb_finder_server" class="checkbox col_right checked" /></li>
+								<li class="listitem"><span class="col_left">Server Address</span><input id="fld_server_address" class="fld_text col_right"/></li>
+								<li class="listitem"><span class="col_left">Server Port</span><input id="fld_server_port" class="fld_text col_right" value="60001"/></li>
+
+							</ul>
+						</div>
+						<button id="settingsBtnBack" class="btn btnBack">Main Menu</button>
+					</div>
+				</div>
+
+				<div id="menu_credits" class="wrp_menu menu_host_race isHidden">
+					<div class="inner">
+						<h1 class="submenu_title" >Credits</h1>
+						<div>
+							<p>
+								Programming:<br/>
+								Nate Bowditch, Philipp Eichmann, Cheng Xie				
+							</p>
+							<p>
+							<br/>
+								Libraries:<br/>
+								Orge 3D, Bullet Physics, SDL, librocket, Lua
+							</p>
+							<p>
+							<br/>
+								Developed at:<br/>
+								Brown University, Providence RI
+							</p>
+
+						</div>
+						<button id="creditsBtnBack" class="btn btnBack">Main Menu</button>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div id="test" class="test" />
 	</body>

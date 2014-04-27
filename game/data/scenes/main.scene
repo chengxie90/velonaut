@@ -6,6 +6,10 @@ return
     objects = 
     {
 		{
+			name = "mainmenu",
+			prefab = "mainmenu"
+		},
+		{
 			name = "initcam",
 			prefab = "initcam"
 		},
