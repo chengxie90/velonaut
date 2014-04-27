@@ -6,7 +6,6 @@ return
             type = "Transform",
             position = Vector(0, 0, 0),
             orientation = Vector(0, 0, 0, 1),
-            scale = Vector(1, .1, 1)
         },
         {
             type = "Light",
@@ -17,7 +16,7 @@ return
             type = "RigidBody",
             shape = "box",
             mass = 1,
-            boxHalfExtents = Vector(10, 1, 10)
+            boxHalfExtents = Vector(10, 10, 10)
         },
         {
             type = "Camera",

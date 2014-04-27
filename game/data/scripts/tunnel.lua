@@ -25,11 +25,13 @@ function Tunnel:_init(object)
 	-- Members
 	self._tunnel = {} -- Each row of table is a table with 3 vectors: position, tangent, normal
 	self._checkpoints = {} -- For convenience. Each row of table is a table with 3 vectors: position, tangent, normal
+	self._pickups = {}
 	self._numCurves = 3
 	self._tunnelRadius = 100
 	self._ringsPerCurve = 80
 	self._samplesPerRing = 30
 	self._samplesPerCheckpoint = 10
+	self._samplesPerPickup = 65
 	self._tunnelSeed = 7243897024 --TODO: set seed globally somewhere else
 
 	-- Params
@@ -141,6 +143,13 @@ function Tunnel:_init(object)
 		checkpointIndex = checkpointIndex + 1
 	end
 
+		-- Add specific samples to pickups member for convenience
+	local pickupIndex = 1
+	while pickupIndex*self._samplesPerPickup < #self._tunnel do
+		self._pickups[pickupIndex] = self._tunnel[pickupIndex*self._samplesPerPickup]
+		pickupIndex = pickupIndex + 1
+	end
+
 end
 
 function Tunnel:start()
@@ -177,6 +186,7 @@ function Tunnel:getSampleTangent(sampleIndex)
 end
 
 function Tunnel:getSampleNormal(sampleIndex)
+	local rad = math.random(0,0.8*self._tunnelRadius)
 	return self._tunnel[sampleIndex][3]
 end
 
@@ -198,4 +208,28 @@ end
 
 function Tunnel:getNumCheckpoints()
 	return #self._checkpoints
+end
+
+function Tunnel:getPickupPosition(pickupIndex)
+	local center = self._pickups[pickupIndex][1]
+	local tangent = self._pickups[pickupIndex][2]
+	local normal = self._pickups[pickupIndex][3]
+	local rad = math.random(0,0.8*self._tunnelRadius)
+	local ang = math.random(0,2*math.pi)
+
+	return center + (normal * (math.cos(ang) * rad)) + 
+						((tangent:cross(normal):getNormalized()) * (math.sin(ang) * rad))
+
+end
+
+function Tunnel:getPickupTangent(pickupIndex)
+	return self._pickups[pickupIndex][2]
+end
+
+function Tunnel:getPickupNormal(pickupIndex)
+	return self._pickups[pickupIndex][3]
+end
+
+function Tunnel:getNumPickups()
+	return #self._pickups
 end

@@ -15,8 +15,27 @@ function Player:start()
 
 	-- Create first checkpoint 
 	self._nextCheckpoint = 1
-	self:createNextCheckpoint();self.RigidBody = self:getComponent("RigidBody")
-	self.Transform = self:getComponent("Transform")
+	self._inventory = {}
+	self:createNextCheckpoint()
+	self:createPickups()
+end
+
+function Player:createPickups()
+	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")	
+	for index = 1, tun:getNumPickups() do
+		local name = "pickup"..index
+		local prefab = "pickup"
+
+		local obj = App:scene():createObject(name)
+		local data = loadDataFile(prefab, "object")
+		obj:load(data)
+		obj:start()
+
+		local startPos = tun:getPickupPosition(index)
+		obj:transform():setPosition(startPos)
+		obj:getComponent("RigidBody"):setPosition(startPos)
+	end
+
 end
 
 function Player:createNextCheckpoint()
@@ -45,7 +64,6 @@ function Player:createNextCheckpoint()
 
 		self._nextCheckpoint = self._nextCheckpoint + 1
 	elseif self._nextCheckpoint == tun:getNumCheckpoints()+1 then
-		print("making finishline")
 		local name = "finishline"
 		local prefab = "finishline"
 
@@ -79,13 +97,14 @@ end
 
 function Player:update(dt)
 
-	local cammantrans = App.scene():findObject("cameraman"):getComponent("Transform")
-	local thrust = self:transform():localZ() * -1
-	local look = cammantrans:localZ() * -1
-	local up = cammantrans:localY()
-	local right = cammantrans:localX()
+	--local cammantrans = App.scene():findObject("cameraman"):getComponent("Transform")
+	--local thrust = self:transform():localZ() * -1
+	local look = self:transform():localZ() * -1
+	local up = self:transform():localY()
+	local right = self:transform():localX() * -1
 
-	local rotScale = 300
+
+	local rotScale = 150
 	local linScale = 800
 	
 	local inTun = true
@@ -97,26 +116,35 @@ function Player:update(dt)
 	end
 	--]]
 
-	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * rotScale) end
-	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * -rotScale) end
+	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
+	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
 	if Input.getKey("key_left") then self.RigidBody:applyTorque(up * rotScale) end
 	if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
 	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
 	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
-	if Input.getKey("key_space") and inTun then self.RigidBody:applyCentralForce(thrust * linScale) end
+	if Input.getKey("key_space") and inTun then self.RigidBody:applyCentralForce(look * linScale) end
+	if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
+		self:owner():getComponent("Ship"):useItem(self._inventory[1][1])
+		self._inventory[1][2] = self._inventory[1][2] - 1
+		if (self._inventory[1][2] < 1) then self._inventory = {} end
+	end
 
 	self:sendPhysics()
-
-		
-	
-
 end
 
 function Player:onCollision(collision)
     if collision.rigidbody:owner():getComponent("Checkpoint") ~= nil then
 		local checkpoint = collision.rigidbody:owner()
     	checkpoint:destroy()
-		self:createNextCheckpoint();
+		self:createNextCheckpoint()
+	elseif collision.rigidbody:owner():getComponent("Pickup") ~= nil then
+		local pickup = collision.rigidbody:owner():getComponent("Pickup"):item()
+		if #self._inventory == 0 then
+			self._inventory[1] = pickup
+		elseif self._inventory[1][1] == pickup[1] then
+			self._inventory[1][2] = self._inventory[1][2] + pickup[2]
+		end
+		collision.rigidbody:owner():destroy()
 	end
 end
 
