@@ -1,0 +1,30 @@
+.menu_lobby .playerlist {
+	margin-top: 30px;
+}
+
+.menu_lobby .playerlist .title {
+	font-family: DinPro;
+	font-size: 21px;
+}
+
+.menu_lobby .playerlist .listitem {
+	display: block;
+}
+
+.menu_lobby .col_right {
+	float: right;
+	width: 30%;
+	margin-right: 10%;
+}
+
+.menu_lobby .status {
+	display: block;
+	font-size: 25px;
+	margin-top: 30px;
+	text-align: center;
+}
+
+.menu_lobby .btnBack {
+	position: relative;
+	margin-top: 80px;
+}

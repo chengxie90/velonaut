@@ -1,0 +1,20 @@
+<rml>
+	<head>
+		<title>Demo</title>
+		<link type="text/rcss" href="css/rkt.rcss"/>
+		<link type="text/rcss" href="css/layout.rcss"/>
+		<link type="text/rcss" href="css/ingame.rcss"/>
+	</head>
+	<body>
+		<div class="wrp">
+			
+			<div id="lbl_checkpoint_counter" class="checkpoint_counter">
+				<span class="caption">Checkpoints</span>
+				<span class="num_checkpoints">1</span>
+				<span class="slash">/</span>
+				<span class="total_checkpoints">10</span>
+			</div>
+
+		</div>
+	</body>
+</rml>

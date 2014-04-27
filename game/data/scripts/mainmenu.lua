@@ -39,7 +39,6 @@ function MainMenu:start()
 		end
 
 		if event.eventType == "gameinit" then
-			print("received gameinit")	
 			if App.players then
 				App._scene:loadPlayers(App.players, App.playerId)
 				Network.RPC("setPlayerReady", "")
@@ -55,6 +54,8 @@ function MainMenu:start()
 
 		if event.eventType == "gamestart" then
 			Gui.setText("txt_status", "");
+			Gui.unloadDocument()
+			Gui.loadDocument("./data/ui/ingame.rml")
 			return
 		end	
 
@@ -81,11 +82,6 @@ function MainMenu:start()
 	local function onStartGame()
 		Network.RPC("startGame", "")
 	end
-
-	local function onBtnJoinRace()
-		print("onBtnJoinRace")
-	end
-
 
 	local function onBtnBack()
 		Network.shutdownServer();

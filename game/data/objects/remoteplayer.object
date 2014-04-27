@@ -15,7 +15,7 @@ return
         },
         {
             type = "MeshRenderer",
-            mesh = "ship",
+            mesh = "cube",
             material = "lambert1"
         },
         {

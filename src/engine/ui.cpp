@@ -19,6 +19,7 @@ void Ui::initLua() {
     LuaManager::GetInstance()->requiref("engine.gui.c",[](lua_State* state) {
         luaL_Reg reg[] = {
             {"loadDocument", Ui::lLoadDocument},
+            {"unloadDocument", Ui::lUnloadDocument},
             {"loadCursor", Ui::lLoadMouseCursor},
             {"loadFont", Ui::lLoadFont},
             {"setText", Ui::lSetText},
@@ -169,6 +170,11 @@ int Ui::lGetAttribute(lua_State *state) {
     LuaManager::GetInstance()->addParam(string(s.CString()));
 
     return 1;
+}
+
+int Ui::lUnloadDocument(lua_State *state) {
+    Ui::GetInstance()->context_->UnloadDocument( Ui::GetInstance()->doc_ );
+    return 0;
 }
 
 

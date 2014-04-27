@@ -1,16 +1,3 @@
-body
-{
-	font-family: Din;
-	font-size: 18px;
-	color: white;
-}
-
-.wrp {
-	position: relative;
-	width: 100%;
-	height: 100%;
-}
-
 .wrp_menu {
 	position: absolute;
 	width: 70%;
@@ -26,20 +13,6 @@ body
 	width: 100%;
 	height: 100%;
 	margin-top: -50%;
-}
-
-.isHidden {
-	visibility: hidden;
-}
-
-.col_left {
-	float: left;	
-	width: 45%;
-}
-
-.col_right {
-	float: right;
-	width: 45%;
 }
 
 .btn
@@ -102,7 +75,3 @@ body
 	height: 100px;
 	transition-duration: 5s;
 }
-
-
-
-

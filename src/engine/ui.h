@@ -34,6 +34,7 @@ private:
     void configureRenderSystem();
     void buildKeyMaps();
     static int lLoadDocument(lua_State* state);
+    static int lUnloadDocument(lua_State* state);
     static int lLoadMouseCursor(lua_State* state);
     static int lLoadFont(lua_State* state);
     static int lSetText(lua_State* state);

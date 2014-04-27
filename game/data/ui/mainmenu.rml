@@ -1,10 +1,11 @@
 <rml>
 	<head>
 		<title>Demo</title>
-		<link type="text/rcss" href="rkt.rcss"/>
-		<link type="text/rcss" href="mainmenu.rcss"/>
-		<link type="text/rcss" href="hostrace.rcss"/>
-		<link type="text/rcss" href="settings.rcss"/>
+		<link type="text/rcss" href="css/rkt.rcss"/>
+		<link type="text/rcss" href="css/layout.rcss"/>
+		<link type="text/rcss" href="css/mainmenu.rcss"/>
+		<link type="text/rcss" href="css/lobby.rcss"/>
+		<link type="text/rcss" href="css/settings.rcss"/>
 	</head>
 	<body>
 		<div class="wrp">
@@ -19,11 +20,10 @@
 						<button id="btn_settings" class="btn"><span class="label">Settings</span></button>
 						<button id="btn_credits" class="btn"><span class="label">Credits</span></button>
 						<button id="btn_quit" class="btn"><span class="label">Quit</span></button>
-						<input id="fld_text" class="input_text"></input>
 					</div>
 				</div>
 
-				<div id="menu_join_race" class="wrp_menu menu_host_race isHidden">
+				<div id="menu_join_race" class="wrp_menu menu_lobby isHidden">
 					<div class="inner">
 						<h1 class="submenu_title" >GETTING READY</h1>
 						<div>
@@ -71,7 +71,7 @@
 					</div>
 				</div>
 
-				<div id="menu_credits" class="wrp_menu menu_host_race isHidden">
+				<div id="menu_credits" class="wrp_menu menu_lobby isHidden">
 					<div class="inner">
 						<h1 class="submenu_title" >Credits</h1>
 						<div>

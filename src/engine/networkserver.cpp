@@ -355,7 +355,7 @@ void NetworkServer::CountDownState::update(NetworkServer* server, timer& t)
     if (!t.isTimeout(1))
         return;
 
-        int count = 5-server->countdown_.elapsedTime();
+        int count = 2-server->countdown_.elapsedTime();
 
         if (count == 0) {
 

@@ -1,0 +1,26 @@
+body
+{
+	font-family: Din;
+	font-size: 18px;
+	color: white;
+}
+
+.wrp {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.isHidden {
+	visibility: hidden;
+}
+
+.col_left {
+	float: left;	
+	width: 45%;
+}
+
+.col_right {
+	float: right;
+	width: 45%;
+}

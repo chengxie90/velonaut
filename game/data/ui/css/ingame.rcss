@@ -1,0 +1,25 @@
+.checkpoint_counter {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 180px;	
+	height: 100px;
+}
+
+.checkpoint_counter .caption {
+	display: block;
+	font-size: 20px;	
+	text-transform: uppercase;
+}
+
+.checkpoint_counter .num_checkpoints {
+	font-size: 30px;
+}
+
+.checkpoint_counter .slash {
+	font-size: 30px;
+}
+
+.checkpoint_counter .total_checkpoints {
+	font-size: 22px;
+}
