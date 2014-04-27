@@ -173,7 +173,7 @@ void Graphics::initLua()
             {"getQuaternionFromAngleAxis", Graphics::VQHelper::lgetQuaternionFromAngleAxis},
             {"angleBetween", Graphics::VQHelper::langleBetween},
             {"rotationTo", Graphics::VQHelper::lrotationTo},
-            {"rotateBy", Graphics::VQHelper::lrotationTo},
+            {"applyRotationTo", Graphics::VQHelper::lapplyRotationTo},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -781,13 +781,13 @@ int Graphics::VQHelper::lrotationTo(lua_State *)
     return 1;
 }
 
-int Graphics::VQHelper::lrotationBy(lua_State *)
+int Graphics::VQHelper::lapplyRotationTo(lua_State *)
 {
-    Ogre::Vector3 v;
-    LuaManager::GetInstance()->extractParam(&v);
-
     Ogre::Quaternion q;
     LuaManager::GetInstance()->extractParam(&q);
+
+    Ogre::Vector3 v;
+    LuaManager::GetInstance()->extractParam(&v);
 
     Ogre::Vector3 ret = q * v;
 

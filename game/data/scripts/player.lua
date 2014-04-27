@@ -104,7 +104,7 @@ function Player:update(dt)
 	local right = self:transform():localX() * -1
 
 
-	local rotScale = 150
+	local rotScale = 200
 	local linScale = 800
 	
 	local inTun = true

@@ -175,10 +175,10 @@ function Vector.rotationTo(v1, v2)
     return gfxvqhelper.rotationTo(v1, v2)
 end
 
-function Vector.rotationBy(q, v)
+function Vector.applyRotationTo(q, v)
     assert(#q == 4)
     assert(#v == 3)
-    return gfxvqhelper.rotationBy(q, v)
+    return gfxvqhelper.applyRotationTo(q, v)
 end
 
 

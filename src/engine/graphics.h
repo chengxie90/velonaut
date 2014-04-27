@@ -108,7 +108,7 @@ private:
         static int lgetQuaternionFromAngleAxis(lua_State *);
         static int langleBetween(lua_State *);
         static int lrotationTo(lua_State *);
-        static int lrotationBy(lua_State *);
+        static int lapplyRotationTo(lua_State *);
     };
 };
 
