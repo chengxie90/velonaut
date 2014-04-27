@@ -16,13 +16,15 @@ return
         {
             name = "box1",
             prefab = "cube",
-            children = {
-                {
-                    name = "box2",
-                    prefab = "sphere"
-                },
-            }
         },
+        {
+            name = "box2",
+            prefab = "sphere"
+        },
+        {
+            name = "projectile",
+            prefab = "projectile"
+        }
 --[[
         {
             name = "player",

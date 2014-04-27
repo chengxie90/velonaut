@@ -12,12 +12,12 @@ return
             mesh = "cube",
             material = "lambert1"
         },
-        -- {
-        --     type = "RigidBody",
-        --     shape = "box",
-        --     boxHalfExtents = Vector(1, 1, 1),
-        --     mass = 0,
-        --     trigger = false,
-        -- }
+        {
+            type = "RigidBody",
+            shape = "box",
+            boxHalfExtents = Vector(1, 1, 1),
+            mass = 0,
+            trigger = false,
+        }
     }
 }

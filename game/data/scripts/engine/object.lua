@@ -6,6 +6,7 @@ require "engine.light"
 require "engine.meshrenderer"
 require "engine.behavior"
 require "engine.rigidbody"
+require "engine.particlerenderer"
 
 Object = class()
 

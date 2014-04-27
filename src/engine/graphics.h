@@ -102,6 +102,10 @@ private:
     struct Material {
         static int lcreate(lua_State *);
     };
+    
+    struct Particle {
+        static int lcreate(lua_State *);
+    };
 
     struct VQHelper {
         static int lgetQuaternionFromAxes(lua_State *);
