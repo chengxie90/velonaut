@@ -9,6 +9,7 @@ function Scene:_init(data)
     gfx.setActiveScene(self._handle)
     self._objects = {}
     self._started = false
+    self._remotePlayers = {}
 	
 end
 
@@ -49,6 +50,7 @@ function Scene:loadPlayers(players, playerId)
             self._player = obj
 		else
 			obj:getComponent("RemotePlayer"):setId(player.id)   
+            self._remotePlayers.insert(obj)
 		end
     end	
 
@@ -116,6 +118,10 @@ end
 
 function Scene:player()
     return self._player
+end
+
+function Scene:remotePlayers()
+    return self._remotePlayers
 end
 
 function Scene:setMainCamera(cam)

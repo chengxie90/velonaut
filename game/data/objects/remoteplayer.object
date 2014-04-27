@@ -6,7 +6,6 @@ return
             type = "Transform",
             position = Vector(30, 30, 30),
             orientation = Vector(0, 0, 0, 1),
-            scale = Vector(10, 10, 10)
         },
         {
             type = "Light",
@@ -15,7 +14,7 @@ return
         },
         {
             type = "MeshRenderer",
-            mesh = "ship",
+            mesh = "cube",
             material = "lambert1"
         },
         {

@@ -4,12 +4,32 @@ return
         {
             type = "Transform",
             position = Vector(0, 0, 0),
-            orientation = Vector(0, 0, 0, 1),
-            scale = Vector(1, 1, 1)
+            orientation = Vector(0, 0, 0, 1)
         },
+        --[[
         {
             type = "ParticleRenderer",
             particleSystem = "projectile"
         },
+        --]]
+        {
+            type = "Light",
+            lightType = "pointlight",
+            diffuse = Color(0.2, 1.0, 0.2)
+        },
+        {
+            type = "RigidBody",
+            shape = "box",
+            mass = 1,
+            boxHalfExtents = Vector(1, 1, 1),
+            trigger = true
+        },
+        {
+            type = "MeshRenderer",
+            mesh = "cube"
+        },
+        {
+            type = "Projectile"
+        }
     }
 }
