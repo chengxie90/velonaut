@@ -28,9 +28,13 @@ function RigidBody:rebuild(mass, shape, params)
     self:_destroy()
     if shape == "box" then
         local boxHalfExtents = params.boxHalfExtents
-        self._handle = phyrigidbody.create(mass, shape, boxHalfExtents)
-        handlemap[self._handle] = self
+        self._handle = phyrigidbody.create(mass, shape, boxHalfExtents)     
+    elseif shape == "sphere" then
+        local radius = params.radius
+        self._handle = phyrigidbody.create(mass, shape, radius)
     end
+    assert(self._handle)
+    handlemap[self._handle] = self
 end
 
 function RigidBody:_destroy()
