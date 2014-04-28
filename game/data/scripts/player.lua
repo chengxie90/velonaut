@@ -24,6 +24,7 @@ function Player:start()
 	self._boostFuel = 0
 
 	self._activeProjectiles = {}
+	self._projectileSpeed = 1200
 	self._projectileCounter = 0
 	self._projectileRange = 10000
 	self._projectileLife = 15
@@ -220,8 +221,15 @@ function Player:updateItems()
 				end
 
 				if target ~= 0 then
-					local force = remotePlayers[target]:transform():position() - pos
-					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 50000)
+					if self._projectileLife - v[2] < 0.5 then
+						local tar = (remotePlayers[target]:transform():position() - pos):getNormalized()*-1
+						local vel = (v[1]:getComponent("RigidBody"):linearVelocity()):getNormalized()
+						local ratio = (self._projectileLife - v[2]) * 0.8
+						tar = tar * ((1-ratio) + 0.2)
+						vel = vel * ratio
+						local newVel = ((tar + vel)/2):getNormalized() * self._projectileSpeed 
+						v[1]:getComponent("RigidBody"):setLinearVelocity(newVel)
+					end
 				end
 			end
 
@@ -278,11 +286,11 @@ function Player:useItem(item)
 		obj:load(data)
 		obj:start()
 
-		local startPos = rigidbody:position() + (look * 10)
+		obj:getComponent("RigidBody"):setTrigger(true)
+		local startPos = rigidbody:position() + (look * 30)
 		obj:transform():setPosition(startPos)
 		obj:getComponent("RigidBody"):setPosition(startPos)
-		obj:getComponent("RigidBody"):setLinearVelocity(look * 1600)
-		obj:getComponent("RigidBody"):setTrigger(true)
+		obj:getComponent("RigidBody"):setLinearVelocity(look * self._projectileSpeed)
 		obj:getComponent("Projectile"):setSender(self:owner():name())
 
 		self._activeProjectiles[name] = {obj, self._projectileLife}
@@ -292,6 +300,8 @@ end
 
 function Player:destroyProjectile(name)
 	local obj = App.scene():findObject(name)
-	self._activeProjectiles[name] = nil
+	if self._activeProjectiles[name] ~= nil then
+		self._activeProjectiles[name] = nil
+	end
 	obj:destroy()
 end

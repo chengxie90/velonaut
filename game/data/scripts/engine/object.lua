@@ -23,7 +23,7 @@ function Object:onDestroy()
 end
 
 function Object:destroy()
-    App.scene():destroyObject(self:name())
+    App.scene():addToDeleteCache(self:name())
 end
 
 function Object:name()

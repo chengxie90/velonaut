@@ -14,9 +14,9 @@ return
         --]]
         {
             type = "RigidBody",
-            shape = "box",
-            mass = 5,
-            boxHalfExtents = Vector(10, 10, 10)
+            shape = "sphere",
+            mass = 0.5,
+            radius = 10
         },
         {
             type = "MeshRenderer",

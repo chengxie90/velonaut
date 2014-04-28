@@ -19,9 +19,8 @@ function Projectile:update()
 end
 
 function Projectile:onCollision(collision)
-	if collision.rigidbody:owner():getComponent("RemotePlayer") ~= nil and self._sender == App.scene():player() then
-		App.scene():player():destroyProjectile(self:owner():name())
-		self:destroy()
+	if collision.rigidbody:owner():getComponent("RemotePlayer") ~= nil then
+		App.scene():player():getComponent("Player"):destroyProjectile(self:owner():name())
 	end
 end
 
