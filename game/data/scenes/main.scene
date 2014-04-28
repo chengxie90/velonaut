@@ -21,11 +21,12 @@ return
             name = "tunnel",
             prefab = "tunnel"
         },
---[[
+
         {
             name = "remoteplayer1",
             prefab = "remoteplayer"
-        }
+        },
+        --[[
         {
             name = "box1",
             prefab = "cube",
