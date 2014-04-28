@@ -113,7 +113,7 @@ function Player:update(dt)
 	local right = self:transform():localX() * -1
 
 
-	local rotScale = 2
+	local rotScale = 200
 	local linScale = 800
 	
 	local inTun = true
@@ -221,7 +221,7 @@ function Player:updateItems()
 
 				if target ~= 0 then
 					local force = remotePlayers[target]:transform():position() - pos
-					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 10000)
+					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 50000)
 				end
 			end
 
@@ -282,6 +282,7 @@ function Player:useItem(item)
 		obj:transform():setPosition(startPos)
 		obj:getComponent("RigidBody"):setPosition(startPos)
 		obj:getComponent("RigidBody"):setLinearVelocity(look * 1600)
+		obj:getComponent("RigidBody"):setTrigger(true)
 		obj:getComponent("Projectile"):setSender(self:owner():name())
 
 		self._activeProjectiles[name] = {obj, self._projectileLife}

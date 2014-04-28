@@ -13,15 +13,14 @@ return
             diffuse = Color(1.0, 1.0, 1.0)
         },
         {
-            type = "MeshRenderer",
-            mesh = "cube",
-            material = "lambert1"
-        },
-        {
             type = "RigidBody",
             shape = "box",
             mass = 1,
-            boxHalfExtents = Vector(1, 1, 1)
+            boxHalfExtents = Vector(10, 10, 10)
+        },
+        {
+            type = "MeshRenderer",
+            mesh = "ship",
         },
         {
             type = "Ship"
