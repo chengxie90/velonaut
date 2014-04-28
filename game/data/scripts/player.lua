@@ -302,6 +302,6 @@ function Player:destroyProjectile(name)
 	local obj = App.scene():findObject(name)
 	if self._activeProjectiles[name] ~= nil then
 		self._activeProjectiles[name] = nil
+		obj:destroy()
 	end
-	obj:destroy()
 end

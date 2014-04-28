@@ -12,6 +12,7 @@ function RemotePlayer:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
 	self._activeProjectiles = {}
+	self._projectileRange = 10000
 	
 	local function onGameMessageReceived(event)
 
@@ -79,8 +80,19 @@ function RemotePlayer:getId()
 end
 
 function RemotePlayer:update(dt)
-	
-	
-
+	local remove = {}
+	for k, v in pairs(self._activeProjectiles) do
+		if (v:transform():position() - self():owner():transform():position()):length() > self._projectileRange then
+			self._activeProjectiles[k] = nil
+			v:destroy()
+		end
+    end
 end
 
+function RemotePlayer:destroyProjectile(name)
+	local obj = App.scene():findObject(name)
+	if self._activeProjectiles[name] ~= nil then
+		self._activeProjectiles[name] = nil
+		obj:destroy()
+	end
+end
