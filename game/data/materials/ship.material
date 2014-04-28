@@ -1,0 +1,160 @@
+material _spacefighter10___Default
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.6 0.6 0.6 1
+			diffuse 0.6 0.6 0.6 1
+			specular 0.9 0.9 0.9 1 10.6
+
+			texture_unit
+			{
+				texture bottomexhaust-paint-05.gif
+			}
+		}
+
+	}
+
+}
+
+
+
+material _spacefighter13___Default
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.6 0.6 0.6 1
+			diffuse 0.6 0.6 0.6 1
+			specular 0.9 0.9 0.9 1 10
+
+			texture_unit
+			{
+				texture gunport-paint-02.gif
+			}
+		}
+
+	}
+
+}
+
+
+
+material _spacefighterbottom_fin
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.6 0.6 0.6 1
+			diffuse 0.6 0.6 0.6 1
+			specular 0.9 0.9 0.9 1 10
+
+			texture_unit
+			{
+				texture bottomwing-paint-01.gif
+			}
+		}
+
+	}
+
+}
+
+
+
+material _spacefighterdagger_hull
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.6 0.6 0.6 1
+			diffuse 0.6 0.6 0.6 1
+			specular 0.9 0.9 0.9 1 10.9
+
+			texture_unit
+			{
+				texture dagger-hull-paint24.gif
+			}
+		}
+
+	}
+
+}
+
+
+
+material _spacefighterdagger_intake
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.6 0.6 0.6 1
+			diffuse 0.6 0.6 0.6 1
+			specular 0.9 0.9 0.9 1 10.9
+
+			texture_unit
+			{
+				texture intake-paint-03.gif
+			}
+		}
+
+	}
+
+}
+
+
+
+material _spacefightermodel_clay
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.9 0.9 0.9 1
+			diffuse 0.9 0.9 0.9 1
+			specular 0.9 0.9 0.9 1 1
+		}
+
+	}
+
+}
+
+
+
+material _spacefighterupper_exhaust
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.6 0.6 0.6 1
+			diffuse 0.6 0.6 0.6 1
+			specular 0.9 0.9 0.9 1 10.9
+
+			texture_unit
+			{
+				texture upperexhaust-paint-06.gif
+			}
+		}
+
+	}
+
+}
+
+
+
+material NoMaterial
+{
+	technique
+	{
+		pass
+		{
+		}
+
+	}
+
+}
