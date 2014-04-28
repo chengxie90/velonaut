@@ -12,13 +12,21 @@ Player = class(Behavior)
 function Player:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
-	print("dfhk;sdf")
 
 	-- Create first checkpoint 
 	self._nextCheckpoint = 1
 	self._inventory = {}
 	self:createNextCheckpoint()
 	self:createPickups()
+
+	self._boostSpeed = 1100
+	self._boostCapacity = 5
+	self._boostFuel = 0
+
+	self._activeProjectiles = {}
+	self._projectileCounter = 0
+	self._projectileRange = 10000
+	self._projectileLife = 50
 end
 
 function Player:createPickups()
@@ -125,10 +133,12 @@ function Player:update(dt)
 	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
 	if Input.getKey("key_space") and inTun then self.RigidBody:applyCentralForce(look * linScale) end
 	if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
-		self:owner():getComponent("Ship"):useItem(self._inventory[1][1])
+		self:useItem(self._inventory[1][1])
 		self._inventory[1][2] = self._inventory[1][2] - 1
 		if (self._inventory[1][2] < 1) then self._inventory = {} end
 	end
+
+	self:updateItems()
 
 	self:sendPhysics()
 end
@@ -165,5 +175,101 @@ function Player:sendPhysics()
 						 ",angularVelo=" .. angularVelo:serialize3d() ..
  						 ",force=" .. force:serialize3d() ..
 						 ",torque=" .. torque:serialize3d() .. "}")
+
+end
+
+function Player:updateItems()
+	if self._boostFuel > 0 then
+		local rigidbody = self:owner():getComponent("RigidBody")
+		local transform = self:owner():getComponent("Transform")
+		local look = transform:orientation():applyRotationTo(Vector(0,0,-1))
+		rigidbody:setLinearVelocity(look:getNormalized() * self._boostSpeed)
+		self._boostFuel = self._boostFuel - 1
+	end
+
+	local remotePlayers = App.scene():remotePlayers()
+	for k, v in pairs(self._activeProjectiles) do
+		local target = 0
+		local targetDist = math.huge
+		local pos = v[1]:transform():position()
+
+
+        if (self:owner():transform():position() - pos):length() > self._projectileRange then
+			self._activeProjectiles[k] = nil
+			v[1]:destroy()
+		end
+
+		if v[2] > 0 then
+			v[2] = v[2] - 1
+
+			for i = 1, #remotePlayers do
+				local relativePos = pos - remotePlayers[i]:transform():position()
+				if relativePos:length() < targetDist then
+					targetDist = relativePos:length()
+					target = i
+				end
+			end
+
+			if target ~= 0 then
+				local force = remotePlayers[target]:transform():position() - pos
+				v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 100)
+			end
+		end
+
+		self:sendProjectile(v[1])
+    end
+end
+
+function Player:sendProjectile(projectile)
+	local rigidbody = projectile:getComponent("RigidBody") 
+	local position 		= rigidbody:position()
+	local orientation 	= rigidbody:orientation()
+	local linearVelo	= rigidbody:linearVelocity()
+	local angularVelo	= rigidbody:angularVelocity()
+	local force			= rigidbody:force()
+	local torque		= rigidbody:torque()
+
+	Network.sendMessage( "{ eventType='projectileUpdate'" ..
+						 ",projectileName='" .. projectile:name() .. "'" ..
+						 ",playerId='" .. self:getId() .. "'" ..
+						 ",position=" .. position:serialize3d() ..
+						 ",orientation=" .. orientation:serialize4d() ..
+   						 ",linearVelo=" .. linearVelo:serialize3d() ..
+						 ",angularVelo=" .. angularVelo:serialize3d() ..
+ 						 ",force=" .. force:serialize3d() ..
+						 ",torque=" .. torque:serialize3d() .. "}")
+
+end
+
+function Player:useItem(item)
+
+	if item == "boost" then
+		print("BOOOOST!")
+		self._boostFuel = self._boostCapacity
+	end
+
+	if item == "projectile" then
+
+		print("PEW!")
+		local rigidbody = self:owner():getComponent("RigidBody")
+		local transform = self:owner():getComponent("Transform")
+		local look = transform:orientation():applyRotationTo(Vector(0,0,-1)):getNormalized()
+
+		self._projectileCounter = self._projectileCounter + 1
+		local name = "projectile_"..self:owner():name().."_".. self._projectileCounter
+		local prefab = "projectile"
+
+		local obj = App:scene():createObject(name)
+		local data = loadDataFile(prefab, "object")
+		obj:load(data)
+		obj:start()
+
+		local startPos = rigidbody:position() + (look * 10)
+		obj:transform():setPosition(startPos)
+		obj:getComponent("RigidBody"):setPosition(startPos)
+		obj:getComponent("RigidBody"):setLinearVelocity(look * 1600)
+
+		self._activeProjectiles[name] = {obj, self._projectileLife}
+	end
 
 end
