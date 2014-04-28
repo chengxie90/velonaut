@@ -34,7 +34,7 @@ function RemotePlayer:start()
 			if self._activeProjectiles[event.projectileName] == nil then
 				local prefab = "projectile"
 
-				local obj = App:scene():createObject(projectileName)
+				local obj = App:scene():createObject(event.projectileName)
 				local data = loadDataFile(prefab, "object")
 				obj:load(data)
 				obj:start()
