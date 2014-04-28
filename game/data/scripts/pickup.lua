@@ -10,8 +10,8 @@ function Pickup:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
 	self.RigidBody:setAngularVelocity(Vector(0,1,0))
-	self._items = {{[1]="projectile", [2]=3}}
-	--, {[1]="boost", [2]=3}
+	self._items = {{[1]="projectile", [2]=3}, {[1]="boost", [2]=3}}
+	
 end
 
 function Pickup:update()

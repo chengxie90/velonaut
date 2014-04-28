@@ -20,6 +20,8 @@ void Ui::initLua() {
         luaL_Reg reg[] = {
             {"loadDocument", Ui::lLoadDocument},
             {"unloadDocument", Ui::lUnloadDocument},
+            {"hideDocument", Ui::lHideDocument},
+            {"showDocument", Ui::lShowDocument},
             {"loadCursor", Ui::lLoadMouseCursor},
             {"loadFont", Ui::lLoadFont},
             {"setText", Ui::lSetText},
@@ -71,18 +73,6 @@ void Ui::shutdown() {
     context_->UnloadAllDocuments();
 }
 
-int Ui::lLoadDocument(lua_State *state)
-{
-    string doc;
-    LuaManager::GetInstance()->extractParam(&doc);
-    Ui::GetInstance()->doc_ = Ui::GetInstance()->context_->LoadDocument( doc.c_str() );
-    if (Ui::GetInstance()->doc_)
-    {
-        Ui::GetInstance()->doc_->Show();
-        Ui::GetInstance()->doc_->RemoveReference();
-    }
-}
-
 int Ui::lLoadMouseCursor(lua_State *state)
 {
     // Load the mouse cursor and release the caller's reference.
@@ -120,6 +110,8 @@ int Ui::lRemoveClass(lua_State *state) {
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
 
+    std::cout << "gg: " << id << ", " << text << std::endl;
+
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetClass(text.c_str(), false);
 }
 
@@ -142,6 +134,8 @@ int Ui::lSetText(lua_State *state) {
 
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
+
+    std::cout << id.c_str() << std::endl;
 
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetInnerRML(text.c_str());
 }
@@ -166,14 +160,55 @@ int Ui::lGetAttribute(lua_State *state) {
     LuaManager::GetInstance()->extractParam(&attr);
 
     Rocket::Core::String s = Ui::GetInstance()->doc_->GetElementById(id.c_str())->GetAttribute<Rocket::Core::String>(attr.c_str(), "none" );
+    Ui::GetInstance()->doc_->Hide();
 
     LuaManager::GetInstance()->addParam(string(s.CString()));
 
     return 1;
 }
 
+int Ui::lLoadDocument(lua_State *state)
+{
+    string docString;
+    LuaManager::GetInstance()->extractParam(&docString);
+
+    std::cout << "loading document " << docString << std::endl;
+
+    Ui* ui = Ui::GetInstance();    
+    Rocket::Core::ElementDocument* doc;
+
+    doc = ui->context_->LoadDocument( docString.c_str() );
+    if (doc)
+    {
+        doc->RemoveReference();
+    }
+    ui->docs_.push_back(doc);
+    int i = ui->docs_.size()-1;
+    LuaManager::GetInstance()->addParam(i);
+
+    return 1;
+}
+
 int Ui::lUnloadDocument(lua_State *state) {
-    Ui::GetInstance()->context_->UnloadDocument( Ui::GetInstance()->doc_ );
+    Ui* ui = Ui::GetInstance();
+    ui->context_->UnloadDocument( ui->doc_ );
+    return 0;
+}
+
+int Ui::lHideDocument(lua_State *state) {
+    Ui* ui = Ui::GetInstance();
+    int docIndex;
+    LuaManager::GetInstance()->extractParam(&docIndex);
+    ui->docs_[docIndex]->Hide();
+    return 0;
+}
+
+int Ui::lShowDocument(lua_State *state) {
+    Ui* ui = Ui::GetInstance();
+    int docIndex;
+    LuaManager::GetInstance()->extractParam(&docIndex);
+    ui->doc_ = ui->docs_[docIndex];
+    ui->doc_->Show();
     return 0;
 }
 

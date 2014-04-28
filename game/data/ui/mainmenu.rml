@@ -10,8 +10,6 @@
 	<body>
 		<div class="wrp">
 			
-			<div id="txt_status" class="status" />
-			
 			<div id="main_menu_wrp">
 				<div id="menu_main" class="wrp_menu menu_main">
 					<div class="inner">

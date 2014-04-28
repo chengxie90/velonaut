@@ -9,6 +9,10 @@ return
 			name = "mainmenu",
 			prefab = "mainmenu"
 		},
+        {
+            name = "hud",
+            prefab = "hud"
+        },
 		{
 			name = "initcam",
 			prefab = "initcam"

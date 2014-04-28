@@ -21,8 +21,7 @@ return
             type = "RigidBody",
             shape = "box",
             mass = 1,
-            boxHalfExtents = Vector(1, 1, 1),
-            trigger = true
+            boxHalfExtents = Vector(1, 1, 1)
         },
         {
             type = "MeshRenderer",
