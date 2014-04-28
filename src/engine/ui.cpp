@@ -177,8 +177,6 @@ int Ui::lUnloadDocument(lua_State *state) {
     return 0;
 }
 
-
-
 // TODO: Add RemoveEventListener function
 
 Ui *Ui::GetInstance()
