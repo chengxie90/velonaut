@@ -221,10 +221,10 @@ function Player:updateItems()
 				end
 
 				if target ~= 0 then
-					if self._projectileLife - v[2] < 0.5 then
-						local tar = (remotePlayers[target]:transform():position() - pos):getNormalized()*-1
+					if ((self._projectileLife - v[2])/self._projectileLife) < 0.5 then
+						local tar = (remotePlayers[target]:transform():position() - pos):getNormalized()
 						local vel = (v[1]:getComponent("RigidBody"):linearVelocity()):getNormalized()
-						local ratio = (self._projectileLife - v[2]) * 0.8
+						local ratio = ((self._projectileLife - v[2])/self._projectileLife) * 0.8
 						tar = tar * ((1-ratio) + 0.2)
 						vel = vel * ratio
 						local newVel = ((tar + vel)/2):getNormalized() * self._projectileSpeed 
