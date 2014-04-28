@@ -110,8 +110,6 @@ int Ui::lRemoveClass(lua_State *state) {
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
 
-    std::cout << "gg: " << id << ", " << text << std::endl;
-
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetClass(text.c_str(), false);
 }
 
@@ -160,8 +158,6 @@ int Ui::lGetAttribute(lua_State *state) {
     LuaManager::GetInstance()->extractParam(&attr);
 
     Rocket::Core::String s = Ui::GetInstance()->doc_->GetElementById(id.c_str())->GetAttribute<Rocket::Core::String>(attr.c_str(), "none" );
-    Ui::GetInstance()->doc_->Hide();
-
     LuaManager::GetInstance()->addParam(string(s.CString()));
 
     return 1;

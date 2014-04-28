@@ -70,7 +70,6 @@ void NetworkServer::rpcSetNumPlayers(BitStream* bsIn,Packet* p)
     NetworkServer* srv = NetworkServer::GetInstance();
     RakString rs;
     srv->readString(bsIn, rs, false);
-    std::cout << "setNumPlayers: " << rs.C_String() << std::endl;
 
     NetworkServer* server = NetworkServer::GetInstance();
     server->numPlayers_ = atoi(rs.C_String());
@@ -199,6 +198,9 @@ RakString NetworkServer::createPlayerListEvent()
     s.append("'");
     s.append(", hostip='");
     s.append(hostip);
+    s.append("'");
+    s.append(", minPlayers='");
+    s.append(to_string(numPlayers_));
     s.append("'");
     s.append(", players={");
 
