@@ -198,6 +198,7 @@ void Network::onGameMessageReceived(Packet *packet) {
     bsIn.IgnoreBytes(sizeof(MessageID));
     StringCompressor compressor;
     compressor.DecodeString(&rs, 1000, &bsIn);
+    //std::cout << string(rs.C_String()) << std::endl;
     fireEvent("game_message", string(rs.C_String()));
 }
 

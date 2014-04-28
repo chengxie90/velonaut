@@ -32,6 +32,7 @@ function RemotePlayer:start()
 
 		if event.eventType == "projectileUpdate" and event.playerId == self:getId() then
 			if self._activeProjectiles[event.projectileName] == nil then
+				print("REMOTE PLAYER " .. self:owner():name() .. " CREATE PROJECTILE ".. event.projectileName)
 				local prefab = "projectile"
 
 				local obj = App:scene():createObject(event.projectileName)
@@ -52,6 +53,7 @@ function RemotePlayer:start()
 
 				self._activeProjectiles[event.projectileName] = obj
 			else
+				print("REMOTE PLAYER " .. self:owner():name() .. " UPDATE PROJECTILE ".. event.projectileName)
 				local obj = self._activeProjectiles[event.projectileName]
 				local rigidbody = obj:getComponent("RigidBody")
 				local transform = obj:transform()
