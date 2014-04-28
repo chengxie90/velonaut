@@ -16,6 +16,10 @@ return
         {
             name = "tunnel",
             prefab = "tunnel"
+        },
+        {
+            name = "remoteplayer1",
+            prefab = "remoteplayer"
         }
 --[[
         {

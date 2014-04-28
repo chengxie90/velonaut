@@ -26,7 +26,7 @@ function Player:start()
 	self._activeProjectiles = {}
 	self._projectileCounter = 0
 	self._projectileRange = 10000
-	self._projectileLife = 50
+	self._projectileLife = 15
 end
 
 function Player:createPickups()
@@ -113,17 +113,15 @@ function Player:update(dt)
 	local right = self:transform():localX() * -1
 
 
-	local rotScale = 200
+	local rotScale = 2
 	local linScale = 800
 	
 	local inTun = true
-	--[[
 	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")
 	local tunnelDist = tun:getClosestSamplePosition(self.Transform:position())
 	if tunnelDist.distance > (tun:tunnelRadius() * 1.1) then 
 		inTun = false
 	end
-	--]]
 
 	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
 	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
@@ -131,7 +129,10 @@ function Player:update(dt)
 	if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
 	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
 	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
-	if Input.getKey("key_space") and inTun then self.RigidBody:applyCentralForce(look * linScale) end
+	if Input.getKey("key_space") then 
+		if inTun then self.RigidBody:applyCentralForce(look * linScale) 
+		else self.RigidBody:applyCentralForce(look * linScale * 0.5) end
+	end
 	if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
 		self:useItem(self._inventory[1][1])
 		self._inventory[1][2] = self._inventory[1][2] - 1
@@ -211,7 +212,7 @@ function Player:updateItems()
 
 				if target ~= 0 then
 					local force = remotePlayers[target]:transform():position() - pos
-					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 100)
+					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 10000)
 				end
 			end
 
@@ -272,8 +273,15 @@ function Player:useItem(item)
 		obj:transform():setPosition(startPos)
 		obj:getComponent("RigidBody"):setPosition(startPos)
 		obj:getComponent("RigidBody"):setLinearVelocity(look * 1600)
+		obj:getComponent("Projectile"):setSender(self:owner():name())
 
 		self._activeProjectiles[name] = {obj, self._projectileLife}
 	end
 
+end
+
+function Player:destroyProjectile(name)
+	local obj = App.scene():findObject(name)
+	self._activeProjectiles[name] = nil
+	obj:destroy()
 end

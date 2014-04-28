@@ -13,16 +13,10 @@ return
         },
         --]]
         {
-            type = "Light",
-            lightType = "pointlight",
-            diffuse = Color(0.2, 1.0, 0.2)
-        },
-        {
             type = "RigidBody",
             shape = "box",
             mass = 1,
             boxHalfExtents = Vector(1, 1, 1),
-            trigger = true
         },
         {
             type = "MeshRenderer",
