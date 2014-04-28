@@ -60,7 +60,14 @@ function Scene:loadPlayers(players, playerId)
     local data = loadDataFile(prefab, "object")
     obj:load(data)
     obj:start()
-    obj:transform():setParent(self._player:transform())
+
+    local cameratarget = self:createObject("cameratarget")
+    local targetdata = loadDataFile("cameratarget", "object")
+    cameratarget:load(targetdata)
+    cameratarget:start()
+
+    cameratarget:transform():setParent(self._player:transform())
+    obj:transform():setParent(cameratarget:transform())
     obj:getComponent("CameraMan"):initializePosition()
 
 	self:setMainCamera(self:findObject("cameraman"):getComponent("Camera"))	

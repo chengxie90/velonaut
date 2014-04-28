@@ -1,0 +1,9 @@
+return 
+{
+    components = {
+        {
+            type = "Transform",
+            position = Vector(0, 10, 0),
+        },
+    }
+}

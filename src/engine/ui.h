@@ -26,7 +26,7 @@ public:
 
     static Ui* GetInstance();
 
-    Rocket::Core::ElementDocument *doc_;
+
 
 private:
     SINGLETON(Ui)
@@ -35,6 +35,8 @@ private:
     void buildKeyMaps();
     static int lLoadDocument(lua_State* state);
     static int lUnloadDocument(lua_State* state);
+    static int lHideDocument(lua_State* state);
+    static int lShowDocument(lua_State* state);
     static int lLoadMouseCursor(lua_State* state);
     static int lLoadFont(lua_State* state);
     static int lSetText(lua_State* state);
@@ -52,6 +54,8 @@ private:
     Rocket::Core::Context* context_;
     Ogre::Matrix4 projection_matrix;
     KeyIdentifierMap key_identifiers;
+    std::vector<Rocket::Core::ElementDocument*> docs_;
+    Rocket::Core::ElementDocument *doc_;
 
 
 class RocketEventListener : public Rocket::Core::EventListener

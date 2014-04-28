@@ -1,0 +1,27 @@
+<rml>
+	<head>
+		<title>Demo</title>
+		<link type="text/rcss" href="css/rkt.rcss"/>
+		<link type="text/rcss" href="css/layout.rcss"/>
+		<link type="text/rcss" href="css/hud.rcss"/>
+	</head>
+	<body>
+		<div class="wrp">
+
+			<div id="txt_status" class="status" />
+
+			<div class="checkpoint_counter">
+				<span class="caption">Checkpoints</span>
+				<span id="lbl_num_checkpoints" class="num_checkpoints">0</span>
+				<span class="slash">/</span>
+				<span id="lbl_total_checkpoints" class="total_checkpoints">10</span>
+			</div>
+
+			<div id="box_pickups" class="pickup">
+				<span id="lbl_current_pickup" class="caption">Pickup</span>
+				<span id="lbl_num_pickups" class="num_pickups">0</span>
+			</div>
+
+		</div>
+	</body>
+</rml>
