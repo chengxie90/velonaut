@@ -133,7 +133,6 @@ int Ui::lSetText(lua_State *state) {
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
 
-    std::cout << id.c_str() << std::endl;
 
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetInnerRML(text.c_str());
 }

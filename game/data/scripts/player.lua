@@ -272,13 +272,13 @@ function Player:useItem(item)
 
 	if item == "projectile" then
 
-		print("PEW!")
 		local rigidbody = self:owner():getComponent("RigidBody")
 		local transform = self:owner():getComponent("Transform")
 		local look = transform:orientation():applyRotationTo(Vector(0,0,-1)):getNormalized()
 
 		self._projectileCounter = self._projectileCounter + 1
 		local name = "projectile_"..self:owner():name().."_".. self._projectileCounter
+		print("LOCAL PLAYER " .. self:owner():name() .. " CREATE PROJECTILE ".. name)
 		local prefab = "projectile"
 
 		local obj = App:scene():createObject(name)
