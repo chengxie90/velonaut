@@ -12,6 +12,7 @@ Player = class(Behavior)
 function Player:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
+	print("dfhk;sdf")
 
 	-- Create first checkpoint 
 	self._nextCheckpoint = 1
