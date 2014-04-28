@@ -11,6 +11,7 @@ RemotePlayer = class(Behavior)
 function RemotePlayer:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
+	self._activeProjectiles = {}
 	
 	local function onGameMessageReceived(event)
 
@@ -27,6 +28,40 @@ function RemotePlayer:start()
 			self.RigidBody:applyTorque(Vector(event.torque))
 
 			return
+		end
+
+		if event.eventType == "projectileUpdate" and event.playerId == self:getId() then
+			if self._activeProjectiles[event.projectileName] == nil then
+				local prefab = "projectile"
+
+				local obj = App:scene():createObject(projectileName)
+				local data = loadDataFile(prefab, "object")
+				obj:load(data)
+				obj:start()
+
+				local rigidbody = obj:getComponent("RigidBody")
+				local transform = obj:transform()
+				transform:setPosition(event.position)
+				transform:setOrientation(event.orientation)
+				rigidbody:setPosition(event.position)
+				rigidbody:setOrientation(event.orientation)
+				rigidbody:setLinearVelocity(event.linearVelo)
+				rigidbody:setAngularVelocity(event.angularVelo)
+				rigidbody:applyCentralForce(event.force)
+				rigidbody:applyTorque(event.torque)
+
+				self._activeProjectiles[event.projectileName] = obj
+			else
+				local obj = self._activeProjectiles[event.projectileName]
+				local rigidbody = obj:getComponent("RigidBody")
+				local transform = obj:transform()
+				transform:setOrientation(event.orientation)
+				rigidbody:setOrientation(event.orientation)
+				rigidbody:setLinearVelocity(event.linearVelo)
+				rigidbody:setAngularVelocity(event.angularVelo)
+				rigidbody:applyCentralForce(event.force)
+				rigidbody:applyTorque(event.torque)
+			end
 		end
 	end
 
