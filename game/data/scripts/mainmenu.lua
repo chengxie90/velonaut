@@ -5,6 +5,8 @@ MainMenu = class(Behavior)
 
 function MainMenu:start()
 
+	print("mainmenu start")
+
 	self.menus = {	"menu_main",
 					"menu_join_race",
 					"menu_settings",
@@ -42,20 +44,14 @@ function MainMenu:start()
 			if App.players then
 				App._scene:loadPlayers(App.players, App.playerId)
 				Network.RPC("setPlayerReady", "")
-				Gui.addClass("main_menu_wrp", "isHidden")
+				App.scene():findObject("hud"):getComponent("Hud"):show()
+				self:hide()
 			end
 			return
 		end
 
-		if event.eventType == "countdown" then
-			Gui.setText("txt_status", event.count);	
-			return		
-		end
-
 		if event.eventType == "gamestart" then
-			Gui.setText("txt_status", "");
-			Gui.unloadDocument()
-			Gui.loadDocument("./data/ui/ingame.rml")
+
 			return
 		end	
 
@@ -160,9 +156,12 @@ function MainMenu:start()
 	Gui.loadFont("./data/ui/font/DINPro-Black.ttf")
 	Gui.loadFont("./data/ui/font/DINPro-Bold.ttf")
 	Gui.loadFont("./data/ui/font/DINMedium.ttf")
-	Gui.loadDocument("./data/ui/mainmenu.rml")
-	Gui.removeClass("menu_join_race", "isHidden")
 
+	self.id = Gui.loadDocument("./data/ui/mainmenu.rml")
+	print("showing menu document no " .. self.id)
+	self:show()
+
+	Gui.removeClass("menu_join_race", "isHidden")
 	Gui.addEventListener("btn_join_race", "click", onBtnJoinRace)
 	Gui.addEventListener("btn_host_race", "click", onBtnHostRace)
 	Gui.addEventListener("btn_settings", "click", onBtnSettings)
@@ -180,10 +179,17 @@ function MainMenu:start()
 
 end
 
+function MainMenu:show()
+	Gui.showDocument( self.id )
+end
+
+function MainMenu:hide()
+	Gui.hideDocument( self.id )
+end
+
 function MainMenu:showMenu(newMenu)
 
 	for i,menu in pairs( self.menus ) do
-		print("menu: " .. menu)
 		Gui.removeClass( menu, "isHidden" )
 		Gui.addClass( menu, "isHidden" )
 	end

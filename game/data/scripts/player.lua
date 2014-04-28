@@ -26,7 +26,7 @@ function Player:start()
 	self._activeProjectiles = {}
 	self._projectileCounter = 0
 	self._projectileRange = 10000
-	self._projectileLife = 50
+	self._projectileLife = 15
 end
 
 function Player:createPickups()
@@ -139,6 +139,14 @@ function Player:update(dt)
 	end
 
 	self:updateItems()
+	
+	local hud = App.scene():findObject("hud"):getComponent("Hud")
+	if #self._inventory > 0 then
+		hud:setPickupName( self._inventory[1][1] )
+		hud:setPickupNumber( self._inventory[1][2] )
+	else
+		hud:setNoPickup()
+	end		
 
 	self:sendPhysics()
 end
@@ -148,6 +156,7 @@ function Player:onCollision(collision)
 		local checkpoint = collision.rigidbody:owner()
     	checkpoint:destroy()
 		self:createNextCheckpoint()
+		App.scene():findObject("hud"):getComponent("Hud"):incrementCheckpoints()
 	elseif collision.rigidbody:owner():getComponent("Pickup") ~= nil then
 		local pickup = collision.rigidbody:owner():getComponent("Pickup"):item()
 		if #self._inventory == 0 then
@@ -211,7 +220,7 @@ function Player:updateItems()
 
 				if target ~= 0 then
 					local force = remotePlayers[target]:transform():position() - pos
-					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 100)
+					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 10000)
 				end
 			end
 
