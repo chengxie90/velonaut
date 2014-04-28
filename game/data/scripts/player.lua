@@ -188,36 +188,40 @@ function Player:updateItems()
 	end
 
 	local remotePlayers = App.scene():remotePlayers()
+
+	local remove = {}
 	for k, v in pairs(self._activeProjectiles) do
 		local target = 0
 		local targetDist = math.huge
 		local pos = v[1]:transform():position()
 
-
         if (self:owner():transform():position() - pos):length() > self._projectileRange then
-			self._activeProjectiles[k] = nil
-			v[1]:destroy()
-		end
+        	table.insert(remove, k)
+        else
+			if v[2] > 0 then
+				v[2] = v[2] - 1
 
-		if v[2] > 0 then
-			v[2] = v[2] - 1
+				for i = 1, #remotePlayers do
+					local relativePos = pos - remotePlayers[i]:transform():position()
+					if relativePos:length() < targetDist then
+						targetDist = relativePos:length()
+						target = i
+					end
+				end
 
-			for i = 1, #remotePlayers do
-				local relativePos = pos - remotePlayers[i]:transform():position()
-				if relativePos:length() < targetDist then
-					targetDist = relativePos:length()
-					target = i
+				if target ~= 0 then
+					local force = remotePlayers[target]:transform():position() - pos
+					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 100)
 				end
 			end
 
-			if target ~= 0 then
-				local force = remotePlayers[target]:transform():position() - pos
-				v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 100)
-			end
+			self:sendProjectile(v[1])
 		end
-
-		self:sendProjectile(v[1])
     end
+
+    for i = 1, #remove do
+    	self._activeProjectiles[remove[i]] = nil
+	end
 end
 
 function Player:sendProjectile(projectile)

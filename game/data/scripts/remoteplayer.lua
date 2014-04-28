@@ -41,26 +41,26 @@ function RemotePlayer:start()
 
 				local rigidbody = obj:getComponent("RigidBody")
 				local transform = obj:transform()
-				transform:setPosition(event.position)
-				transform:setOrientation(event.orientation)
-				rigidbody:setPosition(event.position)
-				rigidbody:setOrientation(event.orientation)
-				rigidbody:setLinearVelocity(event.linearVelo)
-				rigidbody:setAngularVelocity(event.angularVelo)
-				rigidbody:applyCentralForce(event.force)
-				rigidbody:applyTorque(event.torque)
+				transform:setPosition(Vector(event.position))
+				transform:setOrientation(Vector(event.orientation))
+				rigidbody:setPosition(Vector(event.position))
+				rigidbody:setOrientation(Vector(event.orientation))
+				rigidbody:setLinearVelocity(Vector(event.linearVelo))
+				rigidbody:setAngularVelocity(Vector(event.angularVelo))
+				rigidbody:applyCentralForce(Vector(event.force))
+				rigidbody:applyTorque(Vector(event.torque))
 
 				self._activeProjectiles[event.projectileName] = obj
 			else
 				local obj = self._activeProjectiles[event.projectileName]
 				local rigidbody = obj:getComponent("RigidBody")
 				local transform = obj:transform()
-				transform:setOrientation(event.orientation)
-				rigidbody:setOrientation(event.orientation)
-				rigidbody:setLinearVelocity(event.linearVelo)
-				rigidbody:setAngularVelocity(event.angularVelo)
-				rigidbody:applyCentralForce(event.force)
-				rigidbody:applyTorque(event.torque)
+				transform:setOrientation(Vector(event.orientation))
+				rigidbody:setOrientation(Vector(event.orientation))
+				rigidbody:setLinearVelocity(Vector(event.linearVelo))
+				rigidbody:setAngularVelocity(Vector(event.angularVelo))
+				rigidbody:applyCentralForce(Vector(event.force))
+				rigidbody:applyTorque(Vector(event.torque))
 			end
 		end
 	end
