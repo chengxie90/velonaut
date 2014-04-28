@@ -156,7 +156,6 @@ void Network::rpc(string req, string params) {
     bsOut.Reset();
     StringCompressor compressor;
     compressor.EncodeString(params.c_str(), params.size()+1, &bsOut);
-    std::cout << "sending rpc" << std::endl;
     rpc_.Call(req.c_str(), &bsOut, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
 }
 
@@ -237,6 +236,9 @@ void Network::poll() {
             case ID_CONNECTION_ATTEMPT_FAILED:
               onConnectionFailed(packet);
               break;
+            case ID_NO_FREE_INCOMING_CONNECTIONS:
+                std::cout << "NO FREE CONNECTIONS!" << std::endl;
+                break;
             case ID_DISCONNECTION_NOTIFICATION:
             case ID_CONNECTION_LOST:
               onDisconnect(packet);

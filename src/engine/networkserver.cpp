@@ -66,13 +66,12 @@ void NetworkServer::rpcSetPlayerReady(BitStream* bsIn,Packet* p)
 
 void NetworkServer::rpcSetNumPlayers(BitStream* bsIn,Packet* p)
 {
-
-    NetworkServer* srv = NetworkServer::GetInstance();
-    RakString rs;
-    srv->readString(bsIn, rs, false);
-
     NetworkServer* server = NetworkServer::GetInstance();
+    RakString rs;
+    server->readString(bsIn, rs, false);
     server->numPlayers_ = atoi(rs.C_String());
+    server->setMaxIncomingConnections(server->numPlayers_);
+    std::cout << "setting max incoming to: " << server->numPlayers_ << std::endl;
 }
 
 void NetworkServer::start(int port)

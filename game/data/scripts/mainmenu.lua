@@ -20,7 +20,9 @@ function MainMenu:start()
 			print( "Welcome, you been assigned ID " .. event.id )
 			App.playerId = event.id
 			Network.RPC("setPlayerName", Gui.getAttribute("fld_player_name", "value"))
-			if self.isServer then Network.RPC("setNumPlayers", Gui.getAttribute("fld_min_num_players", "value")) end
+			if self.isServer then
+				Network.RPC("setNumPlayers", Gui.getAttribute("fld_min_num_players", "value"))
+			end
 			return
 		end	
 
@@ -53,12 +55,6 @@ function MainMenu:start()
 			end
 			return
 		end
-
-		if event.eventType == "gamestart" then
-
-			return
-		end	
-
 	end
 
 	local function onConnectedToServer()
