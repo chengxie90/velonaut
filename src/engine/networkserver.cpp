@@ -25,6 +25,11 @@ NetworkServer *NetworkServer::GetInstance()
 NetworkServer::NetworkServer():currentState_(0), thread_(0), isRunning_(false) {
     server_ = RakPeerInterface::GetInstance();
     server_->AttachPlugin(&rpc_);
+
+    rpc_.RegisterFunction("setPlayerName", &NetworkServer::rpcSetPlayerName);
+    rpc_.RegisterFunction("setPlayerReady", &NetworkServer::rpcSetPlayerReady);
+    rpc_.RegisterFunction("setNumPlayers", &NetworkServer::rpcSetNumPlayers);
+    rpc_.RegisterFunction("startGame", &NetworkServer::rpcStartGame);
 }
 
 void NetworkServer::rpcSetPlayerName(BitStream* bsIn,Packet* p)
@@ -76,17 +81,25 @@ void NetworkServer::rpcSetNumPlayers(BitStream* bsIn,Packet* p)
 
 void NetworkServer::start(int port)
 {
+    reset();
+
     port_ = port;
     isRunning_ = true;
 
     server_ = RakPeerInterface::GetInstance();
     server_->AttachPlugin(&rpc_);
 
-    rpc_.RegisterFunction("setPlayerName", &NetworkServer::rpcSetPlayerName);
-    rpc_.RegisterFunction("setPlayerReady", &NetworkServer::rpcSetPlayerReady);
-    rpc_.RegisterFunction("setNumPlayers", &NetworkServer::rpcSetNumPlayers);
-    rpc_.RegisterFunction("startGame", &NetworkServer::rpcStartGame);
     pthread_create(&thread_, NULL, &callRun, static_cast<void*>(this) );
+}
+
+void NetworkServer::reset() {
+    clients_.clear();
+    players_.clear();
+    bitSteamOut_.Reset();
+    currentState_ = NULL;
+    port_ = 0;
+    isRunning_ = false;
+    numPlayers_ = 0;
 }
 
 void NetworkServer::shutdown()

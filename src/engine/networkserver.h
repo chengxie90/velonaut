@@ -91,6 +91,7 @@ private:
     void sendToOne(RakNet::RakNetGUID &guid, PacketReliability reliability);
     void pollPackets();
     void setServerState( AbstractServerState* state );
+    void reset();
 
     void writeMessage( GameMessages msgType, RakNet::RakString msg );
     void writeString(RakNet::RakString str );
@@ -109,7 +110,6 @@ private:
 
 private:
     std::vector<RakNet::RakNetGUID> clients_;
-    std::map<unsigned char, std::function<void(NetworkServer&, RakNet::Packet*)> > _callbacks;
     pthread_t thread_;
     RakNet::RakPeerInterface *server_;
     RakNet::BitStream bitSteamOut_;
