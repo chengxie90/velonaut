@@ -133,9 +133,11 @@ end
 
 function Vector:normalize()
 	local len = self:length()
-	for i = 1, #self do
-		self[i] = self[i] / len
-	end
+    if len > 0 then
+    	for i = 1, #self do
+    		self[i] = self[i] / len
+    	end
+    end
 end
 
 function Vector:getNormalized()

@@ -7,7 +7,7 @@ return
         },
 		{
             type = "MeshRenderer",
-            mesh = "sphere",
+            mesh = "checkpoint",
             material = "checkpoint"
         },
 		{

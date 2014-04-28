@@ -21,7 +21,7 @@ function CameraMan:update()
     local linRangeY = 12
 
     local pos = self.RigidBody:position()
-    local look = (Vector(0,0,0) - pos):getNormalized()
+    local look = (Vector(0,0,0) - pos)
     local linVel = self.RigidBody:linearVelocity()
 
     local newX = linVel.x

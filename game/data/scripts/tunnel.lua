@@ -26,7 +26,7 @@ function Tunnel:_init(object)
 	self._tunnel = {} -- Each row of table is a table with 3 vectors: position, tangent, normal
 	self._checkpoints = {} -- For convenience. Each row of table is a table with 3 vectors: position, tangent, normal
 	self._pickups = {}
-	self._numCurves = 3
+	self._numCurves = 6
 	self._tunnelRadius = 100
 	self._ringsPerCurve = 80
 	self._samplesPerRing = 30
@@ -105,7 +105,7 @@ function Tunnel:_init(object)
 	-- CREATE THE MESH ----------------------------------------------------------------------------
 
 	local numRings = self._numCurves * self._ringsPerCurve
-	local mb = MeshBuilder("LineStrip")
+	local mb = MeshBuilder("TriangleStrip")
 
 	for ringIndex = 0, numRings-1 do
 		for ringSampleIndex = 0, self._samplesPerRing-1 do
@@ -113,7 +113,7 @@ function Tunnel:_init(object)
 			local ringSample = ringSamples [ ((ringIndex * self._samplesPerRing) + ringSampleIndex) + 1 ]
 			local sampleNormal = ringSample-curveSamples[ringIndex + 1]			
 			mb:position(ringSample)
-			mb:normal(sampleNormal)			
+			mb:normal(sampleNormal*-1)			
 		end
 	end
 	for ringIndex =  0, numRings-1 do

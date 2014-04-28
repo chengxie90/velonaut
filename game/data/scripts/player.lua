@@ -63,7 +63,7 @@ function Player:createNextCheckpoint()
 		local startTan = tun:getCheckpointTangent(self._nextCheckpoint):getNormalized()
 
 		local angle = Vector(0,0,-1):angleBetween(startTan)
-		local axis = Vector(0,0,-1):cross(startTan)
+		local axis = (Vector(0,0,-1):cross(startTan)):getNormalized()
 		local startOri = Vector(0, 0, 0, 0)
 		startOri:makeQuaternionFromAngleAxis(angle, axis)
 
@@ -86,7 +86,7 @@ function Player:createNextCheckpoint()
 		local startTan = tun:getCheckpointTangent(1):getNormalized()
 
 		local angle = Vector(0,0,-1):angleBetween(startTan)
-		local axis = Vector(0,0,-1):cross(startTan)
+		local axis = (Vector(0,0,-1):cross(startTan)):getNormalized()
 		local startOri = Vector(0, 0, 0, 0)
 		startOri:makeQuaternionFromAngleAxis(angle, axis)
 
