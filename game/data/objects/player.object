@@ -14,9 +14,9 @@ return
         },
         {
             type = "RigidBody",
-            shape = "box",
+            shape = "sphere",
             mass = 1,
-            boxHalfExtents = Vector(10, 10, 10)
+            radius = 10
         },
         {
             type = "Camera",
