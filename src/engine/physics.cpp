@@ -120,6 +120,11 @@ int Physics::RigidBody::lcreate(lua_State *)
         LuaManager::GetInstance()->extractParam(&extents);
         shape = new btBoxShape(extents);
     }
+    else if (shapename == "sphere") {
+        double radius;
+        LuaManager::GetInstance()->extractParam(&radius);
+        shape = new btSphereShape(radius);
+    }
     else {
         assert(false);
     }

@@ -12,7 +12,7 @@ CameraMan = class(Behavior)
 function CameraMan:start()
     self.RigidBody = self:getComponent("RigidBody")
     self.Transform = self:getComponent("Transform")
-    self._stopDist = 40
+    self._stopDist = 35
 end
 
 function CameraMan:update()
@@ -49,8 +49,8 @@ function CameraMan:update()
 end
 
 function CameraMan:initializePosition()
-    self.RigidBody:setPosition((Vector(0,0,1) * self._stopDist))
-    self.Transform:setPosition((Vector(0,0,1) * self._stopDist))
+    self.RigidBody:setPosition((Vector(0,0,1) * self._stopDist) + Vector(0, 10, 0))
+    self.Transform:setPosition((Vector(0,0,1) * self._stopDist) + Vector(0, 10, 0))
 end
 
 function CameraMan:stopDistance()

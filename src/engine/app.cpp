@@ -8,7 +8,6 @@
 #include "physics.h"
 #include "SDL2/SDL.h"
 
-
 using namespace std;
 
 extern App g_app;
