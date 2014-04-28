@@ -105,7 +105,7 @@ function Tunnel:_init(object)
 	-- CREATE THE MESH ----------------------------------------------------------------------------
 
 	local numRings = self._numCurves * self._ringsPerCurve
-	local mb = MeshBuilder("TriangleStrip")
+	local mb = MeshBuilder("LineStrip")
 
 	for ringIndex = 0, numRings-1 do
 		for ringSampleIndex = 0, self._samplesPerRing-1 do
@@ -113,7 +113,7 @@ function Tunnel:_init(object)
 			local ringSample = ringSamples [ ((ringIndex * self._samplesPerRing) + ringSampleIndex) + 1 ]
 			local sampleNormal = ringSample-curveSamples[ringIndex + 1]			
 			mb:position(ringSample)
-			mb:normal(sampleNormal*-1)			
+			mb:normal(sampleNormal)			
 		end
 	end
 	for ringIndex =  0, numRings-1 do
