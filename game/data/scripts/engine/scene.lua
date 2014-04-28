@@ -50,7 +50,7 @@ function Scene:loadPlayers(players, playerId)
             self._player = obj
 		else
 			obj:getComponent("RemotePlayer"):setId(player.id)   
-            self._remotePlayers.insert(obj)
+            self._remotePlayers[#self._remotePlayers+1] = obj
 		end
     end	
 
