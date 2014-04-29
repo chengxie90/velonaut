@@ -40,7 +40,7 @@ function Hud:show()
 			if App.scene():player():getComponent("Player"):getId() == event.winnerId then
 				Gui.setText("game_over_caption", "You win!")
 			else
-				Gui.setText("game_over_caption", "You loose!")
+				Gui.setText("game_over_caption", "You lose!")
 			end
 			Gui.removeClass("game_over", "isHidden");
 			return
