@@ -162,6 +162,9 @@ function Player:update(dt)
 			self._inventory[1][2] = self._inventory[1][2] - 1
 			if (self._inventory[1][2] < 1) then self._inventory = {} end
 		end
+		if Input.getKeyDown("key_f") then
+			self:useItem("projectile")
+		end
 	end
 
 	self:updateItems()
