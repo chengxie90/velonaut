@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <cstdlib>
+#include <ctime>
 
 #include "RakNet/RPC4Plugin.h"
 #include "networkserver.h"
@@ -19,6 +21,7 @@ static void* callRun(void* data)
 NetworkServer *NetworkServer::GetInstance()
 {
     static NetworkServer instance;
+
     return &instance;
 }
 
@@ -31,6 +34,8 @@ NetworkServer::NetworkServer():currentState_(0), thread_(0), isRunning_(false) {
     rpc_.RegisterFunction("setNumPlayers", &NetworkServer::rpcSetNumPlayers);
     rpc_.RegisterFunction("setGameOver", &NetworkServer::rpcSetGameOver);
     rpc_.RegisterFunction("startGame", &NetworkServer::rpcStartGame);
+
+    srand (static_cast <unsigned> (time(0)));
 }
 
 void NetworkServer::rpcSetPlayerName(BitStream* bsIn,Packet* p)
@@ -58,7 +63,7 @@ void NetworkServer::rpcStartGame(BitStream* bsIn,Packet* p)
     NetworkServer* server = NetworkServer::GetInstance();
 
     server->setServerState(new WaitingForPlayerReadyState);
-    server->writeMessage(GAME_MESSAGE, server->createGameInitEvent(123, 0));
+    server->writeMessage(GAME_MESSAGE, server->createGameInitEvent());
     server->sendToAll(RELIABLE_ORDERED);
 
     server->setServerState(new WaitingForPlayerReadyState);
@@ -245,11 +250,16 @@ RakString NetworkServer::createWelcomeEvent(RakNet::RakNetGUID guid)
     return RakString(s.c_str());
 }
 
-RakString NetworkServer::createGameInitEvent(uint64_t guid, int seed)
+RakString NetworkServer::createGameInitEvent()
 {
+    int min = 100000;
+    int max = 20000000;
+    int seed = min + (rand() % (int)(max - min + 1));
+
+
     string s;
     s.append("{eventType='gameinit',seed=");
-    s.append(to_string(123));
+    s.append(to_string(seed));
     s.append("}");
     return RakString(s.c_str());
 }
@@ -354,7 +364,7 @@ void NetworkServer::WaitingForPlayersState::update(NetworkServer* server, timer&
     if (server->players_.size() >= server->numPlayers_) {
         server->setServerState(new WaitingForPlayerReadyState);
 
-        server->writeMessage(GAME_MESSAGE, server->createGameInitEvent(123, 0));
+        server->writeMessage(GAME_MESSAGE, server->createGameInitEvent());
         server->sendToAll(RELIABLE_ORDERED);
 
         server->setServerState(new WaitingForPlayerReadyState);

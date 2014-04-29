@@ -46,6 +46,10 @@ function MainMenu:start()
 
 		if event.eventType == "gameinit" then
 			if App.players then
+				print( "SEED: " .. event.seed )
+				local tunnel = App.scene():findObject("tunnel"):getComponent("Tunnel")
+				tunnel:setSeed(event.seed)
+				tunnel:createTunnel()
 				App._scene:loadPlayers(App.players, App.playerId)
 				Network.RPC("setPlayerReady", "")
 				App.scene():findObject("hud"):getComponent("Hud"):show()
@@ -125,11 +129,17 @@ function MainMenu:start()
 		self:showMenu("menu_credits")
 	end
 
+	local function onBtnQuit() 
+
+	end
+
 	local function onCheckboxInvertControls()
 		if Gui.hasClass("chb_invert_controls", "checked") then
 			Gui.removeClass("chb_invert_controls", "checked")
+			App.scene():setControlsInverted(false)
 		else
 			Gui.addClass("chb_invert_controls", "checked")
+			App.scene():setControlsInverted(true)
 		end
 	end
 
@@ -159,7 +169,7 @@ function MainMenu:start()
 	Gui.addEventListener("btn_host_race", "click", onBtnHostRace)
 	Gui.addEventListener("btn_settings", "click", onBtnSettings)
 	Gui.addEventListener("btn_credits", "click", onBtnCredits)
-	Gui.addEventListener("btn_quit", "click", self.onBtnQuit)
+	Gui.addEventListener("btn_quit", "click", onBtnQuit)
 	Gui.addEventListener("chb_invert_controls", "click", onCheckboxInvertControls)
 	Gui.addEventListener("chb_finder_server", "click", onCheckboxFindServer)	
 	Gui.addEventListener("hostraceBtnBack", "click", onBtnBack)

@@ -56,7 +56,7 @@ function Hud:show()
 
 
 	Gui.showDocument(self.id)
-	local numCP = App.scene():findObject("tunnel"):getComponent("Tunnel"):getNumCheckpoints()+1
+	local numCP = App.scene():findObject("tunnel"):getComponent("Tunnel"):getNumCheckpoints()
 	Gui.setText("lbl_total_checkpoints", tostring(numCP))
 	Network.addEventListener("game_message", onGameMessageReceived)
 	Gui.addEventListener("gameoverBtnBack", "click", onBtnBack)

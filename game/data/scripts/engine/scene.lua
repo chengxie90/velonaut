@@ -12,6 +12,15 @@ function Scene:_init(data)
     self._remotePlayers = {}
 	
     self._deleteCache = {}
+    self._controlsInverted = false
+end
+
+function Scene:setControlsInverted(b)
+    self._controlsInverted = b
+end
+
+function Scene:getControlsInverted()
+    return self._controlsInverted
 end
 
 function Scene:loadPlayers(players, playerId)
@@ -156,8 +165,6 @@ function Scene:start()
             end
         end
     end
-
-    Network.addEventListener("gameinit", onGameInitReceived)
 
     assert(self._started == false)
     for k, v in pairs(self._objects) do

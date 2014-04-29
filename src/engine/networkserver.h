@@ -100,7 +100,7 @@ private:
 
     RakNet::RakString createPlayerListEvent();
     RakNet::RakString createWelcomeEvent(RakNet::RakNetGUID);
-    RakNet::RakString createGameInitEvent(uint64_t guid, int seed);
+    RakNet::RakString createGameInitEvent();
     RakNet::RakString createCountDownEvent( int count);
     RakNet::RakString createGameStartEvent();
     RakNet::RakString createGameOverEvent(RakNet::RakNetGUID guid);

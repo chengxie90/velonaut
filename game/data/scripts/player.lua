@@ -31,6 +31,14 @@ function Player:start()
 	self._projectileRange = 10000
 	self._projectileLife = 30
 
+   if App.scene():getControlsInverted() then
+        self._key_down = "key_up"
+        self._key_up = "key_down"
+    else
+        self._key_down = "key_down"
+        self._key_up = "key_up"
+    end
+
 	self._inTun = true
 
 	local function onGameMessageReceived(event)
@@ -147,8 +155,8 @@ function Player:update(dt)
 	end
 
 	if self._active then
-		if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
-		if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
+		if Input.getKey(self._key_up) then self.RigidBody:applyTorque(right * -rotScale) end
+		if Input.getKey(self._key_down) then self.RigidBody:applyTorque(right * rotScale) end
 		if Input.getKey("key_left") then self.RigidBody:applyTorque(up * rotScale) end
 		if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
 		if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end

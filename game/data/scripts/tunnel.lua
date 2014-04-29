@@ -211,7 +211,7 @@ function Tunnel:createTunnel()
 	end
 
 	local m = mb:getMesh()
-	local mr = object:addComponent("MeshRenderer")
+	local mr = self:owner():addComponent("MeshRenderer")
 	mr:start()
 	mr:setMesh(m)
 	local mat = Material("tunnel")
