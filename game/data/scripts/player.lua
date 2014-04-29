@@ -31,11 +31,7 @@ function Player:start()
 	self._projectileRange = 10000
 	self._projectileLife = 15
 
-	local forcefield = App.scene():createObject("forcefield")
-    local forcefielddata = loadDataFile("forcefield", "object")
-    forcefield:load(forcefielddata)
-    forcefield:start()
-    forcefield:transform():setParent(self:owner():transform())
+	self._inTun = true
 
 	local function onGameMessageReceived(event)
 
@@ -134,11 +130,11 @@ function Player:update(dt)
 	local rotScale = 200
 	local linScale = 800
 	
-	local inTun = true
+	self._inTun = true
 	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")
 	local tunnelDist = tun:getClosestSamplePosition(self.Transform:position())
 	if tunnelDist.distance > (tun:tunnelRadius() * 1.1) then 
-		inTun = false
+		self._inTun = false
 	end
 
 	if self._active then
@@ -149,7 +145,7 @@ function Player:update(dt)
 		if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
 		if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
 		if Input.getKey("key_space") then 
-			if inTun then self.RigidBody:applyCentralForce(look * linScale) 
+			if self._inTun then self.RigidBody:applyCentralForce(look * linScale) 
 			else self.RigidBody:applyCentralForce(look * linScale * 0.5) end
 		end
 		if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
@@ -158,6 +154,15 @@ function Player:update(dt)
 			if (self._inventory[1][2] < 1) then self._inventory = {} end
 		end
 	end
+
+	local ff = App.scene():findObject(self._forcefieldName)
+	local mr = ff:getComponent("MeshRenderer")
+	if self._inTun then
+		mr:setMaterial(Material("forcefieldblue"))
+	else
+		mr:setMaterial(Material("forcefieldred"))
+	end
+		
 
 	self:updateItems()
 	
@@ -204,7 +209,8 @@ function Player:sendPhysics()
    						 ",linearVelo=" .. linearVelo:serialize3d() ..
 						 ",angularVelo=" .. angularVelo:serialize3d() ..
  						 ",force=" .. force:serialize3d() ..
-						 ",torque=" .. torque:serialize3d() .. "}")
+						 ",torque=" .. torque:serialize3d() .. 
+						 ",inTun=" .. tostring(self._inTun) .. "}")
 
 end
 
@@ -250,6 +256,7 @@ function Player:updateItems()
 						v[1]:getComponent("RigidBody"):setLinearVelocity(newVel)
 					end
 				end
+
 			end
 
 			self:sendProjectile(v[1])
@@ -264,23 +271,16 @@ end
 function Player:sendProjectile(projectile)
 	local rigidbody = projectile:getComponent("RigidBody") 
 	local position 		= rigidbody:position()
-	local orientation 	= rigidbody:orientation()
 	local linearVelo	= rigidbody:linearVelocity()
-	local angularVelo	= rigidbody:angularVelocity()
-	local force			= rigidbody:force()
-	local torque		= rigidbody:torque()
 
 	Network.sendMessage( "{ eventType='projectileUpdate'" ..
 						 ",projectileName='" .. projectile:name() .. "'" ..
 						 ",playerId='" .. self:getId() .. "'" ..
 						 ",position=" .. position:serialize3d() ..
-						 ",orientation=" .. orientation:serialize4d() ..
-   						 ",linearVelo=" .. linearVelo:serialize3d() ..
-						 ",angularVelo=" .. angularVelo:serialize3d() ..
- 						 ",force=" .. force:serialize3d() ..
-						 ",torque=" .. torque:serialize3d() .. "}")
+   						 ",linearVelo=" .. linearVelo:serialize3d() ..  "}")
 
 end
+
 
 function Player:useItem(item)
 
@@ -297,7 +297,6 @@ function Player:useItem(item)
 
 		self._projectileCounter = self._projectileCounter + 1
 		local name = "projectile_"..self:owner():name().."_".. self._projectileCounter
-		print("LOCAL PLAYER " .. self:owner():name() .. " CREATE PROJECTILE ".. name)
 		local prefab = "projectile"
 
 		local obj = App:scene():createObject(name)
@@ -323,4 +322,8 @@ function Player:destroyProjectile(name)
 		self._activeProjectiles[name] = nil
 		obj:destroy()
 	end
+end
+
+function Player:setForcefieldName(name)
+	self._forcefieldName = name
 end
