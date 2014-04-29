@@ -31,7 +31,7 @@ function Tunnel:_init(object)
 	self._ringsPerCurve = 110
 	self._samplesPerRing = 30
 	self._samplesPerCheckpoint = 14
-	self._samplesPerPickup = 85
+	self._samplesPerPickup = 60
 	self._tunnelSeed = 7243897024 --TODO: set seed globally somewhere else
 
 end

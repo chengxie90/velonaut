@@ -4,7 +4,7 @@ return
         {
             type = "Transform",
             position = Vector(0, 0, 0),
-            scale = Vector(10, 10, 10)
+            scale = Vector(20, 20, 20)
         },
 		{
             type = "MeshRenderer",
@@ -15,7 +15,7 @@ return
             type = "RigidBody",
             shape = "box",
             mass = 1,
-            boxHalfExtents = Vector(10, 10, 10),
+            boxHalfExtents = Vector(20, 20, 20),
 			trigger = true
         },
         {
