@@ -237,5 +237,5 @@ function Tunnel:createTunnel()
 end
 
 function Tunnel:setSeed(seed)
-	self._tunnelSeed = 7243897021 
+	self._tunnelSeed = 7243897026 
 end

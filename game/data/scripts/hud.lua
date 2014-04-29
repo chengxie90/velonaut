@@ -50,8 +50,7 @@ function Hud:show()
 	local function onBtnBack()
 		Network.shutdownServer();
 		Network.shutdownClient();
-		self:hide()
-		App.scene():findObject("mainmenu"):getComponent("MainMenu"):show()
+		os.exit(0)
 	end
 
 

@@ -130,7 +130,7 @@ function MainMenu:start()
 	end
 
 	local function onBtnQuit() 
-
+		os.exit(0)
 	end
 
 	local function onCheckboxInvertControls()
