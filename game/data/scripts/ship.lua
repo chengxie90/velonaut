@@ -18,7 +18,7 @@ function Ship:update(dt)
 end
 
 function Ship:onCollision(collision)
-    if collision.rigidbody:owner():getComponent("projectile") then
+    if collision.rigidbody:owner():getComponent("Projectile") then
         self._counter = self._counter + 1
         local name = "exp".."_".. self._counter
         local obj = App.scene():createObject(name);
