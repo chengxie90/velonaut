@@ -3,13 +3,12 @@ local Network = require "engine.network.c"
 
 Hud = class(Behavior)
 
-Hud.id = nil
 function Hud:start()
 	print("HUD start")
 	Gui.loadFont("./data/ui/font/DINPro-Black.ttf")
 	Gui.loadFont("./data/ui/font/DINPro-Bold.ttf")
 	Gui.loadFont("./data/ui/font/DINMedium.ttf")
-	Hud.id = Gui.loadDocument("./data/ui/hud.rml")
+	self.id = Gui.loadDocument("./data/ui/hud.rml")
 
 	self._numCheckpoints = 0;
 	
@@ -28,7 +27,27 @@ function Hud:show()
 		if event.eventType == "gamestart" then
 			Gui.setText("txt_status", "");
 			return
+		end
+
+		if event.eventType == "gameover" then
+
+			print(App.scene():player():getComponent("Player"):getId() .. " vs."  .. event.winnerId)
+
+			if App.scene():player():getComponent("Player"):getId() == event.winnerId then
+				Gui.setText("game_over_caption", "You win!")
+			else
+				Gui.setText("game_over_caption", "You loose!")
+			end
+			Gui.removeClass("game_over", "isHidden");
+			return
 		end	
+	end
+
+	local function onBtnBack()
+		Network.shutdownServer();
+		Network.shutdownClient();
+		self:hide()
+		App.scene():findObject("mainmenu"):getComponent("MainMenu"):show()
 	end
 
 
@@ -36,8 +55,16 @@ function Hud:show()
 	local numCP = App.scene():findObject("tunnel"):getComponent("Tunnel"):getNumCheckpoints()+1
 	Gui.setText("lbl_total_checkpoints", tostring(numCP))
 	Network.addEventListener("game_message", onGameMessageReceived)
+	Gui.addEventListener("gameoverBtnBack", "click", onBtnBack)
 	self:setNoPickup()
+
 end
+
+
+function Hud:hide()
+	Gui.hideDocument( self.id )
+end
+
 
 function Hud:setPickupNumber(num)
 	Gui.setText("lbl_num_pickups", tostring(num))
@@ -51,7 +78,6 @@ function Hud:setNoPickup()
 	Gui.setText("lbl_current_pickup", "No Item")
 	Gui.setText("lbl_num_pickups", "0")
 end
-
 
 function Hud:incrementCheckpoints()
 	self._numCheckpoints = self._numCheckpoints + 1

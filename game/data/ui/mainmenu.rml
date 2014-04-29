@@ -3,6 +3,7 @@
 		<title>Demo</title>
 		<link type="text/rcss" href="css/rkt.rcss"/>
 		<link type="text/rcss" href="css/layout.rcss"/>
+		<link type="text/rcss" href="css/btn.rcss"/>
 		<link type="text/rcss" href="css/mainmenu.rcss"/>
 		<link type="text/rcss" href="css/lobby.rcss"/>
 		<link type="text/rcss" href="css/settings.rcss"/>
@@ -94,7 +95,7 @@
 				</div>
 
 			</div>
-			
+
 		</div>
 	</body>
 </rml>

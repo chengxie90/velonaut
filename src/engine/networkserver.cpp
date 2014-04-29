@@ -25,6 +25,12 @@ NetworkServer *NetworkServer::GetInstance()
 NetworkServer::NetworkServer():currentState_(0), thread_(0), isRunning_(false) {
     server_ = RakPeerInterface::GetInstance();
     server_->AttachPlugin(&rpc_);
+
+    rpc_.RegisterFunction("setPlayerName", &NetworkServer::rpcSetPlayerName);
+    rpc_.RegisterFunction("setPlayerReady", &NetworkServer::rpcSetPlayerReady);
+    rpc_.RegisterFunction("setNumPlayers", &NetworkServer::rpcSetNumPlayers);
+    rpc_.RegisterFunction("setGameOver", &NetworkServer::rpcSetGameOver);
+    rpc_.RegisterFunction("startGame", &NetworkServer::rpcStartGame);
 }
 
 void NetworkServer::rpcSetPlayerName(BitStream* bsIn,Packet* p)
@@ -66,28 +72,42 @@ void NetworkServer::rpcSetPlayerReady(BitStream* bsIn,Packet* p)
 
 void NetworkServer::rpcSetNumPlayers(BitStream* bsIn,Packet* p)
 {
-
-    NetworkServer* srv = NetworkServer::GetInstance();
-    RakString rs;
-    srv->readString(bsIn, rs, false);
-
     NetworkServer* server = NetworkServer::GetInstance();
+    RakString rs;
+    server->readString(bsIn, rs, false);
     server->numPlayers_ = atoi(rs.C_String());
+    server->setMaxIncomingConnections(server->numPlayers_);
+}
+
+void NetworkServer::rpcSetGameOver(BitStream* bsIn,Packet* p)
+{
+    NetworkServer* server = NetworkServer::GetInstance();
+    server->players_[p->guid].isWinner = true;
+    server->writeMessage(GAME_MESSAGE, server->createGameOverEvent(p->guid));
+    server->sendToAll(RELIABLE_ORDERED);
 }
 
 void NetworkServer::start(int port)
 {
+    reset();
+
     port_ = port;
     isRunning_ = true;
 
     server_ = RakPeerInterface::GetInstance();
     server_->AttachPlugin(&rpc_);
 
-    rpc_.RegisterFunction("setPlayerName", &NetworkServer::rpcSetPlayerName);
-    rpc_.RegisterFunction("setPlayerReady", &NetworkServer::rpcSetPlayerReady);
-    rpc_.RegisterFunction("setNumPlayers", &NetworkServer::rpcSetNumPlayers);
-    rpc_.RegisterFunction("startGame", &NetworkServer::rpcStartGame);
     pthread_create(&thread_, NULL, &callRun, static_cast<void*>(this) );
+}
+
+void NetworkServer::reset() {
+    clients_.clear();
+    players_.clear();
+    bitSteamOut_.Reset();
+    currentState_ = NULL;
+    port_ = 0;
+    isRunning_ = false;
+    numPlayers_ = 0;
 }
 
 void NetworkServer::shutdown()
@@ -138,11 +158,10 @@ void NetworkServer::onGameMessageReceived(Packet *packet)
 
 void NetworkServer::readString(BitStream *bsIn, RakString &str, bool ignoreMsgType)
 {
-    static StringCompressor compressor;
     if (ignoreMsgType)
         bsIn->IgnoreBytes(sizeof(MessageID));
 
-    compressor.DecodeString(&str, 1000, bsIn);
+    compressor_.DecodeString(&str, 1000, bsIn);
 }
 
 void NetworkServer::writeMessage(GameMessages msgType, RakString msg)
@@ -154,8 +173,7 @@ void NetworkServer::writeMessage(GameMessages msgType, RakString msg)
 
 void NetworkServer::writeString(RakString msg)
 {
-    static StringCompressor compressor;
-    compressor.EncodeString(&msg, msg.GetLength()+1, &bitSteamOut_ );
+    compressor_.EncodeString(&msg, msg.GetLength()+1, &bitSteamOut_ );
 }
 
 void NetworkServer::sendToAllExcept(BitStream *stream, RakNetGUID except, PacketReliability reliability)
@@ -249,6 +267,16 @@ RakString NetworkServer::createGameStartEvent()
 {
     string s;
     s.append("{eventType='gamestart'}");
+    return RakString(s.c_str());
+}
+
+RakString NetworkServer::createGameOverEvent(RakNet::RakNetGUID guid)
+{
+    string s;
+    s.append("{eventType='gameover'");
+    s.append(", winnerId='");
+    s.append(to_string(guid.g));
+    s.append("'}");
     return RakString(s.c_str());
 }
 

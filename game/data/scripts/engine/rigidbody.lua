@@ -1,3 +1,4 @@
+
 require "engine.component"
 local phyrigidbody = require "engine.physics.rigidbody.c"
 
@@ -17,7 +18,7 @@ function RigidBody:_init()
 end
 
 function RigidBody:load(data)
-    print(table.unpack(data))
+   -- print(table.unpack(data))
     self:rebuild(data.mass, data.shape, data)
 
     assert(self._handle)
@@ -72,27 +73,22 @@ function RigidBody:setTrigger(trigger)
 end
 
 function RigidBody:position()
-    --print(debug.traceback())
     return phyrigidbody.position(self._handle)
 end
 
 function RigidBody:orientation()
-    --print(debug.traceback())
 	return phyrigidbody.orientation(self._handle)
 end
 
 function RigidBody:linearVelocity()
-    --print(debug.traceback())
 	return phyrigidbody.linearVelocity(self._handle)
 end
 
 function RigidBody:angularVelocity()
-    --print(debug.traceback())
 	return phyrigidbody.angularVelocity(self._handle)
 end
 
 function RigidBody:force()
-    --print(debug.traceback())
 	return phyrigidbody.force(self._handle)
 end
 

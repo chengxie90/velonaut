@@ -23,8 +23,6 @@ function Object:onDestroy()
 end
 
 function Object:destroy()
-    print("DESTROY OBJECT "..self._name)
-    print(debug.traceback())
     App.scene():addToDeleteCache(self:name())
 end
 

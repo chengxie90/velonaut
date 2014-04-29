@@ -13,6 +13,8 @@ function Player:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
 
+	self._active = false
+
 	-- Create first checkpoint 
 	self._nextCheckpoint = 1
 	self._inventory = {}
@@ -28,6 +30,22 @@ function Player:start()
 	self._projectileCounter = 0
 	self._projectileRange = 10000
 	self._projectileLife = 15
+
+	self._inTun = true
+
+	local function onGameMessageReceived(event)
+
+		if event.eventType == "gamestart" then	
+			if not self._active then self._active = true end
+		end	
+
+		if event.eventType == "gameover" then
+			self._active = false
+		end
+	end
+
+	Network.addEventListener("game_message", onGameMessageReceived)
+
 end
 
 function Player:createPickups()
@@ -107,6 +125,10 @@ end
 
 function Player:update(dt)
 
+	if not self._active then
+		return
+	end
+
 	--local cammantrans = App.scene():findObject("cameraman"):getComponent("Transform")
 	--local thrust = self:transform():localZ() * -1
 	local look = self:transform():localZ() * -1
@@ -117,30 +139,40 @@ function Player:update(dt)
 	local rotScale = 200
 	local linScale = 800
 	
-	local inTun = true
+	self._inTun = true
 	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")
 	local tunnelDist = tun:getClosestSamplePosition(self.Transform:position())
 	if tunnelDist.distance > (tun:tunnelRadius() * 1.1) then 
-		inTun = false
+		self._inTun = false
 	end
 
-	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
-	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
-	if Input.getKey("key_left") then self.RigidBody:applyTorque(up * rotScale) end
-	if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
-	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
-	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
-	if Input.getKey("key_space") then 
-		if inTun then self.RigidBody:applyCentralForce(look * linScale) 
-		else self.RigidBody:applyCentralForce(look * linScale * 0.5) end
+	if self._active then
+		if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
+		if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
+		if Input.getKey("key_left") then self.RigidBody:applyTorque(up * rotScale) end
+		if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
+		if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
+		if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
+		if Input.getKey("key_space") then 
+			if self._inTun then self.RigidBody:applyCentralForce(look * linScale) 
+			else self.RigidBody:applyCentralForce(look * linScale * 0.5) end
+		end
+		if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
+			self:useItem(self._inventory[1][1])
+			self._inventory[1][2] = self._inventory[1][2] - 1
+			if (self._inventory[1][2] < 1) then self._inventory = {} end
+		end
 	end
-	if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
-		self:useItem(self._inventory[1][1])
-		self._inventory[1][2] = self._inventory[1][2] - 1
-		if (self._inventory[1][2] < 1) then self._inventory = {} end
+
+	local ff = App.scene():findObject(self._forcefieldName)
+	local mr = ff:getComponent("MeshRenderer")
+	if self._inTun then
+		mr:setMaterial(Material("forcefieldblue"))
+	else
+		mr:setMaterial(Material("forcefieldred"))
 	end
 	
-	if Input.getKeyDown("key_c") then
+	if Input.getKeyDown("key_f") then
 		self:useItem("projectile") 
 	end
 
@@ -163,6 +195,7 @@ function Player:onCollision(collision)
     	checkpoint:destroy()
 		self:createNextCheckpoint()
 		App.scene():findObject("hud"):getComponent("Hud"):incrementCheckpoints()
+
 	elseif collision.rigidbody:owner():getComponent("Pickup") ~= nil then
 		local pickup = collision.rigidbody:owner():getComponent("Pickup"):item()
 		if #self._inventory == 0 then
@@ -171,6 +204,8 @@ function Player:onCollision(collision)
 			self._inventory[1][2] = self._inventory[1][2] + pickup[2]
 		end
 		collision.rigidbody:owner():destroy()
+	elseif collision.rigidbody:owner():getComponent("FinishLine") ~= nil then
+		Network.RPC("setGameOver", "")
 	end
 end
 
@@ -189,7 +224,8 @@ function Player:sendPhysics()
    						 ",linearVelo=" .. linearVelo:serialize3d() ..
 						 ",angularVelo=" .. angularVelo:serialize3d() ..
  						 ",force=" .. force:serialize3d() ..
-						 ",torque=" .. torque:serialize3d() .. "}")
+						 ",torque=" .. torque:serialize3d() .. 
+						 ",inTun=" .. tostring(self._inTun) .. "}")
 
 end
 
@@ -225,16 +261,17 @@ function Player:updateItems()
 				end
 
 				if target ~= 0 then
-					if ((self._projectileLife - v[2])/self._projectileLife) < 0.5 then
+					if v[2] / self._projectileLife < 0.5 then
 						local tar = (remotePlayers[target]:transform():position() - pos):getNormalized()
 						local vel = (v[1]:getComponent("RigidBody"):linearVelocity()):getNormalized()
-						local ratio = ((self._projectileLife - v[2])/self._projectileLife) * 0.8
-						tar = tar * ((1-ratio) + 0.2)
+						local ratio = v[2] / self._projectileLife
+						tar = tar * (1-ratio)
 						vel = vel * ratio
 						local newVel = ((tar + vel)/2):getNormalized() * self._projectileSpeed 
 						v[1]:getComponent("RigidBody"):setLinearVelocity(newVel)
 					end
 				end
+
 			end
 
 			self:sendProjectile(v[1])
@@ -249,23 +286,16 @@ end
 function Player:sendProjectile(projectile)
 	local rigidbody = projectile:getComponent("RigidBody") 
 	local position 		= rigidbody:position()
-	local orientation 	= rigidbody:orientation()
 	local linearVelo	= rigidbody:linearVelocity()
-	local angularVelo	= rigidbody:angularVelocity()
-	local force			= rigidbody:force()
-	local torque		= rigidbody:torque()
 
 	Network.sendMessage( "{ eventType='projectileUpdate'" ..
 						 ",projectileName='" .. projectile:name() .. "'" ..
 						 ",playerId='" .. self:getId() .. "'" ..
 						 ",position=" .. position:serialize3d() ..
-						 ",orientation=" .. orientation:serialize4d() ..
-   						 ",linearVelo=" .. linearVelo:serialize3d() ..
-						 ",angularVelo=" .. angularVelo:serialize3d() ..
- 						 ",force=" .. force:serialize3d() ..
-						 ",torque=" .. torque:serialize3d() .. "}")
+   						 ",linearVelo=" .. linearVelo:serialize3d() ..  "}")
 
 end
+
 
 function Player:useItem(item)
 
@@ -282,7 +312,6 @@ function Player:useItem(item)
 
 		self._projectileCounter = self._projectileCounter + 1
 		local name = "projectile_"..self:owner():name().."_".. self._projectileCounter
-		print("LOCAL PLAYER " .. self:owner():name() .. " CREATE PROJECTILE ".. name)
 		local prefab = "projectile"
 
 		local obj = App:scene():createObject(name)
@@ -308,4 +337,8 @@ function Player:destroyProjectile(name)
 		self._activeProjectiles[name] = nil
 		obj:destroy()
 	end
+end
+
+function Player:setForcefieldName(name)
+	self._forcefieldName = name
 end
