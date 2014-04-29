@@ -1,20 +1,17 @@
 material tunnel
+{
+    technique
     {
-        technique
+
+        pass
         {
-            pass
-            {
-                ambient 1.0 1.0 1.0
-                diffuse 1.0 1.0 1.0
-                specular 1.0 1.0 1.0 9800.0
-                emissive 0.0 0.0 0.0 1
-                texture_unit
-                {
-                    cubic_texture ../../../asset/skyboxes/MoonShine/MoonShine_front.tif ../../../asset/skyboxes/MoonShine/MoonShine_back.tif ../../../asset/skyboxes/MoonShine/MoonShine_right.tif ../../../asset/skyboxes/MoonShine/MoonShine_left.tif ../../../asset/skyboxes/MoonShine/MoonShine_up.tif ../../../asset/skyboxes/MoonShine/MoonShine_down.tif separateUV
-				tex_address_mode clamp
-                    color_op_ex blend_manual src_texture src_current 0.1
-                    env_map spherical
-                }
-            }
+            lighting on
+            shading phong
+            scene_blend alpha_blend
+            cull_hardware none
+            cull_software none
+            ambient 1 1 1
+            diffuse 0.6 0.6 0.6 0.5
         }
     }
+}

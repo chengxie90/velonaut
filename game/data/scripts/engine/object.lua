@@ -38,6 +38,13 @@ function Object:load(data)
         local comp = self:addComponent(typename)
         comp:load(componentData)
     end
+
+    if data.children then
+        for _, objData in ipairs(data.children) do
+            local child = self:_loadObjectData(objData)
+            child:transform():setParent(obj:transform())
+        end
+    end
 end
 
 function Object:start()
@@ -64,7 +71,6 @@ function Object:addComponent(typename)
 
     end
     local comp = classobject(self)
-	
     comp:setOwner(self)
     self._components[typename] = comp
     return comp

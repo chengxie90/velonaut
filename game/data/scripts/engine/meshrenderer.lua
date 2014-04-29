@@ -60,7 +60,7 @@ end
 
 -- this must be called after setMesh, due to Ogre
 function MeshRenderer:setMaterial(material)
-    assert(self._handle) 
+    assert(self._handle)
     self._material = material
     gfxentity.setMaterial(self._handle, material._handle)
 end

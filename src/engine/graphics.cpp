@@ -115,7 +115,14 @@ void Graphics::initLua()
         luaL_Reg reg[] = {
             {"create", Graphics::Light::lcreate},
             {"setType", Graphics::Light::lsetType},
+            {"setPosition", Graphics::Light::lsetPosition},
+            {"setDirection", Graphics::Light::lsetDirection},
             {"setDiffuse", Graphics::Light::lsetDiffuse},
+            {"setSpecular", Graphics::Light::lsetSpecular},
+            {"setRange", Graphics::Light::lsetRange},
+            {"setSpotlightInnerAngle", Graphics::Light::lsetSpotlightInnerAngle},
+            {"setSpotlightOuterAngle", Graphics::Light::lsetSpotlightOuterAngle},
+            {"setSpotlightFalloff", Graphics::Light::lsetSpotlightFalloff},
             {NULL, NULL}
         };
         LuaManager::GetInstance()->addlib(reg);
@@ -188,9 +195,12 @@ void Graphics::initLua()
     });
 }
 
-void Graphics::render()
+void Graphics::render(float dt)
 {
     root_->_fireFrameStarted();
+    for (ParticleSystem* ps : particles_) {
+        ps->_update(dt);
+    }
     root_->renderOneFrame();
     root_->_fireFrameRenderingQueued();
     root_->_fireFrameEnded();
@@ -581,6 +591,7 @@ int Graphics::Light::lsetType(lua_State *)
     assert(light);
     string type;
     LuaManager::GetInstance()->extractParam(&type);
+    cout << type << endl;
     if (type == "pointlight") {
         light->setType(Ogre::Light::LT_POINT);
     }
@@ -609,6 +620,96 @@ int Graphics::Light::lsetDiffuse(lua_State *)
     return 0;
 }
 
+int Graphics::Light::lsetSpecular(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    assert(light);
+
+    ColourValue color;
+    LuaManager::GetInstance()->extractParam(&color);
+    
+    light->setSpecularColour(color);
+    return 0;
+}
+
+int Graphics::Light::lsetRange(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    assert(light);
+
+    double range;
+    LuaManager::GetInstance()->extractParam(&range);
+    
+    light->setAttenuation(range, 1.0f, 7.5/range, 75.0f/(range*range));
+    return 0;
+}
+
+int Graphics::Light::lsetPosition(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    assert(light);
+
+    Vector3 pos;
+    LuaManager::GetInstance()->extractParam(&pos);
+    
+    light->setPosition(pos);
+    return 0;
+}
+
+int Graphics::Light::lsetDirection(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    assert(light);
+
+    Vector3 dir;
+    LuaManager::GetInstance()->extractParam(&dir);
+    
+    light->setDirection(dir);
+    return 0;
+}
+
+int Graphics::Light::lsetSpotlightInnerAngle(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    assert(light);
+
+    double innerAngle;
+    LuaManager::GetInstance()->extractParam(&innerAngle);
+    
+    light->setSpotlightInnerAngle(Radian(Degree(innerAngle)));
+    return 0;
+}
+
+int Graphics::Light::lsetSpotlightOuterAngle(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    assert(light);
+
+    double outerAngle;
+    LuaManager::GetInstance()->extractParam(&outerAngle);
+    
+    light->setSpotlightOuterAngle(Radian(Degree(outerAngle)));
+    return 0;
+}
+
+int Graphics::Light::lsetSpotlightFalloff(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    assert(light);
+
+    double falloff;
+    LuaManager::GetInstance()->extractParam(&falloff);
+    
+    light->setSpotlightFalloff(falloff);
+    return 0;
+}
 
 int Graphics::Mesh::lcreate(lua_State *)
 {
@@ -721,6 +822,8 @@ int Graphics::MeshBuilder::lgetMesh(lua_State *)
     Ogre::Mesh* p = mesh.get();
     Graphics::GetInstance()->meshMap_[p] = mesh;
     
+    Graphics::GetInstance()->scene_->destroyManualObject(mo);
+    
     LuaManager::GetInstance()->addParam((void *)p);
     
     return 1;
@@ -783,6 +886,8 @@ int Graphics::Particle::lcreate(lua_State *)
     LuaManager::GetInstance()->extractParam(&prefab);
     
     ParticleSystem* ps = Graphics::GetInstance()->scene_->createParticleSystem(name + std::to_string(count++), prefab);
+    
+    Graphics::GetInstance()->particles_.push_back(ps);
     
     MovableObject *obj = static_cast<MovableObject*>(ps);
 

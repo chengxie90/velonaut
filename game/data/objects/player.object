@@ -4,19 +4,24 @@ return
     {
         {
             type = "Transform",
-            position = Vector(0, 0, 0),
-            orientation = Vector(0, 0, 0, 1)
         },
         {
             type = "Light",
             lightType = "pointlight",
-            diffuse = Color(1.0, 1.0, 1.0)
+            position = Vector(0, 20, -10),
+            diffuse = Color(5, 5, 5),
+            specular = Color(1, 1, 1),
+            range = 200,
+            spotlightInnerAngle = 0,
+            spotlightOuterAngle = 50,
+            spotlightFalloff = 0.3,
+            direction = Vector(0, 0, -1)
         },
         {
             type = "RigidBody",
             shape = "sphere",
             mass = 1,
-            radius = 10
+            radius = 10,
         },
         {
             type = "Camera",

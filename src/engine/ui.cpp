@@ -109,7 +109,6 @@ int Ui::lRemoveClass(lua_State *state) {
 
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
-
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetClass(text.c_str(), false);
 }
 
@@ -132,7 +131,6 @@ int Ui::lSetText(lua_State *state) {
 
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
-
 
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetInnerRML(text.c_str());
 }
@@ -166,8 +164,6 @@ int Ui::lLoadDocument(lua_State *state)
 {
     string docString;
     LuaManager::GetInstance()->extractParam(&docString);
-
-    std::cout << "loading document " << docString << std::endl;
 
     Ui* ui = Ui::GetInstance();    
     Rocket::Core::ElementDocument* doc;
