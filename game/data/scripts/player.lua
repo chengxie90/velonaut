@@ -164,18 +164,6 @@ function Player:update(dt)
 		end
 	end
 
-	local ff = App.scene():findObject(self._forcefieldName)
-	local mr = ff:getComponent("MeshRenderer")
-	if self._inTun then
-		mr:setMaterial(Material("forcefieldblue"))
-	else
-		mr:setMaterial(Material("forcefieldred"))
-	end
-	
-	if Input.getKeyDown("key_f") then
-		self:useItem("projectile") 
-	end
-
 	self:updateItems()
 	
 	local hud = App.scene():findObject("hud"):getComponent("Hud")
@@ -337,8 +325,4 @@ function Player:destroyProjectile(name)
 		self._activeProjectiles[name] = nil
 		obj:destroy()
 	end
-end
-
-function Player:setForcefieldName(name)
-	self._forcefieldName = name
 end

@@ -15,7 +15,7 @@ return
         {
             type = "RigidBody",
             shape = "sphere",
-            mass = 3
+            mass = 3,
             radius = 10
         },
         {

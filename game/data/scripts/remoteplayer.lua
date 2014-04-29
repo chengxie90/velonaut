@@ -74,15 +74,6 @@ end
 
 function RemotePlayer:update(dt)
 
-	local ff = App.scene():findObject(self._forcefieldName)
-	local mr = ff:getComponent("MeshRenderer")
-	if self._inTun then
-		mr:setMaterial(Material("forcefieldblue"))
-	else
-		mr:setMaterial(Material("forcefieldred"))
-	end
-
-
 	for k, v in pairs(self._activeProjectiles) do
 		if (v:transform():position() - self:owner():transform():position()):length() > self._projectileRange then
 			self._activeProjectiles[k] = nil
@@ -97,8 +88,4 @@ function RemotePlayer:destroyProjectile(name)
 		self._activeProjectiles[name] = nil
 		obj:destroy()
 	end
-end
-
-function RemotePlayer:setForcefieldName(name)
-	self._forcefieldName = name
 end

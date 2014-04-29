@@ -46,21 +46,12 @@ function Scene:loadPlayers(players, playerId)
         obj:getComponent("RigidBody"):setPosition(ringSample)   
         obj:transform():setPosition(ringSample)   
 
-        local ffName = "forcefield" .. tostring(ringSampleIndex)
-        local forcefield = App.scene():createObject(ffName)
-        local forcefielddata = loadDataFile("forcefield", "object")
-        forcefield:load(forcefielddata)
-        forcefield:start()
-        forcefield:transform():setParent(obj:transform())
 
 		if player.id == playerId then
 			obj:getComponent("Player"):setId(playerId)
-            print(ffName)
-            obj:getComponent("Player"):setForcefieldName(ffName)
             self._player = obj
 		else
 			obj:getComponent("RemotePlayer"):setId(player.id)  
-            obj:getComponent("RemotePlayer"):setForcefieldName(ffName) 
             self._remotePlayers[#self._remotePlayers+1] = obj
 		end
     end	
