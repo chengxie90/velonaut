@@ -1,0 +1,15 @@
+return 
+{
+    components = {
+        {
+            type = "Transform",
+        },
+        {
+            type = "Light",
+            lightType = "directlight",
+            diffuse = Color(0.4, 0.4, 0.4),
+            specular = Color(1, 1, 1),
+            direction = Vector(0, -1, 0)
+        }
+    }
+}

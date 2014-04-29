@@ -51,7 +51,7 @@ void App::run()
         input_->update();
         luaManager_->update(dt);
         network_->poll();
-        graphics_->render();
+        graphics_->render(dt);
     }
 }
 

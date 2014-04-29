@@ -113,7 +113,7 @@ function Tunnel:_init(object)
 			local ringSample = ringSamples [ ((ringIndex * self._samplesPerRing) + ringSampleIndex) + 1 ]
 			local sampleNormal = ringSample-curveSamples[ringIndex + 1]			
 			mb:position(ringSample)
-			mb:normal(sampleNormal)			
+			mb:normal(-sampleNormal)			
 		end
 	end
 	for ringIndex =  0, numRings-1 do
@@ -126,11 +126,11 @@ function Tunnel:_init(object)
 	end
 
 	local m = mb:getMesh()
-	local mr = object:addComponent("MeshRenderer", nil, false)
-	
+	local mr = object:addComponent("MeshRenderer")
+	mr:start()
 	mr:setMesh(m)
-	--local mat = Material("tunnel")
-	--mr:setMaterial(mat)
+	local mat = Material("tunnel")
+	mr:setMaterial(mat)
 
 	-- Add specific samples to checkpoints member for convenience
 	local checkpointIndex = 1

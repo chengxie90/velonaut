@@ -1,28 +1,40 @@
+// Example particle systems
+
+// smoke
 particle_system projectile
 {
-    material lambert1
-    particle_width 1
-    particle_height 1
-    cull_each false
-    quota 10000
-
+    material            particle
+    particle_width      5
+    particle_height     5
+    quota               1000
+    billboard_type      point
+    sorted              true
+    iteration_interval  0.013
+    
     // Area emitter
     emitter Point
     {
-        angle 15
-        emission_rate 5
-        time_to_live 3
-        direction 0 1 0
-        velocity_min 0.1
-        velocity_max 0.5
-        colour_range_start 1 0 0
-        colour_range_end 0 0 1
+        position 0 0 -20
+        angle 50
+        emission_rate 100
+        time_to_live 0.7
+        direction 0 0 1
+        velocity_min 10
+        velocity_max 20
     }
 
-    // Gravity
-    affector LinearForce
+    affector ColourFader
     {
-        force_vector 0 -1 0
-        force_application add
+        alpha -2.0
+    }
+
+    affector ColourImage
+    {
+        image smokecolors.png
+    }
+
+    affector Scaler
+    {
+        rate 0.1
     }
 }

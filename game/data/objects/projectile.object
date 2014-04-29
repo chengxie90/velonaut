@@ -6,16 +6,11 @@ return
             position = Vector(0, 0, 0),
             orientation = Vector(0, 0, 0, 1)
         },
-        --[[
-        {
-            type = "ParticleRenderer",
-            particleSystem = "projectile"
-        },
-        --]]
         {
             type = "Light",
             lightType = "pointlight",
-            diffuse = Color(0.2, 1.0, 0.2)
+            diffuse = Color(1, 0, 0),
+            range = 150,
         },
         {
             type = "RigidBody",
@@ -24,8 +19,8 @@ return
             boxHalfExtents = Vector(1, 1, 1)
         },
         {
-            type = "MeshRenderer",
-            mesh = "cube"
+            type = "ParticleRenderer",
+            particleSystem = "projectile"
         },
         {
             type = "Projectile"

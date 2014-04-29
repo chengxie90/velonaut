@@ -10,7 +10,7 @@ class Graphics {
 public:
     void init();
     void initLua();
-    void render();
+    void render(float dt);
     void shutdown();
     Ogre::RenderWindow* renderWindow_ = NULL;
     Ogre::SceneManager* scene_ = NULL;
@@ -36,6 +36,8 @@ private:
     Ogre::Camera* defaultCamera_ = NULL;
     Ogre::Viewport* viewport_ = NULL;
     
+    std::vector<Ogre::ParticleSystem*> particles_;
+   
 private:
 
     // we need to keep shared pointers to keep them from being deleted
@@ -78,6 +80,13 @@ private:
         static int lcreate(lua_State *);
         static int lsetType(lua_State *);
         static int lsetDiffuse(lua_State *); 
+        static int lsetSpecular(lua_State *);
+        static int lsetRange(lua_State *);
+        static int lsetPosition(lua_State *);
+        static int lsetDirection(lua_State *);
+        static int lsetSpotlightInnerAngle(lua_State *);
+        static int lsetSpotlightOuterAngle(lua_State *);
+        static int lsetSpotlightFalloff(lua_State *);
     };
     
     struct Entity {
