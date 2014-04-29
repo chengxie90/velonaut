@@ -10,6 +10,10 @@ function Light:_init()
     self._handle = gfxlight.create()
 end
 
+function Light:onDestroy()
+    self:_detach()
+end
+
 function Light:load(data)
     assert(data.lightType)
     self:setType(data.lightType)
@@ -23,10 +27,25 @@ function Light:load(data)
     if data.setSpotlightFalloff then self:setSpotlightFalloff(data.setSpotlightFalloff) end
 end
 
+function Light:_attach()
+    if self._handle then
+        local trans = self:transform()
+        assert(trans)
+        assert(trans._handle)
+        gfxnode.attachObject(trans._handle, self._handle)
+    end
+end
+
+function Light:_detach()
+    if self._handle then
+        local trans = self:transform()
+        gfxnode.detachObject(trans._handle, self._handle)
+        self._handle = nil
+    end
+end
+
 function Light:start()
-    local trans = self:transform()
-    assert(trans)
-    gfxnode.attachObject(trans._handle, self._handle)
+    self:_attach()
 end
 
 function Light:setType(type)
