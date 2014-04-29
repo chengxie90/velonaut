@@ -165,9 +165,11 @@ end
 
 function Scene:destroyObject(name)
     local obj = self:findObject(name)
-    assert(obj)
-    obj:onDestroy()
-    self._objects[name] = nil
+    --assert(obj)
+    if obj ~= nil then
+        obj:onDestroy()
+        self._objects[name] = nil
+    end
 end
 
 function Scene:addToDeleteCache(name)
