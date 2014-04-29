@@ -10,7 +10,8 @@ return
         {
             type = "Light",
             lightType = "pointlight",
-            diffuse = Color(1.0, 1.0, 1.0)
+            diffuse = Color(0.5, 0.5, 0.5),
+            range = 300,
         },
         {
             type = "RigidBody",
