@@ -145,18 +145,18 @@ void Network::findServer(int port) {
 }
 
 void Network::sendMessage(string msg) {
-    bsOut.Reset();
-    bsOut.Write((MessageID)GAME_MESSAGE);
+    bsOut_.Reset();
+    bsOut_.Write((MessageID)GAME_MESSAGE);
     StringCompressor compressor;
-    compressor.EncodeString(msg.c_str(), msg.size()+1, &bsOut);
-    client_->Send(&bsOut,HIGH_PRIORITY,UNRELIABLE_SEQUENCED,0, serverAddress_,false);
+    compressor.EncodeString(msg.c_str(), msg.size()+1, &bsOut_);
+    client_->Send(&bsOut_,HIGH_PRIORITY,UNRELIABLE_SEQUENCED,0, serverAddress_,false);
 }
 
 void Network::rpc(string req, string params) {
-    bsOut.Reset();
+    bsOut_.Reset();
     StringCompressor compressor;
-    compressor.EncodeString(params.c_str(), params.size()+1, &bsOut);
-    rpc_.Call(req.c_str(), &bsOut, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
+    compressor.EncodeString(params.c_str(), params.size()+1, &bsOut_);
+    rpc_.Call(req.c_str(), &bsOut_, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
 }
 
 void Network::onServerPong(Packet *packet) {
@@ -175,7 +175,6 @@ void Network::onServerPong(Packet *packet) {
 }
 
 void Network::connectToServer(const char *serverAdress, int port) {
-
     client_->Connect(serverAdress, port, 0,0);
 }
 
@@ -193,12 +192,12 @@ void Network::onDisconnect(Packet *packet) {
 }
 
 void Network::onGameMessageReceived(Packet *packet) {
+    static StringCompressor compressor;
+
     RakString rs;
     BitStream bsIn(packet->data,packet->length,false);
     bsIn.IgnoreBytes(sizeof(MessageID));
-    StringCompressor compressor;
     compressor.DecodeString(&rs, 1000, &bsIn);
-    //std::cout << string(rs.C_String()) << std::endl;
     fireEvent("game_message", string(rs.C_String()));
 }
 

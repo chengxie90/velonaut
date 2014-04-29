@@ -47,6 +47,7 @@ class NetworkServer
         RakNet::RakNetGUID guid;
         bool isReady;
         bool isServer;
+        bool isWinner;
         std::string name;
         std::string ipAdress;
 
@@ -102,11 +103,13 @@ private:
     RakNet::RakString createGameInitEvent(uint64_t guid, int seed);
     RakNet::RakString createCountDownEvent( int count);
     RakNet::RakString createGameStartEvent();
+    RakNet::RakString createGameOverEvent(RakNet::RakNetGUID guid);
 
     static void rpcSetPlayerName(RakNet::BitStream* s, RakNet::Packet* p);
     static void rpcStartGame(RakNet::BitStream* s, RakNet::Packet* p);
     static void rpcSetPlayerReady(RakNet::BitStream* s, RakNet::Packet* p);
     static void rpcSetNumPlayers(RakNet::BitStream* s, RakNet::Packet* p);
+    static void rpcSetGameOver(RakNet::BitStream* s, RakNet::Packet* p);
 
 private:
     std::vector<RakNet::RakNetGUID> clients_;

@@ -5,8 +5,6 @@ MainMenu = class(Behavior)
 
 function MainMenu:start()
 
-	print("mainmenu start")
-
 	self.menus = {	"menu_main",
 					"menu_join_race",
 					"menu_settings",
@@ -17,7 +15,7 @@ function MainMenu:start()
 
 	local function onGameMessageReceived(event)
 		if event.eventType == "welcome" then
-			print( "Welcome, you been assigned ID " .. event.id )
+			print( "Welcome, you have been assigned ID " .. event.id )
 			App.playerId = event.id
 			Network.RPC("setPlayerName", Gui.getAttribute("fld_player_name", "value"))
 			if self.isServer then
@@ -58,20 +56,20 @@ function MainMenu:start()
 	end
 
 	local function onConnectedToServer()
-		print("client connected")
+		print("client connected.")
 	end
 
 	local function onConnectionFailed()
-		print("on connection failed yo!")
+		print("connection failed.")
 	end
 
 	local function onDisconnect()
-		print("client disconnected yo!")
+		print("client disconnected.")
 	end
 
 	local function onServerFound( serverip )
 		print("Found server at " .. serverip)
-		Network.connectToServer(serverip, 60001)	
+		Network.connectToServer(serverip, tonumber(Gui.getAttribute("fld_server_port","value")))	
 	end
 
 	local function onStartGame()
@@ -103,9 +101,6 @@ function MainMenu:start()
 		else
 			Network.connectToServer(serverAdress, serverPort)
 		end
-		print("join race")
-	
-
 	end
 
 	local function onBtnHostRace()
@@ -132,20 +127,16 @@ function MainMenu:start()
 
 	local function onCheckboxInvertControls()
 		if Gui.hasClass("chb_invert_controls", "checked") then
-			print("hasClass")
 			Gui.removeClass("chb_invert_controls", "checked")
 		else
-			print("hasNotClass")
 			Gui.addClass("chb_invert_controls", "checked")
 		end
 	end
 
 	local function onCheckboxFindServer()
 		if Gui.hasClass("chb_finder_server", "checked") then
-			print("hasClass")
 			Gui.removeClass("chb_finder_server", "checked")
 		else
-			print("hasNotClass")
 			Gui.addClass("chb_finder_server", "checked")
 		end
 	end
@@ -176,12 +167,11 @@ function MainMenu:start()
 	Gui.addEventListener("creditsBtnBack", "click", onBtnBack)
 	Gui.setAttribute("fld_player_name", "value", "Guest");
 
-	self:showMenu("menu_main")
-
 end
 
 function MainMenu:show()
 	Gui.showDocument( self.id )
+	self:showMenu("menu_main")
 end
 
 function MainMenu:hide()
@@ -196,5 +186,4 @@ function MainMenu:showMenu(newMenu)
 	end
 
 	Gui.removeClass( newMenu, "isHidden" )
-	print("setting to visible " .. newMenu)
 end

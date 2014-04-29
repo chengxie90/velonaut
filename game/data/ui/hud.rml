@@ -4,6 +4,7 @@
 		<link type="text/rcss" href="css/rkt.rcss"/>
 		<link type="text/rcss" href="css/layout.rcss"/>
 		<link type="text/rcss" href="css/hud.rcss"/>
+		<link type="text/rcss" href="css/btn.rcss"/>
 	</head>
 	<body>
 		<div class="wrp">
@@ -20,6 +21,13 @@
 			<div id="box_pickups" class="pickup">
 				<span id="lbl_current_pickup" class="caption">Pickup</span>
 				<span id="lbl_num_pickups" class="num_pickups">0</span>
+			</div>
+
+			<div id="game_over" class="wrp_gameover isHidden">
+				<div class="inner">
+					<h1 id="game_over_caption" class="caption">Game Over</h1>
+					<button id="gameoverBtnBack" class="btn btnBack">Back to Main Menu</button>
+				</div>
 			</div>
 
 		</div>

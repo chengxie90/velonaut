@@ -28,6 +28,8 @@ function Player:start()
 	self._projectileCounter = 0
 	self._projectileRange = 10000
 	self._projectileLife = 15
+	self._isActive = false
+
 end
 
 function Player:createPickups()
@@ -159,6 +161,7 @@ function Player:onCollision(collision)
     	checkpoint:destroy()
 		self:createNextCheckpoint()
 		App.scene():findObject("hud"):getComponent("Hud"):incrementCheckpoints()
+		--Network.RPC("setGameOver", "")
 	elseif collision.rigidbody:owner():getComponent("Pickup") ~= nil then
 		local pickup = collision.rigidbody:owner():getComponent("Pickup"):item()
 		if #self._inventory == 0 then
@@ -167,6 +170,8 @@ function Player:onCollision(collision)
 			self._inventory[1][2] = self._inventory[1][2] + pickup[2]
 		end
 		collision.rigidbody:owner():destroy()
+	elseif collision.rigidbody:owner():getComponent("FinishLine") ~= nil then
+		--Network.RPC("setPlayerFinished", "")
 	end
 end
 

@@ -55,7 +55,9 @@ private:
     NetworkServer* server_ = NULL;
     RakNet::RakPeerInterface *client_ = NULL;
     RakNet::SystemAddress serverAddress_;
-    RakNet::BitStream bsOut;
+    RakNet::BitStream bsOut_;
+    RakNet::BitStream bsIn_;
+
     std::map<std::string, std::vector<int> > listenerMap_;
     RakNet::RPC4 rpc_;
 

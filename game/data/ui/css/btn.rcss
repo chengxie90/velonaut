@@ -1,0 +1,26 @@
+.btn
+{
+	display: block;	
+	background-color: #AC050599;
+	font-family: DinPro;
+	font-size: 23px;
+	padding: 10px 10px;
+	margin: 15px 10px;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.btn .label {
+	display :block;
+	margin-top: 9px;
+}
+
+.btn:hover
+{
+	background-color: #AC0505FF;
+}
+
+.btn:active
+{
+	background-color: red;
+}
