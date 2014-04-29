@@ -78,6 +78,7 @@ private:
     
     struct Light {
         static int lcreate(lua_State *);
+        static int ldestroy(lua_State *);
         static int lsetType(lua_State *);
         static int lsetDiffuse(lua_State *); 
         static int lsetSpecular(lua_State *);

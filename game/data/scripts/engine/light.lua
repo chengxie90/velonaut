@@ -40,6 +40,7 @@ function Light:_detach()
     if self._handle then
         local trans = self:transform()
         gfxnode.detachObject(trans._handle, self._handle)
+        gfxlight.destroy(self._handle)
         self._handle = nil
     end
 end

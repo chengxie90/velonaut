@@ -114,6 +114,7 @@ void Graphics::initLua()
     LuaManager::GetInstance()->requiref("engine.graphics.light.c", [](lua_State* state) {
         luaL_Reg reg[] = {
             {"create", Graphics::Light::lcreate},
+            {"destroy", Graphics::Light::ldestroy},
             {"setType", Graphics::Light::lsetType},
             {"setPosition", Graphics::Light::lsetPosition},
             {"setDirection", Graphics::Light::lsetDirection},
@@ -332,6 +333,14 @@ int Graphics::Light::lcreate(lua_State *)
     Ogre::Light* light = Graphics::GetInstance()->scene_->createLight();
     LuaManager::GetInstance()->addParam((void *)light);
     return 1;
+}
+
+int Graphics::Light::ldestroy(lua_State *)
+{
+    Ogre::Light* light;
+    LuaManager::GetInstance()->extractParam((void **)&light);
+    
+    Graphics::GetInstance()->scene_->destroyLight(light);
 }
 
 int Graphics::Scene::lsetAmbientLight(lua_State *)
