@@ -34,6 +34,91 @@ function Tunnel:_init(object)
 	self._samplesPerPickup = 85
 	self._tunnelSeed = 7243897024 --TODO: set seed globally somewhere else
 
+end
+
+function Tunnel:start()
+
+end
+
+function Tunnel:update(dt)
+
+end
+
+function Tunnel:getClosestSamplePosition(position)
+	local minDist = math.huge
+	local minInd = 0	
+	for i = 1, #self._tunnel do
+		local newDist = (self._tunnel[i][1] - position):length()
+		if (newDist < minDist) then 
+			minDist = newDist
+			minInd = i
+		end
+	end
+	return {["position"] = self._tunnel[minInd][1], ["distance"] = minDist}
+end
+
+function Tunnel:tunnelRadius()
+	return self._tunnelRadius
+end
+
+function Tunnel:getSamplePosition(sampleIndex)
+	return self._tunnel[sampleIndex][1]
+end
+
+function Tunnel:getSampleTangent(sampleIndex)
+	return self._tunnel[sampleIndex][2]
+end
+
+function Tunnel:getSampleNormal(sampleIndex)
+	local rad = math.random(0,0.8*self._tunnelRadius)
+	return self._tunnel[sampleIndex][3]
+end
+
+function Tunnel:getNumSamples()
+	return #self._tunnel
+end
+
+function Tunnel:getCheckpointPosition(checkpointIndex)
+	return self._checkpoints[checkpointIndex][1]
+end
+
+function Tunnel:getCheckpointTangent(checkpointIndex)
+	return self._checkpoints[checkpointIndex][2]
+end
+
+function Tunnel:getCheckpointNormal(checkpointIndex)
+	return self._checkpoints[checkpointIndex][3]
+end
+
+function Tunnel:getNumCheckpoints()
+	return #self._checkpoints
+end
+
+function Tunnel:getPickupPosition(pickupIndex)
+	local center = self._pickups[pickupIndex][1]
+	local tangent = self._pickups[pickupIndex][2]
+	local normal = self._pickups[pickupIndex][3]
+	local rad = math.random(0,0.8*self._tunnelRadius)
+	local ang = math.random(0,2*math.pi)
+
+	return center + (normal * (math.cos(ang) * rad)) + 
+						((tangent:cross(normal):getNormalized()) * (math.sin(ang) * rad))
+
+end
+
+function Tunnel:getPickupTangent(pickupIndex)
+	return self._pickups[pickupIndex][2]
+end
+
+function Tunnel:getPickupNormal(pickupIndex)
+	return self._pickups[pickupIndex][3]
+end
+
+function Tunnel:getNumPickups()
+	return #self._pickups
+end
+
+function Tunnel:createTunnel()
 	-- Params
 	local minStartRadius = 500
 	local maxStartRadius = 550
@@ -149,87 +234,8 @@ function Tunnel:_init(object)
 		self._pickups[pickupIndex] = self._tunnel[pickupIndex*self._samplesPerPickup]
 		pickupIndex = pickupIndex + 1
 	end
-
 end
 
-function Tunnel:start()
-
-end
-
-function Tunnel:update(dt)
-
-end
-
-function Tunnel:getClosestSamplePosition(position)
-	local minDist = math.huge
-	local minInd = 0	
-	for i = 1, #self._tunnel do
-		local newDist = (self._tunnel[i][1] - position):length()
-		if (newDist < minDist) then 
-			minDist = newDist
-			minInd = i
-		end
-	end
-	return {["position"] = self._tunnel[minInd][1], ["distance"] = minDist}
-end
-
-function Tunnel:tunnelRadius()
-	return self._tunnelRadius
-end
-
-function Tunnel:getSamplePosition(sampleIndex)
-	return self._tunnel[sampleIndex][1]
-end
-
-function Tunnel:getSampleTangent(sampleIndex)
-	return self._tunnel[sampleIndex][2]
-end
-
-function Tunnel:getSampleNormal(sampleIndex)
-	local rad = math.random(0,0.8*self._tunnelRadius)
-	return self._tunnel[sampleIndex][3]
-end
-
-function Tunnel:getNumSamples()
-	return #self._tunnel
-end
-
-function Tunnel:getCheckpointPosition(checkpointIndex)
-	return self._checkpoints[checkpointIndex][1]
-end
-
-function Tunnel:getCheckpointTangent(checkpointIndex)
-	return self._checkpoints[checkpointIndex][2]
-end
-
-function Tunnel:getCheckpointNormal(checkpointIndex)
-	return self._checkpoints[checkpointIndex][3]
-end
-
-function Tunnel:getNumCheckpoints()
-	return #self._checkpoints
-end
-
-function Tunnel:getPickupPosition(pickupIndex)
-	local center = self._pickups[pickupIndex][1]
-	local tangent = self._pickups[pickupIndex][2]
-	local normal = self._pickups[pickupIndex][3]
-	local rad = math.random(0,0.8*self._tunnelRadius)
-	local ang = math.random(0,2*math.pi)
-
-	return center + (normal * (math.cos(ang) * rad)) + 
-						((tangent:cross(normal):getNormalized()) * (math.sin(ang) * rad))
-
-end
-
-function Tunnel:getPickupTangent(pickupIndex)
-	return self._pickups[pickupIndex][2]
-end
-
-function Tunnel:getPickupNormal(pickupIndex)
-	return self._pickups[pickupIndex][3]
-end
-
-function Tunnel:getNumPickups()
-	return #self._pickups
+function Tunnel:setSeed(seed)
+	self._tunnelSeed = seed 
 end

@@ -112,6 +112,53 @@ function Scene:load(data)
 end
 
 function Scene:start()
+    local function onGameMessageReceived(event)
+
+        if event.eventType == "playerUpdate" and event.playerId == self:getId() then        
+            self.RigidBody:clearForces()
+            
+            local curPosition = (Vector(event.position) - self.Transform:position()) / 0.03;
+
+--          self.RigidBody:setPosition(Vector(event.position))
+            self.RigidBody:setOrientation(Vector(event.orientation))
+            self.RigidBody:setLinearVelocity(curPosition)
+            self.RigidBody:setAngularVelocity(Vector(event.angularVelo))
+            self.RigidBody:applyCentralForce(Vector(event.force))
+            self.RigidBody:applyTorque(Vector(event.torque))
+            self._inTun = event.inTun
+
+            return
+        end
+
+        if event.eventType == "projectileUpdate" and event.playerId == self:getId() then
+            if self._activeProjectiles[event.projectileName] == nil and App.scene():findObject(event.projectileName) == nil then
+                local prefab = "projectile"
+
+                local obj = App:scene():createObject(event.projectileName)
+                local data = loadDataFile(prefab, "object")
+                obj:load(data)
+                obj:start()
+
+                local rigidbody = obj:getComponent("RigidBody")
+                local transform = obj:transform()
+                transform:setPosition(Vector(event.position))
+                rigidbody:setPosition(Vector(event.position))
+                rigidbody:setLinearVelocity(Vector(event.linearVelo))
+
+                self._activeProjectiles[event.projectileName] = obj
+            elseif self._activeProjectiles[event.projectileName] == nil and App.scene():findObject(event.projectileName) ~= nil then
+                return
+            else
+                local obj = self._activeProjectiles[event.projectileName]
+                local rigidbody = obj:getComponent("RigidBody")
+                local transform = obj:transform()
+                rigidbody:setLinearVelocity(Vector(event.linearVelo))
+            end
+        end
+    end
+
+    Network.addEventListener("gameinit", onGameInitReceived)
+
     assert(self._started == false)
     for k, v in pairs(self._objects) do
         v:start()
