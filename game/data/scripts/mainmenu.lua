@@ -19,6 +19,8 @@ function MainMenu:start()
 		if event.eventType == "welcome" then
 			print( "Welcome, you been assigned ID " .. event.id )
 			App.playerId = event.id
+			Network.RPC("setPlayerName", Gui.getAttribute("fld_player_name", "value"))
+			if self.isServer then Network.RPC("setNumPlayers", Gui.getAttribute("fld_min_num_players", "value")) end
 			return
 		end	
 
@@ -33,10 +35,12 @@ function MainMenu:start()
 				list = list .. "<li class='listitem'>" .. player.name .. "</li>"
 			end
 
-			local minPlayers = tonumber(Gui.getAttribute("fld_min_num_players", "value"))
+			local minPlayers = tonumber(event.minPlayers)
 			local numPlayers = #App.players
+
 			Gui.setText("lbl_current_players", "Current Players (" .. numPlayers .. "/" .. minPlayers .. ")");
 			Gui.setText("lst_players", list);
+
 			return
 		end
 
@@ -58,8 +62,7 @@ function MainMenu:start()
 	end
 
 	local function onConnectedToServer()
-		Network.RPC("setPlayerName", Gui.getAttribute("fld_player_name", "value"))
-		if self.isServer then Network.RPC("setNumPlayers", Gui.getAttribute("fld_min_num_players", "value")) end
+		print("client connected")
 	end
 
 	local function onConnectionFailed()
@@ -90,10 +93,13 @@ function MainMenu:start()
 	end
 
 	local function onBtnJoinRace()
+		self:showMenu("menu_join_race")	
+
 		self.isServer = false
-		local serverAdress = Gui.getAttribute("fld_server_address","value");
+
+		local serverAdress = Gui.getAttribute("fld_server_address","value")
 		local serverPort = tonumber(Gui.getAttribute("fld_server_port","value"))
-		
+
 		Network.startClient()
 
 		if Gui.hasClass("chb_finder_server","checked") then
@@ -101,8 +107,9 @@ function MainMenu:start()
 		else
 			Network.connectToServer(serverAdress, serverPort)
 		end
+		print("join race")
+	
 
-		self:showMenu("menu_join_race")		
 	end
 
 	local function onBtnHostRace()
@@ -153,15 +160,14 @@ function MainMenu:start()
 	Network.addEventListener("connected_to_server", onConnectedToServer)
 	Network.addEventListener("disconnect", onDisconnect)
 
+
 	Gui.loadFont("./data/ui/font/DINPro-Black.ttf")
 	Gui.loadFont("./data/ui/font/DINPro-Bold.ttf")
 	Gui.loadFont("./data/ui/font/DINMedium.ttf")
 
 	self.id = Gui.loadDocument("./data/ui/mainmenu.rml")
-	print("showing menu document no " .. self.id)
 	self:show()
 
-	Gui.removeClass("menu_join_race", "isHidden")
 	Gui.addEventListener("btn_join_race", "click", onBtnJoinRace)
 	Gui.addEventListener("btn_host_race", "click", onBtnHostRace)
 	Gui.addEventListener("btn_settings", "click", onBtnSettings)
@@ -172,7 +178,6 @@ function MainMenu:start()
 	Gui.addEventListener("hostraceBtnBack", "click", onBtnBack)
 	Gui.addEventListener("settingsBtnBack", "click", onSettingsBtnBack)
 	Gui.addEventListener("creditsBtnBack", "click", onBtnBack)
-
 	Gui.setAttribute("fld_player_name", "value", "Guest");
 
 	self:showMenu("menu_main")
@@ -195,4 +200,5 @@ function MainMenu:showMenu(newMenu)
 	end
 
 	Gui.removeClass( newMenu, "isHidden" )
+	print("setting to visible " .. newMenu)
 end

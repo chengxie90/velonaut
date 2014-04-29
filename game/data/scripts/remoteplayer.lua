@@ -12,6 +12,7 @@ function RemotePlayer:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
 	self._activeProjectiles = {}
+	self._projectileRange = 10000
 	
 	local function onGameMessageReceived(event)
 
@@ -31,7 +32,8 @@ function RemotePlayer:start()
 		end
 
 		if event.eventType == "projectileUpdate" and event.playerId == self:getId() then
-			if self._activeProjectiles[event.projectileName] == nil then
+			if self._activeProjectiles[event.projectileName] == nil and App.scene():findObject(event.projectileName) == nil then
+				print("REMOTE PLAYER " .. self:owner():name() .. " CREATE PROJECTILE ".. event.projectileName)
 				local prefab = "projectile"
 
 				local obj = App:scene():createObject(event.projectileName)
@@ -51,7 +53,10 @@ function RemotePlayer:start()
 				rigidbody:applyTorque(Vector(event.torque))
 
 				self._activeProjectiles[event.projectileName] = obj
+			elseif self._activeProjectiles[event.projectileName] == nil and App.scene():findObject(event.projectileName) ~= nil then
+				return
 			else
+				print("REMOTE PLAYER " .. self:owner():name() .. " UPDATE PROJECTILE ".. event.projectileName)
 				local obj = self._activeProjectiles[event.projectileName]
 				local rigidbody = obj:getComponent("RigidBody")
 				local transform = obj:transform()
@@ -77,8 +82,19 @@ function RemotePlayer:getId()
 end
 
 function RemotePlayer:update(dt)
-	
-	
-
+	local remove = {}
+	for k, v in pairs(self._activeProjectiles) do
+		if (v:transform():position() - self:owner():transform():position()):length() > self._projectileRange then
+			self._activeProjectiles[k] = nil
+			v:destroy()
+		end
+    end
 end
 
+function RemotePlayer:destroyProjectile(name)
+	local obj = App.scene():findObject(name)
+	if self._activeProjectiles[name] ~= nil then
+		self._activeProjectiles[name] = nil
+		obj:destroy()
+	end
+end

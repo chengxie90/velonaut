@@ -26,7 +26,7 @@ function Tunnel:_init(object)
 	self._tunnel = {} -- Each row of table is a table with 3 vectors: position, tangent, normal
 	self._checkpoints = {} -- For convenience. Each row of table is a table with 3 vectors: position, tangent, normal
 	self._pickups = {}
-	self._numCurves = 3
+	self._numCurves = 6
 	self._tunnelRadius = 100
 	self._ringsPerCurve = 80
 	self._samplesPerRing = 30

@@ -11,6 +11,7 @@ function Scene:_init(data)
     self._started = false
     self._remotePlayers = {}
 	
+    self._deleteCache = {}
 end
 
 function Scene:loadPlayers(players, playerId)
@@ -118,6 +119,12 @@ function Scene:start()
 end
 
 function Scene:update(dt)
+    local removed = {}
+    for i = 1, #self._deleteCache do
+        table.insert(removed, i)
+        self:destroyObject(self._deleteCache[i])
+    end
+    for i = 1, #removed do table.remove(self._deleteCache, removed[i]) end
     for k, v in pairs(self._objects) do
         v:update(dt)
     end
@@ -151,4 +158,8 @@ function Scene:destroyObject(name)
     assert(obj)
     obj:onDestroy()
     self._objects[name] = nil
+end
+
+function Scene:addToDeleteCache(name)
+    table.insert(self._deleteCache, name)
 end

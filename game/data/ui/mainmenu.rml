@@ -92,8 +92,9 @@
 						<button id="creditsBtnBack" class="btn btnBack">Main Menu</button>
 					</div>
 				</div>
+
 			</div>
+			
 		</div>
-		<div id="test" class="test" />
 	</body>
 </rml>

@@ -9,7 +9,7 @@ return
 		{
             type = "MeshRenderer",
             mesh = "cube",
-            material = "orb"
+            material = "pickup"
         },
 		{
             type = "RigidBody",

@@ -24,6 +24,7 @@ function Player:start()
 	self._boostFuel = 0
 
 	self._activeProjectiles = {}
+	self._projectileSpeed = 1200
 	self._projectileCounter = 0
 	self._projectileRange = 10000
 	self._projectileLife = 15
@@ -62,7 +63,7 @@ function Player:createNextCheckpoint()
 		local startTan = tun:getCheckpointTangent(self._nextCheckpoint):getNormalized()
 
 		local angle = Vector(0,0,-1):angleBetween(startTan)
-		local axis = Vector(0,0,-1):cross(startTan)
+		local axis = (Vector(0,0,-1):cross(startTan)):getNormalized()
 		local startOri = Vector(0, 0, 0, 0)
 		startOri:makeQuaternionFromAngleAxis(angle, axis)
 
@@ -85,7 +86,7 @@ function Player:createNextCheckpoint()
 		local startTan = tun:getCheckpointTangent(1):getNormalized()
 
 		local angle = Vector(0,0,-1):angleBetween(startTan)
-		local axis = Vector(0,0,-1):cross(startTan)
+		local axis = (Vector(0,0,-1):cross(startTan)):getNormalized()
 		local startOri = Vector(0, 0, 0, 0)
 		startOri:makeQuaternionFromAngleAxis(angle, axis)
 
@@ -117,13 +118,11 @@ function Player:update(dt)
 	local linScale = 800
 	
 	local inTun = true
-	--[[
 	local tun = App.scene():findObject("tunnel"):getComponent("Tunnel")
 	local tunnelDist = tun:getClosestSamplePosition(self.Transform:position())
 	if tunnelDist.distance > (tun:tunnelRadius() * 1.1) then 
 		inTun = false
 	end
-	--]]
 
 	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
 	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
@@ -131,7 +130,10 @@ function Player:update(dt)
 	if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
 	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
 	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
-	if Input.getKey("key_space") and inTun then self.RigidBody:applyCentralForce(look * linScale) end
+	if Input.getKey("key_space") then 
+		if inTun then self.RigidBody:applyCentralForce(look * linScale) 
+		else self.RigidBody:applyCentralForce(look * linScale * 0.5) end
+	end
 	if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
 		self:useItem(self._inventory[1][1])
 		self._inventory[1][2] = self._inventory[1][2] - 1
@@ -219,8 +221,15 @@ function Player:updateItems()
 				end
 
 				if target ~= 0 then
-					local force = remotePlayers[target]:transform():position() - pos
-					v[1]:getComponent("RigidBody"):applyCentralForce(force:getNormalized() * 10000)
+					if ((self._projectileLife - v[2])/self._projectileLife) < 0.5 then
+						local tar = (remotePlayers[target]:transform():position() - pos):getNormalized()
+						local vel = (v[1]:getComponent("RigidBody"):linearVelocity()):getNormalized()
+						local ratio = ((self._projectileLife - v[2])/self._projectileLife) * 0.8
+						tar = tar * ((1-ratio) + 0.2)
+						vel = vel * ratio
+						local newVel = ((tar + vel)/2):getNormalized() * self._projectileSpeed 
+						v[1]:getComponent("RigidBody"):setLinearVelocity(newVel)
+					end
 				end
 			end
 
@@ -263,13 +272,13 @@ function Player:useItem(item)
 
 	if item == "projectile" then
 
-		print("PEW!")
 		local rigidbody = self:owner():getComponent("RigidBody")
 		local transform = self:owner():getComponent("Transform")
 		local look = transform:orientation():applyRotationTo(Vector(0,0,-1)):getNormalized()
 
 		self._projectileCounter = self._projectileCounter + 1
 		local name = "projectile_"..self:owner():name().."_".. self._projectileCounter
+		print("LOCAL PLAYER " .. self:owner():name() .. " CREATE PROJECTILE ".. name)
 		local prefab = "projectile"
 
 		local obj = App:scene():createObject(name)
@@ -277,12 +286,22 @@ function Player:useItem(item)
 		obj:load(data)
 		obj:start()
 
-		local startPos = rigidbody:position() + (look * 10)
+		obj:getComponent("RigidBody"):setTrigger(true)
+		local startPos = rigidbody:position() + (look * 30)
 		obj:transform():setPosition(startPos)
 		obj:getComponent("RigidBody"):setPosition(startPos)
-		obj:getComponent("RigidBody"):setLinearVelocity(look * 1600)
+		obj:getComponent("RigidBody"):setLinearVelocity(look * self._projectileSpeed)
+		obj:getComponent("Projectile"):setSender(self:owner():name())
 
 		self._activeProjectiles[name] = {obj, self._projectileLife}
 	end
 
+end
+
+function Player:destroyProjectile(name)
+	local obj = App.scene():findObject(name)
+	if self._activeProjectiles[name] ~= nil then
+		self._activeProjectiles[name] = nil
+		obj:destroy()
+	end
 end
