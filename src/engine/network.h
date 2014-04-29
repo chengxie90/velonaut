@@ -57,6 +57,7 @@ private:
     RakNet::SystemAddress serverAddress_;
     RakNet::BitStream bsOut_;
     RakNet::BitStream bsIn_;
+    RakNet::StringCompressor compressor_;
 
     std::map<std::string, std::vector<int> > listenerMap_;
     RakNet::RPC4 rpc_;

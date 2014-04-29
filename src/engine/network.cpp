@@ -147,15 +147,13 @@ void Network::findServer(int port) {
 void Network::sendMessage(string msg) {
     bsOut_.Reset();
     bsOut_.Write((MessageID)GAME_MESSAGE);
-    StringCompressor compressor;
-    compressor.EncodeString(msg.c_str(), msg.size()+1, &bsOut_);
+    compressor_.EncodeString(msg.c_str(), msg.size()+1, &bsOut_);
     client_->Send(&bsOut_,HIGH_PRIORITY,UNRELIABLE_SEQUENCED,0, serverAddress_,false);
 }
 
 void Network::rpc(string req, string params) {
     bsOut_.Reset();
-    StringCompressor compressor;
-    compressor.EncodeString(params.c_str(), params.size()+1, &bsOut_);
+    compressor_.EncodeString(params.c_str(), params.size()+1, &bsOut_);
     rpc_.Call(req.c_str(), &bsOut_, HIGH_PRIORITY,RELIABLE_ORDERED, 0, serverAddress_,false);
 }
 
@@ -192,12 +190,10 @@ void Network::onDisconnect(Packet *packet) {
 }
 
 void Network::onGameMessageReceived(Packet *packet) {
-    static StringCompressor compressor;
-
     RakString rs;
     BitStream bsIn(packet->data,packet->length,false);
     bsIn.IgnoreBytes(sizeof(MessageID));
-    compressor.DecodeString(&rs, 1000, &bsIn);
+    compressor_.DecodeString(&rs, 1000, &bsIn);
     fireEvent("game_message", string(rs.C_String()));
 }
 

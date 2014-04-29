@@ -158,11 +158,10 @@ void NetworkServer::onGameMessageReceived(Packet *packet)
 
 void NetworkServer::readString(BitStream *bsIn, RakString &str, bool ignoreMsgType)
 {
-    static StringCompressor compressor;
     if (ignoreMsgType)
         bsIn->IgnoreBytes(sizeof(MessageID));
 
-    compressor.DecodeString(&str, 1000, bsIn);
+    compressor_.DecodeString(&str, 1000, bsIn);
 }
 
 void NetworkServer::writeMessage(GameMessages msgType, RakString msg)
@@ -174,8 +173,7 @@ void NetworkServer::writeMessage(GameMessages msgType, RakString msg)
 
 void NetworkServer::writeString(RakString msg)
 {
-    static StringCompressor compressor;
-    compressor.EncodeString(&msg, msg.GetLength()+1, &bitSteamOut_ );
+    compressor_.EncodeString(&msg, msg.GetLength()+1, &bitSteamOut_ );
 }
 
 void NetworkServer::sendToAllExcept(BitStream *stream, RakNetGUID except, PacketReliability reliability)

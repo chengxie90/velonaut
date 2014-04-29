@@ -37,11 +37,15 @@ function Player:start()
 
 		if event.eventType == "gamestart" then	
 			if not self._active then self._active = true end
-		end		
+		end	
+
+		if event.eventType == "gameover" then
+			self._active = false
+		end
 	end
 
 	Network.addEventListener("game_message", onGameMessageReceived)
-	
+
 end
 
 function Player:createPickups()
@@ -121,6 +125,10 @@ end
 
 function Player:update(dt)
 
+	if not self._active then
+		return
+	end
+
 	--local cammantrans = App.scene():findObject("cameraman"):getComponent("Transform")
 	--local thrust = self:transform():localZ() * -1
 	local look = self:transform():localZ() * -1
@@ -184,7 +192,7 @@ function Player:onCollision(collision)
     	checkpoint:destroy()
 		self:createNextCheckpoint()
 		App.scene():findObject("hud"):getComponent("Hud"):incrementCheckpoints()
-		--Network.RPC("setGameOver", "")
+
 	elseif collision.rigidbody:owner():getComponent("Pickup") ~= nil then
 		local pickup = collision.rigidbody:owner():getComponent("Pickup"):item()
 		if #self._inventory == 0 then
@@ -194,7 +202,7 @@ function Player:onCollision(collision)
 		end
 		collision.rigidbody:owner():destroy()
 	elseif collision.rigidbody:owner():getComponent("FinishLine") ~= nil then
-		--Network.RPC("setPlayerFinished", "")
+		Network.RPC("setGameOver", "")
 	end
 end
 
