@@ -38,6 +38,10 @@ return
         },
         {
             type = "Ship"
-        }
+        },
+        -- {
+        --     type = "ParticleRenderer",
+        --     particleSystem = "trail"
+        -- }
     }
 }
