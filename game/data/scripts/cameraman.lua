@@ -12,7 +12,7 @@ CameraMan = class(Behavior)
 function CameraMan:start()
     self.RigidBody = self:getComponent("RigidBody")
     self.Transform = self:getComponent("Transform")
-    self._stopDist = 35
+    self._stopDist = 90
 end
 
 function CameraMan:update()

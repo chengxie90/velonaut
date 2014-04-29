@@ -1,9 +1,0 @@
-return 
-{
-    components = {
-        {
-            type = "Transform",
-            position = Vector(0, 0, 0),
-        },
-    }
-}

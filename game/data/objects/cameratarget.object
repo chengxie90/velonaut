@@ -3,7 +3,7 @@ return
     components = {
         {
             type = "Transform",
-            position = Vector(0, 10, 0),
+            position = Vector(0, 20, 0),
         },
     }
 }
