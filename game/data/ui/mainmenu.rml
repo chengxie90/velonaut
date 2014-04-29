@@ -44,7 +44,7 @@
 								<span class="status">Waiting for players to join...</span>
 							</div>
 						</div>
-						<button id="hostraceBtnBack" class="btn btnBack">Main Menu</button>
+						<button id="hostraceBtnBack" class="btn btnBack">Exit</button>
 					</div>
 				</div>
 

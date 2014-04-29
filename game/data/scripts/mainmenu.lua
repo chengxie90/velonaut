@@ -90,6 +90,10 @@ function MainMenu:start()
 		self:showMenu("menu_main")
 	end
 
+	local function onLobbyBtnBack()
+		os.exit(0)
+	end
+
 	local function onBtnJoinRace()
 		self:showMenu("menu_join_race")	
 
@@ -172,7 +176,7 @@ function MainMenu:start()
 	Gui.addEventListener("btn_quit", "click", onBtnQuit)
 	Gui.addEventListener("chb_invert_controls", "click", onCheckboxInvertControls)
 	Gui.addEventListener("chb_finder_server", "click", onCheckboxFindServer)	
-	Gui.addEventListener("hostraceBtnBack", "click", onBtnBack)
+	Gui.addEventListener("hostraceBtnBack", "click", onLobbyBtnBack)
 	Gui.addEventListener("settingsBtnBack", "click", onSettingsBtnBack)
 	Gui.addEventListener("creditsBtnBack", "click", onBtnBack)
 	Gui.setAttribute("fld_player_name", "value", "Guest");
