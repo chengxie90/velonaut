@@ -49,8 +49,8 @@ function CameraMan:update()
 end
 
 function CameraMan:initializePosition()
-    self.RigidBody:setPosition((Vector(0,0,1) * self._stopDist) + Vector(0, 10, 0))
-    self.Transform:setPosition((Vector(0,0,1) * self._stopDist) + Vector(0, 10, 0))
+    self.RigidBody:setPosition((Vector(0,0,1) * self._stopDist) + Vector(0, 100, 0))
+    self.Transform:setPosition((Vector(0,0,1) * self._stopDist) + Vector(0, 100, 0))
 end
 
 function CameraMan:stopDistance()

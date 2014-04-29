@@ -26,12 +26,12 @@ function Tunnel:_init(object)
 	self._tunnel = {} -- Each row of table is a table with 3 vectors: position, tangent, normal
 	self._checkpoints = {} -- For convenience. Each row of table is a table with 3 vectors: position, tangent, normal
 	self._pickups = {}
-	self._numCurves = 6
+	self._numCurves = 5
 	self._tunnelRadius = 100
-	self._ringsPerCurve = 80
+	self._ringsPerCurve = 110
 	self._samplesPerRing = 30
-	self._samplesPerCheckpoint = 10
-	self._samplesPerPickup = 65
+	self._samplesPerCheckpoint = 14
+	self._samplesPerPickup = 85
 	self._tunnelSeed = 7243897024 --TODO: set seed globally somewhere else
 
 	-- Params
