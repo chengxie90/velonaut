@@ -13,6 +13,8 @@ function Player:start()
 	self.RigidBody = self:getComponent("RigidBody")
 	self.Transform = self:getComponent("Transform")
 
+	self._active = false
+
 	-- Create first checkpoint 
 	self._nextCheckpoint = 1
 	self._inventory = {}
@@ -28,6 +30,21 @@ function Player:start()
 	self._projectileCounter = 0
 	self._projectileRange = 10000
 	self._projectileLife = 15
+
+	local forcefield = App.scene():createObject("forcefield")
+    local forcefielddata = loadDataFile("forcefield", "object")
+    forcefield:load(forcefielddata)
+    forcefield:start()
+    forcefield:transform():setParent(self:owner():transform())
+
+	local function onGameMessageReceived(event)
+
+		if event.eventType == "gamestart" then	
+			if not self._active then self._active = true end
+		end		
+	end
+
+	Network.addEventListener("game_message", onGameMessageReceived)
 end
 
 function Player:createPickups()
@@ -124,20 +141,22 @@ function Player:update(dt)
 		inTun = false
 	end
 
-	if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
-	if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
-	if Input.getKey("key_left") then self.RigidBody:applyTorque(up * rotScale) end
-	if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
-	if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
-	if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
-	if Input.getKey("key_space") then 
-		if inTun then self.RigidBody:applyCentralForce(look * linScale) 
-		else self.RigidBody:applyCentralForce(look * linScale * 0.5) end
-	end
-	if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
-		self:useItem(self._inventory[1][1])
-		self._inventory[1][2] = self._inventory[1][2] - 1
-		if (self._inventory[1][2] < 1) then self._inventory = {} end
+	if self._active then
+		if Input.getKey("key_up") then self.RigidBody:applyTorque(right * -rotScale) end
+		if Input.getKey("key_down") then self.RigidBody:applyTorque(right * rotScale) end
+		if Input.getKey("key_left") then self.RigidBody:applyTorque(up * rotScale) end
+		if Input.getKey("key_right") then self.RigidBody:applyTorque(up * -rotScale) end
+		if Input.getKey("key_a") then self.RigidBody:applyTorque(look * -rotScale) end
+		if Input.getKey("key_d") then self.RigidBody:applyTorque(look * rotScale) end
+		if Input.getKey("key_space") then 
+			if inTun then self.RigidBody:applyCentralForce(look * linScale) 
+			else self.RigidBody:applyCentralForce(look * linScale * 0.5) end
+		end
+		if Input.getKeyDown("key_lshift") and #self._inventory > 0 then
+			self:useItem(self._inventory[1][1])
+			self._inventory[1][2] = self._inventory[1][2] - 1
+			if (self._inventory[1][2] < 1) then self._inventory = {} end
+		end
 	end
 
 	self:updateItems()
@@ -221,11 +240,11 @@ function Player:updateItems()
 				end
 
 				if target ~= 0 then
-					if ((self._projectileLife - v[2])/self._projectileLife) < 0.5 then
+					if v[2] / self._projectileLife < 0.5 then
 						local tar = (remotePlayers[target]:transform():position() - pos):getNormalized()
 						local vel = (v[1]:getComponent("RigidBody"):linearVelocity()):getNormalized()
-						local ratio = ((self._projectileLife - v[2])/self._projectileLife) * 0.8
-						tar = tar * ((1-ratio) + 0.2)
+						local ratio = v[2] / self._projectileLife
+						tar = tar * (1-ratio)
 						vel = vel * ratio
 						local newVel = ((tar + vel)/2):getNormalized() * self._projectileSpeed 
 						v[1]:getComponent("RigidBody"):setLinearVelocity(newVel)
