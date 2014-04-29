@@ -109,7 +109,6 @@ int Ui::lRemoveClass(lua_State *state) {
 
     LuaManager::GetInstance()->extractParam(&id);
     LuaManager::GetInstance()->extractParam(&text);
-
     Ui::GetInstance()->doc_->GetElementById(id.c_str())->SetClass(text.c_str(), false);
 }
 

@@ -27,4 +27,3 @@ function Projectile:onCollision(collision)
 		end
 	end
 end
-

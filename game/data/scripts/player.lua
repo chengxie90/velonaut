@@ -171,7 +171,10 @@ function Player:update(dt)
 	else
 		mr:setMaterial(Material("forcefieldred"))
 	end
-		
+	
+	if Input.getKeyDown("key_f") then
+		self:useItem("projectile") 
+	end
 
 	self:updateItems()
 	
