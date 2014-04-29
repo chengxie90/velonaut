@@ -11,11 +11,15 @@ function Hud:start()
 	self.id = Gui.loadDocument("./data/ui/hud.rml")
 
 	self._numCheckpoints = 0;
+	self._goCounter = 0;
+	self._isShown = false;
 	
 end
 
 
 function Hud:show()	
+
+	self._isShown = true
 
 	local function onGameMessageReceived(event)
 
@@ -25,7 +29,7 @@ function Hud:show()
 		end
 
 		if event.eventType == "gamestart" then
-			Gui.setText("txt_status", "");
+			Gui.setText("txt_status", "Go!");
 			return
 		end
 
@@ -58,6 +62,20 @@ function Hud:show()
 	Gui.addEventListener("gameoverBtnBack", "click", onBtnBack)
 	self:setNoPickup()
 
+end
+
+function Hud:update()
+
+	if not self._isShown then
+		return
+	end
+
+	if  self._goCounter > 280 then
+		Gui.setText("txt_status", "");
+		self._isShown = false
+	else
+		self._goCounter = self._goCounter + 1
+	end
 end
 
 
