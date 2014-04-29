@@ -21,7 +21,7 @@ function Player:start()
 	self:createNextCheckpoint()
 	self:createPickups()
 
-	self._boostSpeed = 1100
+	self._boostSpeed = 900
 	self._boostCapacity = 5
 	self._boostFuel = 0
 
@@ -29,7 +29,7 @@ function Player:start()
 	self._projectileSpeed = 1200
 	self._projectileCounter = 0
 	self._projectileRange = 10000
-	self._projectileLife = 15
+	self._projectileLife = 30
 
 	self._inTun = true
 
@@ -258,7 +258,7 @@ function Player:updateItems()
 				end
 
 				if target ~= 0 then
-					if v[2] / self._projectileLife < 0.5 then
+					if v[2] / self._projectileLife < 0.85 then
 						local tar = (remotePlayers[target]:transform():position() - pos):getNormalized()
 						local vel = (v[1]:getComponent("RigidBody"):linearVelocity()):getNormalized()
 						local ratio = v[2] / self._projectileLife
