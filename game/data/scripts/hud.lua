@@ -35,8 +35,6 @@ function Hud:show()
 
 		if event.eventType == "gameover" then
 
-			print(App.scene():player():getComponent("Player"):getId() .. " vs."  .. event.winnerId)
-
 			if App.scene():player():getComponent("Player"):getId() == event.winnerId then
 				Gui.setText("game_over_caption", "You win!")
 			else
