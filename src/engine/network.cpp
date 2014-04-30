@@ -158,12 +158,10 @@ void Network::rpc(string req, string params) {
 }
 
 void Network::onServerPong(Packet *packet) {
-    //std::cout << "onServerPong" << std::endl;
     RakNet::TimeMS time;
     RakNet::BitStream bsIn(packet->data,packet->length,false);
     bsIn.IgnoreBytes(1);
     bsIn.Read(time);
-    //cout << "Got pong from " << packet->systemAddress.ToString() << std::endl;
 
     string ipaddress = string(packet->systemAddress.ToString());
     ipaddress = ipaddress.substr(0, ipaddress.find("|"));
@@ -233,7 +231,6 @@ void Network::poll() {
               onConnectionFailed(packet);
               break;
             case ID_NO_FREE_INCOMING_CONNECTIONS:
-                //std::cout << "NO FREE CONNECTIONS!" << std::endl;
                 break;
             case ID_DISCONNECTION_NOTIFICATION:
             case ID_CONNECTION_LOST:

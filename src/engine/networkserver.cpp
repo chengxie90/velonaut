@@ -128,7 +128,10 @@ void NetworkServer::setMaxIncomingConnections(int numCon)
 
 void NetworkServer::onClientConnect(Packet* packet)
 {
+<<<<<<< HEAD
     //std::cout << "onClientConnect" << std::endl;
+=======
+>>>>>>> bf1e2d33c0a31875883e025e96f8affe9b6d88e6
     clients_.push_back(packet->guid);
 
     writeMessage(GAME_MESSAGE, createWelcomeEvent(packet->guid));
@@ -142,13 +145,19 @@ void NetworkServer::onClientAlreadyConnected(Packet *packet)
 
 void NetworkServer::onClientDisconnect(Packet *packet)
 {
+<<<<<<< HEAD
     //cout << "onClientDisconnect" << endl;
+=======
+>>>>>>> bf1e2d33c0a31875883e025e96f8affe9b6d88e6
     players_.erase(packet->guid);
 }
 
 void NetworkServer::onClientConnectionLost(Packet *packet)
 {
+<<<<<<< HEAD
     //cout << "onClientConnectionLost" << endl;
+=======
+>>>>>>> bf1e2d33c0a31875883e025e96f8affe9b6d88e6
     players_.erase(packet->guid);
 }
 

@@ -8,7 +8,7 @@
 
 .wrp_menu .inner {
 	position: relative;	
-	background-color: #000000CC;
+	background-color: #FFFFFF11;
 	padding: 20px 20px;
 	width: 100%;
 	height: 100%;
