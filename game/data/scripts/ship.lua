@@ -22,7 +22,6 @@ function Ship:onCollision(collision)
     if collision.rigidbody:owner():getComponent("Projectile") then
         counter = counter + 1
         local name = "exp".."_".. counter
-	print(name)
         local obj = App.scene():createObject(name);
         local data = loadDataFile("explode", "object")
         obj:load(data)

@@ -600,7 +600,6 @@ int Graphics::Light::lsetType(lua_State *)
     assert(light);
     string type;
     LuaManager::GetInstance()->extractParam(&type);
-    cout << type << endl;
     if (type == "pointlight") {
         light->setType(Ogre::Light::LT_POINT);
     }

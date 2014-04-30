@@ -4,7 +4,6 @@ local Network = require "engine.network.c"
 Hud = class(Behavior)
 
 function Hud:start()
-	print("HUD start")
 	Gui.loadFont("./data/ui/font/DINPro-Black.ttf")
 	Gui.loadFont("./data/ui/font/DINPro-Bold.ttf")
 	Gui.loadFont("./data/ui/font/DINMedium.ttf")
@@ -34,8 +33,6 @@ function Hud:show()
 		end
 
 		if event.eventType == "gameover" then
-
-			print(App.scene():player():getComponent("Player"):getId() .. " vs."  .. event.winnerId)
 
 			if App.scene():player():getComponent("Player"):getId() == event.winnerId then
 				Gui.setText("game_over_caption", "You win!")

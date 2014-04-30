@@ -21,6 +21,5 @@ function Pickup:item()
 	math.randomseed(os.time())
 	local index = math.ceil(math.random(#self._items))
 	local item = self._items[index]
-	print(item[1]) print(item[2])
 	return self._items[math.ceil(math.random(#self._items))]
 end

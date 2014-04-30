@@ -198,7 +198,6 @@ function Scene:setMainCamera(cam)
 end
 
 function Scene:createObject(name)
-	print(name)
     assert(self._objects[name] == nil)
     local obj = Object(name)
     self._objects[name] = obj

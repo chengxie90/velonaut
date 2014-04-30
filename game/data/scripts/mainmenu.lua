@@ -15,7 +15,7 @@ function MainMenu:start()
 
 	local function onGameMessageReceived(event)
 		if event.eventType == "welcome" then
-			print( "Welcome, you have been assigned ID " .. event.id )
+			--print( "Welcome, you have been assigned ID " .. event.id )
 			App.playerId = event.id
 			Network.RPC("setPlayerName", Gui.getAttribute("fld_player_name", "value"))
 			if self.isServer then
@@ -46,7 +46,7 @@ function MainMenu:start()
 
 		if event.eventType == "gameinit" then
 			if App.players then
-				print( "SEED: " .. event.seed )
+				--print( "SEED: " .. event.seed )
 				local tunnel = App.scene():findObject("tunnel"):getComponent("Tunnel")
 				tunnel:setSeed(event.seed)
 				tunnel:createTunnel()
@@ -60,19 +60,19 @@ function MainMenu:start()
 	end
 
 	local function onConnectedToServer()
-		print("client connected.")
+		--print("client connected.")
 	end
 
 	local function onConnectionFailed()
-		print("connection failed.")
+		--print("connection failed.")
 	end
 
 	local function onDisconnect()
-		print("client disconnected.")
+		--print("client disconnected.")
 	end
 
 	local function onServerFound( serverip )
-		print("Found server at " .. serverip)
+		--print("Found server at " .. serverip)
 		Network.connectToServer(serverip, tonumber(Gui.getAttribute("fld_server_port","value")))	
 	end
 

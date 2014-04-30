@@ -299,7 +299,6 @@ end
 function Player:useItem(item)
 
 	if item == "boost" then
-		print("BOOOOST!")
 		self._boostFuel = self._boostCapacity
 	end
 
